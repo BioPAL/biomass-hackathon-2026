@@ -31,8 +31,6 @@ biomass-hackathon-2026/
     ├── 06-biomass-validation/
     ├── 07-biomass-geology/
     ├── 08-biomass-cryosphere/
-    ├── 09-biomass-ocean/
-    ├── 10-biomass-ionosphere/
     ├── 11-biomass-biodiversity/
     └── 12-forest-height-tomosar/
 ```
