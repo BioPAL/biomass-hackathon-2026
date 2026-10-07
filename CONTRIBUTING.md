@@ -1,46 +1,58 @@
 # Contributing
 
-Thanks for contributing to the ESA Biomass MAAP Hackathon shared repository.
+Thanks for contributing to the ESA Biomass MAAP Hackathon shared repository. This guide is for hackathon participants, 12 to 16 October at ESOC.
 
 This is a hackathon repo, not the main BPS production codebase, so the process here is much lighter than BioPAL/BPS's own contributing guide. If you are also working on BPS itself, that repo has a more formal review process with an approval gate and CODEOWNERS routing. None of that applies here.
 
-## Before the hackathon, fill in your topic folder
+## How a contribution flows
 
-Every `topics/` folder already has a README with the goal, data sources and open actions, taken from the hackathon brief. If you are listed as a contact for a topic, please check your folder and fill in anything marked "still to source", "not assigned" or "TBD" before 12 October. You do not need Git for this:
+You do not have write access to this repository, so you will work from your own fork.
 
-1. Open your folder on github.com, for example `github.com/BioPAL/biomass-hackathon-2026/tree/main/topics/04-3d-forest-structure`
-2. Click `README.md`, then the pencil icon to edit
-3. Fill in or correct the content
-4. Scroll down, choose "Create a new branch and start a pull request", then click "Propose changes"
-5. On the pull request page that opens, click "Merge pull request"
+1. Fork the repository to your own GitHub account.
+2. Clone your fork, create a branch, find or create your topic folder under `topics/`.
+3. Commit, push to your fork.
+4. Open a pull request from your fork to `main` on `BioPAL/biomass-hackathon-2026`.
 
-No local setup needed. If step 5 is greyed out, or you are not sure about anything, ping Yoann and he will merge it for you.
-
-## How a contribution flows, during the hackathon
-
-1. Find or create your topic folder under `topics/`.
-2. Work on a branch, commit, push.
-3. Open a pull request targeting `main`.
-
-No approval gate, no mandatory reviewers. You can merge your own pull request as long as it only touches your topic folder. The one rule that is enforced is that `main` is protected, so everything has to go through a pull request.
+`main` is protected: every change goes through a pull request, and a maintainer reviews and merges it. Do not merge your own pull request.
 
 ## Getting set up with Git
 
-Clone the repo and create a branch:
+**1. Fork the repository**
+
+Open [github.com/BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026) and click "Fork" in the top right. This creates a copy under your own GitHub account.
+
+**2. Clone your fork**
 
 ```bash
-git clone https://github.com/BioPAL/biomass-hackathon-2026.git
+git clone https://github.com/YOUR-USERNAME/biomass-hackathon-2026.git
 cd biomass-hackathon-2026
+```
+
+Replace `YOUR-USERNAME` with your GitHub username.
+
+**3. Add the original repository as a remote**
+
+This lets you pull in changes made by others later.
+
+```bash
+git remote add upstream https://github.com/BioPAL/biomass-hackathon-2026.git
+```
+
+**4. Create a branch**
+
+```bash
 git checkout -b 04-3d-forest-structure/short-description
 ```
 
-Create your topic folder if it does not exist yet:
+**5. Create your topic folder if it does not exist yet**
 
 ```bash
 mkdir -p topics/04-3d-forest-structure
 ```
 
-Commit and push when ready:
+**6. Commit and push to your fork**
+
+`origin` points to your fork, not to `BioPAL/biomass-hackathon-2026`, so this push goes to your own copy.
 
 ```bash
 git add topics/04-3d-forest-structure/
@@ -48,7 +60,18 @@ git commit -m "Add first tomographic processing notebook"
 git push -u origin 04-3d-forest-structure/short-description
 ```
 
-Then open a pull request on GitHub.
+**7. Open a pull request**
+
+Go to your fork on github.com. GitHub shows a banner suggesting a pull request for your new branch, click it. Check that the base repository is `BioPAL/biomass-hackathon-2026` and the base branch is `main`, then create the pull request. A maintainer will review and merge it.
+
+**Keeping your fork up to date** (optional, useful if the hackathon runs for several days)
+
+```bash
+git fetch upstream
+git checkout main
+git merge upstream/main
+git push origin main
+```
 
 ## Issues or Discussions
 
@@ -71,4 +94,4 @@ Be respectful, welcome newcomers, keep feedback constructive, respect different 
 
 ## Getting help
 
-ACRI-ST is on site all week for Git and technical questions. Ask in person, or open a Help wanted issue. For anything not urgent, use Discussions.
+We are on site all week for Git and technical questions. Ask in person, or open a Help wanted issue. For anything not urgent, use Discussions.
