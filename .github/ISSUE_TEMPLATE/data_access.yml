@@ -16,6 +16,8 @@ body:
         - "06 - BIOMASS validation"
         - "07 - BIOMASS for Geology"
         - "08 - BIOMASS for Cryosphere"
+        - "09 - BIOMASS for Ocean"
+        - "10 - BIOMASS for Ionosphere"
         - "11 - BIOMASS for biodiversity"
         - "12 - Forest Height from TomoSAR"
     validations:

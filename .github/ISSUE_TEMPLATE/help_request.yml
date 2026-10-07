@@ -1,7 +1,7 @@
 name: "Help wanted (Git or technical)"
 description: Ask us for help. No question is too basic.
 title: "[Help] "
-labels: ["help-wanted"]
+labels: ["help wanted"]
 body:
   - type: dropdown
     id: topic
@@ -17,6 +17,8 @@ body:
         - "06 - BIOMASS validation"
         - "07 - BIOMASS for Geology"
         - "08 - BIOMASS for Cryosphere"
+        - "09 - BIOMASS for Ocean"
+        - "10 - BIOMASS for Ionosphere"
         - "11 - BIOMASS for biodiversity"
         - "12 - Forest Height from TomoSAR"
     validations:
