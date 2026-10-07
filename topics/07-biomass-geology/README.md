@@ -1,6 +1,25 @@
 # BIOMASS for Geology
 
-Add your notebooks, scripts and results here.
+## Goal
 
-See the task description and data sources for this topic in the hackathon
-brief (topic 07 in the main [README](../../README.md#hackathon-topics)).
+Implement a Jupyter notebook to extract Biomass images and suggest polarimetric parameters or stack based processing that can be used to identify paleoclimatological channels.
+
+## Extra challenge
+
+Determine the depth of the river channels.
+
+## Reference
+
+https://saharasar.astrophy.u-bordeaux.fr/saharaCesium.php (to confirm)
+
+## Actions
+
+Data and sites to be provided by Armando and Francesco.
+
+## Status
+
+Not started.
+
+## Contact
+
+Armando, Francesco

@@ -1,26 +1,27 @@
 # BIOMASS MAAP Hackathon 2026
 
-Shared workspace for the **ESA Biomass MAAP Hackathon** (12–16 October 2026, ESOC, Darmstadt) - project templates, notebooks and resources.
+Shared workspace for the **ESA Biomass MAAP Hackathon** (12 to 16 October 2026, ESOC, Darmstadt): project folders, notebooks and resources.
 
 ## About
 
 | | |
 |---|---|
 | **Event** | ESA Biomass MAAP Hackathon 2026 |
-| **Dates** | 12–16 October 2026 (5 days, in-person) |
+| **Dates** | 12 to 16 October 2026 (5 days, in person) |
 | **Location** | ESOC (European Space Operations Centre), Darmstadt, Germany |
-| **Format** | Hands-on coding · English · Python |
-| **Goal** | Evolve the BioPAL open-source processor suite ([BPS](https://github.com/BioPAL/BPS)) and the MAAP platform through collaborative coding |
-| **Git support** | ACRI-ST - Git workflows & Q&A, on-site all week |
+| **Format** | Hands on coding, English, Python |
+| **Goal** | Evolve the BioPAL open source processor suite ([BPS](https://github.com/BioPAL/BPS)) and the MAAP platform through collaborative coding |
+| **Git support** | ACRI-ST, Git workflows and Q&A, on site all week |
 
-This repository is the shared home for all hackathon project groups. Add a folder, bring your code, and don't hesitate to ask for help with Git - that's what we're here for.
+This repository is the shared home for all hackathon project groups. Add a folder, bring your code, and do not hesitate to ask for help with Git, that is what we are here for.
 
 ## Repository structure
 
 ```
 biomass-hackathon-2026/
 ├── README.md
-├── resources/            ← shared code, data-access helpers, course material links
+├── CONTRIBUTING.md
+├── resources/            shared code, data access helpers, course material links
 └── topics/
     ├── 01-polsar-polinsar-analytics/
     ├── 02-rfi-removal/
@@ -36,7 +37,7 @@ biomass-hackathon-2026/
     └── 12-forest-height-tomosar/
 ```
 
-Each project group works in its own folder under `topics/`. If yours doesn't exist yet, create it — see **How to contribute** below.
+Each project group works in its own folder under `topics/`. Every folder already has a README with the goal, data sources and open actions from the hackathon brief. If something there is marked "still to source" or "TBD" and you are the contact for that topic, please fill it in before the event, see CONTRIBUTING.md for the fast way to do that without Git.
 
 ## Hackathon topics
 
@@ -46,63 +47,28 @@ Each project group works in its own folder under `topics/`. If yours doesn't exi
 | 2 | RFI removal | `topics/02-rfi-removal/` | Francesco |
 | 3 | QGIS plugin | `topics/03-qgis-plugin/` | Christiano |
 | 4 | 3D forest structure visualisation | `topics/04-3d-forest-structure/` | Francesco (PolInSAR course code) |
-| 5 | BIOMASS and GEDI intercomparison | `topics/05-biomass-gedi-intercomparison/` | — |
+| 5 | BIOMASS and GEDI intercomparison | `topics/05-biomass-gedi-intercomparison/` | not assigned |
 | 6 | BIOMASS validation | `topics/06-biomass-validation/` | Klaus (protocol) |
 | 7 | BIOMASS for Geology | `topics/07-biomass-geology/` | Armando, Francesco |
 | 8 | BIOMASS for Cryosphere | `topics/08-biomass-cryosphere/` | Armando, Francesco |
-| 11 | BIOMASS for biodiversity | `topics/11-biomass-biodiversity/` | — |
-| 12 | Forest Height from TomoSAR | `topics/12-forest-height-tomosar/` | — |
+| 9 | BIOMASS for Ocean | `topics/09-biomass-ocean/` | Klaus |
+| 10 | BIOMASS for Ionosphere | `topics/10-biomass-ionosphere/` | TBD |
+| 11 | BIOMASS for biodiversity | `topics/11-biomass-biodiversity/` | not assigned |
+| 12 | Forest Height from TomoSAR | `topics/12-forest-height-tomosar/` | not assigned |
 
-Full task descriptions and data sources for each topic: see the hackathon brief shared before the event.
+## Contributing
 
-## How to contribute
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the pull request workflow, how topic contacts can fill in their folder quickly before the event, and the ground rules (no large data files, no credentials).
 
-**1. Clone the repository**
+## Data and resources
 
-```bash
-git clone https://github.com/BioPAL/biomass-hackathon-2026.git
-cd biomass-hackathon-2026
-```
-
-**2. Create your topic folder** (skip if it already exists)
-
-```bash
-mkdir -p topics/04-3d-forest-structure
-```
-
-**3. Work on a branch** — keeps `main` clean and avoids conflicts between groups
-
-```bash
-git checkout -b 04-3d-forest-structure/initial-notebook
-```
-
-**4. Commit often, with clear messages**
-
-```bash
-git add topics/04-3d-forest-structure/
-git commit -m "Add first tomographic processing notebook for Lopé ALS data"
-```
-
-**5. Push your branch and open a Pull Request**
-
-```bash
-git push -u origin 04-3d-forest-structure/initial-notebook
-```
-
-Then open a Pull Request on GitHub targeting `main`. 
-
-### Ground rules
-
-- **No large data files** in the repo (point clouds, imagery, …) - link to the MAAP dataset or add a small download script instead.
-- **No credentials or API keys**, ever.
-- One folder per topic group; put shared/reusable code in `resources/` if several groups need it.
-- Stuck on Git? ACRI-ST is on-site all week for exactly this — just ask.
-
-## Data & resources
-
-- [MAAP platform](https://maap-project.org/) - BIOMASS data, Brazil SFB ALS acquisitions, compute environment
-- [PolSARpro](https://polsarpro.readthedocs.io/) — PolSAR/PolInSAR processing
-- GEDI data — via MAAP or [gediDB](https://gedidb.readthedocs.io/)
+- [MAAP platform](https://maap-project.org/), BIOMASS data, Brazil SFB ALS acquisitions, compute environment
+- [PolSARpro](https://polsarpro.readthedocs.io/), PolSAR and PolInSAR processing
+- GEDI data, via MAAP or [gediDB](https://gedidb.readthedocs.io/)
+- Lope TLS and ALS datasets, ask Francesco
+- PolInSAR course example code (tomographic processor), ask Francesco
+- BIOMASS validation protocol, ask Klaus
+- Geo-Trees reference site data, ask for access
 
 ## License
 

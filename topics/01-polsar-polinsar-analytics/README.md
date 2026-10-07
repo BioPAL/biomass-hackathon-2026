@@ -1,6 +1,17 @@
 # PolSAR and PolInSAR Analytics
 
-Add your notebooks, scripts and results here.
+## Goal
 
-See the task description and data sources for this topic in the hackathon
-brief (topic 01 in the main [README](../../README.md#hackathon-topics)).
+Process BIOMASS data in [PyPolSARpro](https://polsarpro.readthedocs.io/) and use the resulting data layers for feature detection in a selected application, for example flooding, ice, deserts, or archaeology. Implement new RGB visualisations and submit the code for inclusion in PyPolSARpro.
+
+## Data sources
+
+Example sites to be provided by Armando before the hackathon.
+
+## Status
+
+Not started. Waiting on example sites.
+
+## Contact
+
+Armando

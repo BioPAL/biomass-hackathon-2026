@@ -1,6 +1,13 @@
 # QGIS plugin
 
-Add your notebooks, scripts and results here.
+## Goal
 
-See the task description and data sources for this topic in the hackathon
-brief (topic 03 in the main [README](../../README.md#hackathon-topics)).
+Implement a QGIS plugin including a reader and visualisation tools for BIOMASS data. The plugin should correctly expose the BIOMASS geolocation information and GCPs to QGIS, so the product can be used with standard QGIS functions such as geocoding, reprojection, clipping, and mosaicking.
+
+## Status
+
+Not started.
+
+## Contact
+
+Christiano
