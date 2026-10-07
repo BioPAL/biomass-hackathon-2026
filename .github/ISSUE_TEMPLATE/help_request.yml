@@ -1,0 +1,43 @@
+name: "Help wanted (Git or technical)"
+description: Ask us for help. No question is too basic.
+title: "[Help] "
+labels: ["help-wanted"]
+body:
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic (leave as "Not topic-specific" if it's a general Git question)
+      options:
+        - "Not topic-specific"
+        - "01 - PolSAR and PolInSAR Analytics"
+        - "02 - RFI removal"
+        - "03 - QGIS plugin"
+        - "04 - 3D forest structure visualisation"
+        - "05 - BIOMASS and GEDI intercomparison"
+        - "06 - BIOMASS validation"
+        - "07 - BIOMASS for Geology"
+        - "08 - BIOMASS for Cryosphere"
+        - "11 - BIOMASS for biodiversity"
+        - "12 - Forest Height from TomoSAR"
+    validations:
+      required: true
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Urgency
+      options:
+        - "Low, can wait"
+        - "Medium, blocking my progress"
+        - "High, blocking the whole group"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's the problem?
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you already tried?
