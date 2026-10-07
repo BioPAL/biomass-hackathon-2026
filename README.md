@@ -43,7 +43,7 @@ Each project group works in its own folder under `topics/`. Every folder already
 | --- | --------------------------------- | ----------------------------------------- | -------------------------------- |
 | 1   | PolSAR and PolInSAR Analytics     | `topics/01-polsar-polinsar-analytics/`    | Armando                          |
 | 2   | RFI removal                       | `topics/02-rfi-removal/`                  | Francesco                        |
-| 3   | QGIS plugin                       | `topics/03-qgis-plugin/`                  | Christiano                       |
+| 3   | QGIS plugin                       | `topics/03-qgis-plugin/`                  | Cristiano                       |
 | 4   | 3D forest structure visualisation | `topics/04-3d-forest-structure/`          | Francesco (PolInSAR course code) |
 | 5   | BIOMASS and GEDI intercomparison  | `topics/05-biomass-gedi-intercomparison/` | not assigned                     |
 | 6   | BIOMASS validation                | `topics/06-biomass-validation/`           | Klaus (protocol)                 |
