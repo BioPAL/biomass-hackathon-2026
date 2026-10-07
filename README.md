@@ -37,7 +37,7 @@ biomass-hackathon-2026/
     └── 12-forest-height-tomosar/
 ```
 
-Each project group works in its own folder under `topics/`. Every folder already has a README with the goal, data sources and open actions from the hackathon brief. If something there is marked "still to source" or "TBD" and you are the contact for that topic, please fill it in before the event, see CONTRIBUTING.md for the fast way to do that without Git.
+Each project group works in its own folder under `topics/`. Every folder already has a README with the goal and data sources from the hackathon brief to get you started.
 
 ## Hackathon topics
 
