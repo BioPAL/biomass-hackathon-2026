@@ -4,14 +4,14 @@ Shared workspace for the **ESA Biomass MAAP Hackathon** (12 to 16 October 2026, 
 
 ## About
 
-| | |
-|---|---|
-| **Event** | ESA Biomass MAAP Hackathon 2026 |
-| **Dates** | 12 to 16 October 2026 (5 days, in person) |
-| **Location** | ESOC (European Space Operations Centre), Darmstadt, Germany |
-| **Format** | Hands on coding, English, Python |
-| **Goal** | Evolve the BioPAL open source processor suite ([BPS](https://github.com/BioPAL/BPS)) and the MAAP platform through collaborative coding |
-| **Git support** | ACRI-ST, Git workflows and Q&A, on site all week |
+|                 |                                                                                                                                         |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Event**       | ESA Biomass MAAP Hackathon 2026                                                                                                         |
+| **Dates**       | 12 to 16 October 2026 (5 days, in person)                                                                                               |
+| **Location**    | ESOC (European Space Operations Centre), Darmstadt, Germany                                                                             |
+| **Format**      | Hands on coding, English, Python                                                                                                        |
+| **Goal**        | Evolve the BioPAL open source processor suite ([BPS](https://github.com/BioPAL/BPS)) and the MAAP platform through collaborative coding |
+| **Git support** | ACRI-ST, Git workflows and Q&A, on site all week                                                                                        |
 
 This repository is the shared home for all hackathon project groups. Add a folder, bring your code, and do not hesitate to ask for help with Git, that is what we are here for.
 
@@ -39,20 +39,18 @@ Each project group works in its own folder under `topics/`. Every folder already
 
 ## Hackathon topics
 
-| ID | Topic | Folder | Contact(s) |
-|----|-------|--------|------------|
-| 1 | PolSAR and PolInSAR Analytics | `topics/01-polsar-polinsar-analytics/` | Armando |
-| 2 | RFI removal | `topics/02-rfi-removal/` | Francesco |
-| 3 | QGIS plugin | `topics/03-qgis-plugin/` | Christiano |
-| 4 | 3D forest structure visualisation | `topics/04-3d-forest-structure/` | Francesco (PolInSAR course code) |
-| 5 | BIOMASS and GEDI intercomparison | `topics/05-biomass-gedi-intercomparison/` | not assigned |
-| 6 | BIOMASS validation | `topics/06-biomass-validation/` | Klaus (protocol) |
-| 7 | BIOMASS for Geology | `topics/07-biomass-geology/` | Armando, Francesco |
-| 8 | BIOMASS for Cryosphere | `topics/08-biomass-cryosphere/` | Armando, Francesco |
-| 9 | BIOMASS for Ocean | `topics/09-biomass-ocean/` | Klaus |
-| 10 | BIOMASS for Ionosphere | `topics/10-biomass-ionosphere/` | TBD |
-| 11 | BIOMASS for biodiversity | `topics/11-biomass-biodiversity/` | not assigned |
-| 12 | Forest Height from TomoSAR | `topics/12-forest-height-tomosar/` | not assigned |
+| ID  | Topic                             | Folder                                    | Contact(s)                       |
+| --- | --------------------------------- | ----------------------------------------- | -------------------------------- |
+| 1   | PolSAR and PolInSAR Analytics     | `topics/01-polsar-polinsar-analytics/`    | Armando                          |
+| 2   | RFI removal                       | `topics/02-rfi-removal/`                  | Francesco                        |
+| 3   | QGIS plugin                       | `topics/03-qgis-plugin/`                  | Christiano                       |
+| 4   | 3D forest structure visualisation | `topics/04-3d-forest-structure/`          | Francesco (PolInSAR course code) |
+| 5   | BIOMASS and GEDI intercomparison  | `topics/05-biomass-gedi-intercomparison/` | not assigned                     |
+| 6   | BIOMASS validation                | `topics/06-biomass-validation/`           | Klaus (protocol)                 |
+| 7   | BIOMASS for Geology               | `topics/07-biomass-geology/`              | Armando, Francesco               |
+| 8   | BIOMASS for Cryosphere            | `topics/08-biomass-cryosphere/`           | Armando, Francesco               |
+| 11  | BIOMASS for biodiversity          | `topics/11-biomass-biodiversity/`         | not assigned                     |
+| 12  | Forest Height from TomoSAR        | `topics/12-forest-height-tomosar/`        | not assigned                     |
 
 ## Contributing
 
@@ -66,7 +64,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the pull request workflow, how topic 
 - Lope TLS and ALS datasets, ask Francesco
 - PolInSAR course example code (tomographic processor), ask Francesco
 - BIOMASS validation protocol, ask Klaus
-- Geo-Trees reference site data, ask for access
 
 ## License
 
