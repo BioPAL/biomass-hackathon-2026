@@ -2,18 +2,26 @@
 
 Thanks for contributing to the ESA Biomass MAAP Hackathon shared repository. This guide is for hackathon participants, 12 to 16 October at ESOC.
 
-This is a hackathon repo, not the main BPS production codebase, so the process here is much lighter than BioPAL/BPS's own contributing guide. If you are also working on BPS itself, that repo has a more formal review process with an approval gate and CODEOWNERS routing. None of that applies here.
+## Hackathon vs BioPAL/BPS
+
+This is a **hackathon** repo, not the main BPS production codebase. This week:
+
+- No signed commits required
+- No mandatory CI gate on pull requests
+- A maintainer reviews and merges; do not merge your own PR
+
+[BioPAL/BPS](https://github.com/BioPAL/BPS) has stricter rules (approval gates, CODEOWNERS, and related checks). None of that applies here unless you are contributing to BPS itself.
 
 ## How a contribution flows
 
 You do not have write access to this repository, so you will work from your own fork.
 
 1. Fork the repository to your own GitHub account.
-2. Clone your fork, create a branch, find or create your topic folder under `topics/`.
+2. Clone **your fork**, create a branch, work in your topic folder (or in `resources/` for shared code).
 3. Commit, push to your fork.
-4. Open a pull request from your fork to `main` on `BioPAL/biomass-hackathon-2026`.
+4. Open a pull request: **base** = `BioPAL/biomass-hackathon-2026` / `main`, **head** = your fork + your branch.
 
-`main` is protected: every change goes through a pull request, and a maintainer reviews and merges it. Do not merge your own pull request.
+`main` is protected: every change goes through a pull request. Do not merge your own pull request.
 
 ## Getting set up with Git
 
@@ -40,11 +48,15 @@ git remote add upstream https://github.com/BioPAL/biomass-hackathon-2026.git
 
 **4. Create a branch**
 
+Prefer `<topic-folder>/<short-description>`:
+
 ```bash
 git checkout -b 04-3d-forest-structure/short-description
 ```
 
-**5. Create your topic folder if it does not exist yet**
+For shared-code work, `resources/<short-description>` is fine.
+
+**5. Work in your topic folder (or create it if needed)**
 
 ```bash
 mkdir -p topics/04-3d-forest-structure
@@ -62,7 +74,13 @@ git push -u origin 04-3d-forest-structure/short-description
 
 **7. Open a pull request**
 
-Go to your fork on github.com. GitHub shows a banner suggesting a pull request for your new branch, click it. Check that the base repository is `BioPAL/biomass-hackathon-2026` and the base branch is `main`, then create the pull request. A maintainer will review and merge it.
+Go to your fork on github.com. GitHub shows a banner suggesting a pull request for your new branch; click it. Check that:
+
+- Base repository: `BioPAL/biomass-hackathon-2026`
+- Base branch: `main`
+- Head: your fork and branch
+
+Then create the pull request. A maintainer will review and merge it.
 
 **Keeping your fork up to date** (optional, useful if the hackathon runs for several days)
 
@@ -73,10 +91,34 @@ git merge upstream/main
 git push origin main
 ```
 
+## Where to put code: `topics/` vs `resources/`
+
+| Put it in… | When… |
+| --- | --- |
+| `topics/<num>-<name>/` | Notebooks, scripts, and helpers for **one** challenge only |
+| `resources/load/` | Shared readers: products → arrays / xarray (no plotting) |
+| `resources/process/` | Shared transforms: arrays in → arrays out (no plotting) |
+| `resources/evaluate/` | Shared metrics, validation, stats |
+| `resources/plot/` | Shared figures and maps |
+| `resources/tests/` | `pytest` for shared helpers |
+
+**Promote to `resources/`** when a second team needs the same helper, or when the function is clearly generic (e.g. a common MAAP load path). Prototype in your topic folder first; then open an explicit PR that adds the cleaned version under the right `resources/` layer. See [resources/README.md](resources/README.md).
+
+Edit mostly your own topic folder. Touch `resources/` only when the PR is intentionally about shared code.
+
+## Light coding conventions
+
+- Prefer English for docs and comments aimed at other teams.
+- License-compatible dependencies only (Apache 2.0–compatible), matching this repo and BioPAL/BPS.
+- On **shared** code in `resources/`: NumPy-style docstrings and type hints on exported function signatures.
+- If you introduce a linter config (e.g. Ruff), keep it lightweight and document it in the PR; there is no project-wide Ruff config yet.
+- No large data files in Git: link to MAAP or ship a small download script.
+- No credentials, API keys, or absolute machine paths (e.g. `/Users/...`) in committed code.
+
 ## Issues or Discussions
 
 | Where | What for |
-|---|---|
+| --- | --- |
 | Issues | Something specific and actionable: help wanted, a data access request, a bug in shared resources |
 | Discussions | Open questions, ideas, show and tell, anything not tied to one task |
 
@@ -86,7 +128,8 @@ Issue templates are set up for this repo: Help wanted, Data access request, and 
 
 - No large data files in the repo. Link to the MAAP dataset, or add a small download script instead.
 - No credentials or API keys, ever.
-- Keep changes inside your own topic folder. Put anything shared by several groups in `resources/`.
+- Keep changes inside your own topic folder unless the PR is explicitly for `resources/`.
+- Contributions should remain Apache 2.0 compatible.
 
 ## Code of conduct
 

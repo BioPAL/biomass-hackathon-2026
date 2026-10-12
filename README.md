@@ -21,7 +21,12 @@ This repository is the shared home for all hackathon project groups. Add a folde
 biomass-hackathon-2026/
 ├── README.md
 ├── CONTRIBUTING.md
-├── resources/            shared code, data access helpers, course material links
+├── resources/                 shared code reusable across topics
+│   ├── load/                  read products → arrays / xarray
+│   ├── process/               arrays in → arrays out
+│   ├── evaluate/              metrics, validation, stats
+│   ├── plot/                  figures, maps
+│   └── tests/                 pytest for shared code
 └── topics/
     ├── 01-polsar-polinsar-analytics/
     ├── 02-rfi-removal/
@@ -35,7 +40,7 @@ biomass-hackathon-2026/
     └── 12-forest-height-tomosar/
 ```
 
-Each project group works in its own folder under `topics/`. Every folder already has a README with the goal and data sources from the hackathon brief to get you started.
+Each project group works mainly in its own folder under `topics/`. Put **shared** helpers in `resources/` (see [resources/README.md](resources/README.md)). Every topic folder already has a README with the goal and data sources from the hackathon brief to get you started.
 
 ## Hackathon topics
 
@@ -54,7 +59,16 @@ Each project group works in its own folder under `topics/`. Every folder already
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the pull request workflow, how topic contacts can fill in their folder quickly before the event, and the ground rules (no large data files, no credentials).
+Work from a **fork** (you do not push directly to `main`):
+
+1. Fork [BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026) on GitHub.
+2. Clone **your fork**, create a branch, commit your work.
+3. Push to your fork and open a pull request targeting `BioPAL/biomass-hackathon-2026` branch `main`.
+
+- Topic-specific code and notebooks → `topics/<num>-<name>/`
+- Code useful to several teams → `resources/` (load / process / evaluate / plot)
+
+Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Data and resources
 
