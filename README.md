@@ -40,20 +40,20 @@ biomass-hackathon-2026/
     └── 12-forest-height-tomosar/
 ```
 
-Each project group works mainly in its own folder under `topics/`. Put **shared** helpers in `resources/` (see [resources/README.md](resources/README.md)). Every topic folder already has a README with the goal and data sources from the hackathon brief to get you started.
+Each project group works mainly in its own folder under `topics/`. Put **shared** helpers in `resources/` (see [resources/README.md](resources/README.md)). Every topic folder already has a README with the challenge title, goal, roadmap (foundation and deep dive), and data sources from the hackathon brief to get you started.
 
 ## Hackathon topics
 
-| ID  | Topic                             | Folder                                    | Contact(s)                       |
+| ID  | Topic                             | Folder                                    | Contact                          |
 | --- | --------------------------------- | ----------------------------------------- | -------------------------------- |
-| 1   | PolSAR and PolInSAR Analytics     | `topics/01-polsar-polinsar-analytics/`    | Armando                          |
-| 2   | RFI removal                       | `topics/02-rfi-removal/`                  | Francesco                        |
-| 3   | QGIS plugin                       | `topics/03-qgis-plugin/`                  | Cristiano                       |
-| 4   | 3D forest structure visualisation | `topics/04-3d-forest-structure/`          | Francesco (PolInSAR course code) |
+| 1   | PolSAR and PolInSAR Analytics     | `topics/01-polsar-polinsar-analytics/`    | Topic referent                   |
+| 2   | RFI removal                       | `topics/02-rfi-removal/`                  | Topic referent                   |
+| 3   | QGIS plugin                       | `topics/03-qgis-plugin/`                  | Topic referent                   |
+| 4   | 3D forest structure visualisation | `topics/04-3d-forest-structure/`          | Topic referent                   |
 | 5   | BIOMASS and GEDI intercomparison  | `topics/05-biomass-gedi-intercomparison/` | not assigned                     |
-| 6   | BIOMASS validation                | `topics/06-biomass-validation/`           | Klaus (protocol)                 |
-| 7   | BIOMASS for Geology               | `topics/07-biomass-geology/`              | Armando, Francesco               |
-| 8   | BIOMASS for Cryosphere            | `topics/08-biomass-cryosphere/`           | Armando, Francesco               |
+| 6   | BIOMASS validation                | `topics/06-biomass-validation/`           | Topic referent                   |
+| 7   | BIOMASS for Geology               | `topics/07-biomass-geology/`              | Topic referent                   |
+| 8   | BIOMASS for Cryosphere            | `topics/08-biomass-cryosphere/`           | Topic referent                   |
 | 11  | BIOMASS for biodiversity          | `topics/11-biomass-biodiversity/`         | not assigned                     |
 | 12  | Forest Height from TomoSAR        | `topics/12-forest-height-tomosar/`        | not assigned                     |
 
@@ -75,9 +75,9 @@ Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md
 - [MAAP platform](https://maap-project.org/), BIOMASS data, Brazil SFB ALS acquisitions, compute environment
 - [PolSARpro](https://polsarpro.readthedocs.io/), PolSAR and PolInSAR processing
 - GEDI data, via MAAP or [gediDB](https://gedidb.readthedocs.io/)
-- Lope TLS and ALS datasets, ask Francesco
-- PolInSAR course example code (tomographic processor), ask Francesco
-- BIOMASS validation protocol, ask Klaus
+- Lope TLS and ALS datasets, ask the topic referent
+- PolInSAR course example code (tomographic processor), ask the topic referent
+- BIOMASS validation protocol, ask the topic referent
 
 ## License
 
