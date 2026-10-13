@@ -35,24 +35,12 @@ from shapely.geometry import box, shape
 from shapely.errors import ShapelyError
 
 # -------------------- Configuration --------------------
+import yaml
 
-CREDENTIALS_PATH = "./credentials.txt"
-ROI_JSON_PATH = "/home/samuel/codes/biomass-hackathon-2026/topics/11-B-FLOODED-FOREST/rois.json"  # Change to where rois.json is stored
-OUTPUT_JSON_PATH = "./sta_level1c_by_roi.json"
 
-STAC_API_URL = "https://catalog.maap.eo.esa.int/catalogue/"
-TOKEN_URL = (
-    "https://iam.maap.eo.esa.int/realms/esa-maap/" "protocol/openid-connect/token"
-)
-
-# IMPORTANT: replace with the exact collection ID for STA Level-1C products.
-STAC_COLLECTION_ID = "BiomassLevel1c"
-
-# 0.0 = any intersection. For example, 0.01 requires at least 1% of ROI area
-# to overlap the product footprint.
-MIN_OVERLAP_FRACTION = 0.0
-MAX_ITEMS_PER_ROI = 1000
-REQUEST_PAUSE_SECONDS = 0.1
+def load_config(config_path):
+    with open(config_path, "r") as f:
+        return yaml.safe_load(f)
 
 
 # -------------------- Authentication --------------------
@@ -254,6 +242,13 @@ def main():
             collections=[STAC_COLLECTION_ID],
             bbox=roi["bbox"],
             max_items=MAX_ITEMS_PER_ROI,
+            # fields={
+            #     "include": [
+            #         "assets.enclosure_ql_pauli_png",
+            #         "assets.enclosure_i_abs_tiff",
+            #         "assets.enclosure_i_phase_tiff",
+            #     ]
+            # },
         )
 
         try:
@@ -291,4 +286,24 @@ def main():
     print("\nProduct IDs by ROI:")
 
 
-main()
+if __name__ == "__main__":
+    config_path = "/home/samuel/codes/biomass-hackathon-2026/topics/11-B-FLOODED-FOREST/config.yaml"
+
+    # Usage example:config = load_config(config_path)
+    config = load_config(config_path)
+    CREDENTIALS_PATH = config.get("credentials_path")
+    ROI_JSON_PATH = config.get("roi_json_path")
+    OUTPUT_JSON_PATH = config.get("output_json_path")
+    STAC_API_URL = config.get("stac_api_url")
+    TOKEN_URL = config.get("token_url")
+
+    # IMPORTANT: replace with the exact collection ID for STA Level-1C products.
+    STAC_COLLECTION_ID = "BiomassLevel1c"
+
+    # 0.0 = any intersection. For example, 0.01 requires at least 1% of ROI area
+    # to overlap the product footprint.
+    MIN_OVERLAP_FRACTION = 0.0
+    MAX_ITEMS_PER_ROI = 1000
+    REQUEST_PAUSE_SECONDS = 0.1
+
+    main()
