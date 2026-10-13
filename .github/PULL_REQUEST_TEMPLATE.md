@@ -2,7 +2,7 @@
 
 Closes #
 
-<!-- One PR = one issue. Example: Closes #12 -->
+<!-- One PR = one issue. Example: Closes #N (replace N with your issue number) -->
 <!-- Open as Draft while coding (board → Doing). Mark Ready for review when done (board → In review). -->
 
 ## Group

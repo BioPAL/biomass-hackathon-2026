@@ -66,11 +66,13 @@ jobs:
 
             function closesIssues(body) {
               if (!body) return [];
+              // Ignore HTML comments (PR template example: <!-- Closes #12 -->)
+              const cleaned = body.replace(/<!--[\s\S]*?-->/g, '');
               const re =
                 /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#(\d+)/gi;
               const nums = new Set();
               let m;
-              while ((m = re.exec(body)) !== null) {
+              while ((m = re.exec(cleaned)) !== null) {
                 nums.add(parseInt(m[1], 10));
               }
               return [...nums];
@@ -185,11 +187,28 @@ jobs:
             }
 
             async function setIssueStatus(issueNumber, statusKey, ctx) {
-              const { data: issue } = await github.rest.issues.get({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber,
-              });
+              let issue;
+              try {
+                const res = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                });
+                issue = res.data;
+              } catch (err) {
+                if (err.status === 404 || err.status === 410) {
+                  core.warning(
+                    `Issue #${issueNumber} is missing/deleted; skipping Status update.`
+                  );
+                  return;
+                }
+                throw err;
+              }
+              // Skip if this number is a pull request, not an issue
+              if (issue.pull_request) {
+                core.info(`#${issueNumber} is a PR, not an issue; skipping.`);
+                return;
+              }
               const itemId = await ensureItem(ctx.projectId, issue.node_id);
               const optionId = ctx.optionIdFor(statusKey);
               await setStatus(
