@@ -1,18 +1,20 @@
-name: "Task"
-description: A hackathon work item (≤ 2 hours). One issue per task.
-title: "[Task] "
+name: "Task · resources (shared)"
+description: Shared helper in resources/ for several groups (≤ 2 hours).
+title: "[Task][resources] "
 labels: ["task"]
 body:
   - type: markdown
     attributes:
       value: |
-        Create **one issue per task**. After submit, add your **group label** and **assign yourself**.
-        Search existing issues first to avoid duplicates.
+        **Where:** `resources/` (load / process / evaluate / plot).
+
+        Use this only if **another group** will reuse the code.
+        After submit: add your **group label**, **assign yourself**, avoid duplicates.
   - type: dropdown
     id: group
     attributes:
-      label: Group
-      description: Also add this as a GitHub label on the issue after creation.
+      label: Proposing group
+      description: Also apply this as a GitHub label on the issue after creation.
       options:
         - "02-RFI"
         - "03-QGIS"
@@ -28,19 +30,31 @@ body:
         - "11-B-FLOODED-FOREST"
     validations:
       required: true
+  - type: dropdown
+    id: layer
+    attributes:
+      label: resources/ layer
+      options:
+        - "load"
+        - "process"
+        - "evaluate"
+        - "plot"
+        - "tests"
+        - "not sure yet"
+    validations:
+      required: true
   - type: textarea
     id: done_when
     attributes:
       label: Done when
-      description: Checkable result (how do we know this issue is finished?)
-      placeholder: e.g. Notebook cell loads the sample L2 product into xarray on MAAP
+      description: Checkable result
+      placeholder: e.g. function load_l2(path) returns an xarray Dataset and has a short docstring
     validations:
       required: true
   - type: dropdown
     id: size
     attributes:
       label: Size
-      description: Must be ≤ 2 hours for one person. Split if larger.
       options:
         - "S (≤ 1 hour)"
         - "M (≤ 2 hours)"
@@ -57,15 +71,10 @@ body:
         - "P2 - nice to have"
     validations:
       required: true
-  - type: input
-    id: blocked_by
-    attributes:
-      label: Blocked by
-      description: Issue number if any, otherwise leave empty
-      placeholder: e.g. #12
   - type: textarea
-    id: notes
+    id: who_reuses
     attributes:
-      label: Notes / approach
-      description: Optional — where the work will live (topics/… path) and short plan
-      placeholder: e.g. topics/02-rfi-removal/notebooks/…
+      label: Who else will use this?
+      description: Other groups / use cases
+    validations:
+      required: true
