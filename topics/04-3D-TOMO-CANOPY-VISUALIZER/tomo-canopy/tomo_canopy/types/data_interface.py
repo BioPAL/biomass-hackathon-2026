@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, List
 
 T = TypeVar("T")
 
@@ -24,7 +24,7 @@ S = TypeVar("S")
 
 
 @dataclass
-class DataLayer3D(DataLayer[DataPoint3D[S]]):
+class DataLayer3D(DataLayer[list[DataPoint3D[S]]]):
     "Data Layer of 3D data"
 
 
