@@ -16,10 +16,11 @@ This is a **hackathon** repo, not the main BPS production codebase. This week:
 
 You do not have write access to this repository, so you will work from your own fork.
 
-1. Fork the repository to your own GitHub account.
-2. Clone **your fork**, create a branch, work in your topic folder (or in `resources/` for shared code).
-3. Commit, push to your fork.
-4. Open a pull request: **base** = `BioPAL/biomass-hackathon-2026` / `main`, **head** = your fork + your branch.
+1. Create (or pick) a **Task** issue on GitHub and choose your **Group** (the group label is applied automatically).
+2. Fork the repository to your own GitHub account.
+3. Clone **your fork**, create a branch, work in your group folder (or in `resources/` for shared code).
+4. Commit, push to your fork.
+5. Open a pull request: **base** = `BioPAL/biomass-hackathon-2026` / `main`, **head** = your fork + your branch. Put `Closes #<issue-number>` in the PR description.
 
 `main` is protected: every change goes through a pull request. Do not merge your own pull request.
 
@@ -48,21 +49,21 @@ git remote add upstream https://github.com/BioPAL/biomass-hackathon-2026.git
 
 **4. Create a branch**
 
-Prefer `<topic-folder>/<short-description>`:
+Prefer `<GROUP-LABEL>/<short-description>` (same string as your group folder / GitHub label):
 
 ```bash
-git checkout -b 04-3d-forest-structure/short-description
+git checkout -b 04-3D-TOMO-CANOPY-VISUALIZER/short-description
 ```
 
 For shared-code work, `resources/<short-description>` is fine.
 
-**5. Work in your topic folder (or create it if needed)**
+**5. Work in your group folder**
+
+Folder names under `topics/` match the GitHub group labels (see the table in [README.md](README.md)). Example:
 
 ```bash
-mkdir -p topics/04-3D-TOMO-CANOPY-VISUALIZER
+cd topics/04-3D-TOMO-CANOPY-VISUALIZER
 ```
-
-Use the folder that matches your **group label** (same string as on GitHub Issues).
 
 **6. Commit and push to your fork**
 
@@ -81,6 +82,7 @@ Go to your fork on github.com. GitHub shows a banner suggesting a pull request f
 - Base repository: `BioPAL/biomass-hackathon-2026`
 - Base branch: `main`
 - Head: your fork and branch
+- Description includes `Closes #<issue-number>` (one PR = one issue)
 
 Then create the pull request. A maintainer will review and merge it.
 
@@ -104,9 +106,9 @@ git push origin main
 | `resources/plot/` | Shared figures and maps |
 | `resources/tests/` | `pytest` for shared helpers |
 
-**Promote to `resources/`** when a second team needs the same helper, or when the function is clearly generic (e.g. a common MAAP load path). Prototype in your topic folder first; then open an explicit PR that adds the cleaned version under the right `resources/` layer. See [resources/README.md](resources/README.md).
+**Promote to `resources/`** when a second team needs the same helper, or when the function is clearly generic (e.g. a common MAAP load path). Prototype in your group folder first; then open an explicit PR that adds the cleaned version under the right `resources/` layer. See [resources/README.md](resources/README.md).
 
-Edit mostly your own topic folder. Touch `resources/` only when the PR is intentionally about shared code.
+Edit mostly your own group folder. Touch `resources/` only when the PR is intentionally about shared code.
 
 ## Light coding conventions
 
@@ -121,16 +123,16 @@ Edit mostly your own topic folder. Touch `resources/` only when the PR is intent
 
 | Where | What for |
 | --- | --- |
-| Issues | Something specific and actionable: help wanted, a data access request, a bug in shared resources |
-| Discussions | Open questions, ideas, show and tell, anything not tied to one task |
+| Issues (Task forms) | Work items: **Task · my group** (code in your `topics/<GROUP-LABEL>/` folder) or **Task · resources** (shared helpers) |
+| Discussions | Questions, ideas, show and tell, Git help that is not a concrete task |
 
-Issue templates are set up for this repo: Help wanted, Data access request, and Bug report.
+Pick your **Group** in the Task form; the colored group label is applied automatically. Keep each Task small (S / M / L, ideally about 2 hours, at most 3).
 
 ## Ground rules
 
 - No large data files in the repo. Link to the MAAP dataset, or add a small download script instead.
 - No credentials or API keys, ever.
-- Keep changes inside your own topic folder unless the PR is explicitly for `resources/`.
+- Keep changes inside your own group folder unless the PR is explicitly for `resources/`.
 - Contributions should remain Apache 2.0 compatible.
 
 ## Code of conduct
@@ -139,4 +141,4 @@ Be respectful, welcome newcomers, keep feedback constructive, respect different 
 
 ## Getting help
 
-We are on site all week for Git and technical questions. Ask in person, or open a Help wanted issue. For anything not urgent, use Discussions.
+We are on site all week for Git and technical questions. Ask in person first. For anything not urgent, use Discussions.
