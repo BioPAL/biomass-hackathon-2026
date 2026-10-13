@@ -7,7 +7,7 @@ Thanks for contributing to the ESA Biomass MAAP Hackathon shared repository. Thi
 This is a **hackathon** repo, not the main BPS production codebase. This week:
 
 - No signed commits required
-- No mandatory CI gate on pull requests
+- Light CI on PRs (Python syntax + a few critical Ruff checks) — fix failures when you can
 - A maintainer reviews and merges; do not merge your own PR
 
 [BioPAL/BPS](https://github.com/BioPAL/BPS) has stricter rules (approval gates, CODEOWNERS, and related checks). None of that applies here unless you are contributing to BPS itself.
