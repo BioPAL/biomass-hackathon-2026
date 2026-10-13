@@ -37,10 +37,70 @@ from shapely.errors import ShapelyError
 # -------------------- Configuration --------------------
 import yaml
 
+TOPIC_DIR = Path(__file__).resolve().parent
+_CONFIG_PATH_KEYS = ("credentials_path", "roi_json_path", "output_json_path")
 
-def load_config(config_path):
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)
+
+def find_topic_dir(start: Path | None = None) -> Path:
+    """Directory containing config.yaml, rois.json, and this script."""
+    start = (start or Path.cwd()).resolve()
+    for directory in (start, *start.parents):
+        if (
+            (directory / "config.yaml").is_file()
+            and (directory / "rois.json").is_file()
+            and (directory / "find_stack_files.py").is_file()
+        ):
+            return directory
+    raise FileNotFoundError(
+        "Could not find topic folder (config.yaml, rois.json, find_stack_files.py). "
+        f"Searched from: {start}"
+    )
+
+
+def load_config(config_path: Path | str | None = None) -> dict:
+    if config_path is None:
+        config_path = TOPIC_DIR / "config.yaml"
+    config_path = Path(config_path).expanduser().resolve()
+    with config_path.open("r", encoding="utf-8") as f:
+        config = yaml.safe_load(f) or {}
+
+    base_dir = config_path.parent
+    for key in _CONFIG_PATH_KEYS:
+        value = config.get(key)
+        if not value:
+            continue
+        path = Path(value).expanduser()
+        if not path.is_absolute():
+            path = (base_dir / path).resolve()
+        else:
+            path = path.resolve()
+        config[key] = str(path)
+    return config
+
+
+def init_settings(
+    config_path: Path | str | None = None,
+    *,
+    stac_collection_id: str = "BiomassLevel1c",
+    min_overlap_fraction: float = 0.0,
+    max_items_per_roi: int = 1000,
+    request_pause_seconds: float = 0.1,
+) -> dict:
+    """Load config.yaml and set module globals used by main()."""
+    global CREDENTIALS_PATH, ROI_JSON_PATH, OUTPUT_JSON_PATH, STAC_API_URL, TOKEN_URL
+    global STAC_COLLECTION_ID, MIN_OVERLAP_FRACTION, MAX_ITEMS_PER_ROI, REQUEST_PAUSE_SECONDS
+
+    config = load_config(config_path)
+    CREDENTIALS_PATH = config["credentials_path"]
+    ROI_JSON_PATH = config["roi_json_path"]
+    OUTPUT_JSON_PATH = config["output_json_path"]
+    STAC_API_URL = config["stac_api_url"]
+    TOKEN_URL = config["token_url"]
+    STAC_COLLECTION_ID = stac_collection_id
+    MIN_OVERLAP_FRACTION = min_overlap_fraction
+    MAX_ITEMS_PER_ROI = max_items_per_roi
+    REQUEST_PAUSE_SECONDS = request_pause_seconds
+    return config
 
 
 # -------------------- Authentication --------------------
@@ -55,7 +115,10 @@ def load_credentials(path):
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, value = line.split("=", 1)
-            values[key.strip()] = value.strip()
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+                value = value[1:-1]
+            values[key.strip()] = value
 
     required = ("OFFLINE_TOKEN", "CLIENT_ID", "CLIENT_SECRET")
     missing = [key for key in required if not values.get(key)]
@@ -287,23 +350,5 @@ def main():
 
 
 if __name__ == "__main__":
-    config_path = "/home/samuel/codes/biomass-hackathon-2026/topics/11-B-FLOODED-FOREST/config.yaml"
-
-    # Usage example:config = load_config(config_path)
-    config = load_config(config_path)
-    CREDENTIALS_PATH = config.get("credentials_path")
-    ROI_JSON_PATH = config.get("roi_json_path")
-    OUTPUT_JSON_PATH = config.get("output_json_path")
-    STAC_API_URL = config.get("stac_api_url")
-    TOKEN_URL = config.get("token_url")
-
-    # IMPORTANT: replace with the exact collection ID for STA Level-1C products.
-    STAC_COLLECTION_ID = "BiomassLevel1c"
-
-    # 0.0 = any intersection. For example, 0.01 requires at least 1% of ROI area
-    # to overlap the product footprint.
-    MIN_OVERLAP_FRACTION = 0.0
-    MAX_ITEMS_PER_ROI = 1000
-    REQUEST_PAUSE_SECONDS = 0.1
-
+    init_settings()
     main()

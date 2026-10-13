@@ -53,5 +53,16 @@
       "north": -2.869
     },
     "bbox_units": "decimal degrees"
+  },
+  {
+    "name": "Belém",
+    "region": "Pará, Brazil (Amazon estuary)",
+    "bbox": {
+      "west": -49.4,
+      "south": -2.4,
+      "east": -49.0,
+      "north": -2.2
+    },
+    "bbox_units": "decimal degrees"
   }
 ]
