@@ -1,0 +1,71 @@
+name: "Task"
+description: A hackathon work item (≤ 2 hours). One issue per task.
+title: "[Task] "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Create **one issue per task**. After submit, add your **group label** and **assign yourself**.
+        Search existing issues first to avoid duplicates.
+  - type: dropdown
+    id: group
+    attributes:
+      label: Group
+      description: Also add this as a GitHub label on the issue after creation.
+      options:
+        - "02-RFI"
+        - "03-QGIS"
+        - "04-3D-TOMO-CANOPY-VISUALIZER"
+        - "05-BIOMASS&GEDI"
+        - "06A-CARBON"
+        - "06B-CARBON"
+        - "07-GEOLOGY"
+        - "08-ICE-QUEEN"
+        - "09-BIODIVERSITY"
+        - "10-TOMO-SAR-FOREST-HEIGHT"
+        - "11-A-SOIL-MOISTURE"
+        - "11-B-FLOODED-FOREST"
+    validations:
+      required: true
+  - type: textarea
+    id: done_when
+    attributes:
+      label: Done when
+      description: Checkable result (how do we know this issue is finished?)
+      placeholder: e.g. Notebook cell loads the sample L2 product into xarray on MAAP
+    validations:
+      required: true
+  - type: dropdown
+    id: size
+    attributes:
+      label: Size
+      description: Must be ≤ 2 hours for one person. Split if larger.
+      options:
+        - "S (≤ 1 hour)"
+        - "M (≤ 2 hours)"
+        - "L (split me - too big)"
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - "P0 - blocking the group"
+        - "P1 - needed soon"
+        - "P2 - nice to have"
+    validations:
+      required: true
+  - type: input
+    id: blocked_by
+    attributes:
+      label: Blocked by
+      description: Issue number if any, otherwise leave empty
+      placeholder: e.g. #12
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / approach
+      description: Optional — where the work will live (topics/… path) and short plan
+      placeholder: e.g. topics/02-rfi-removal/notebooks/…
