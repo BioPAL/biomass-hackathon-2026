@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biomass"
+version = "0.1.0"
+description = "Search and download ESA Biomass products from the MAAP catalogue"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "pandas",
+    "pystac-client",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+geo = ["geopandas", "folium", "rasterio", "fsspec", "aiohttp", "matplotlib"]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
