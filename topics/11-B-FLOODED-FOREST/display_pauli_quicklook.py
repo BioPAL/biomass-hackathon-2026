@@ -10,6 +10,7 @@ json_path = "./sta_level1c_by_roi.json"
 with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 
+
 # 2. Get your access token (using your existing functions)
 offline_token, client_id, client_secret = load_credentials(CREDENTIALS_PATH)
 access_token = get_maap_access_token(offline_token, client_id, client_secret)
@@ -52,40 +53,3 @@ dates = [p.get("datetime") for p in products]
 print(f"Total products: {len(dates)}")
 print(f"First Date: {dates[0]}")
 print(f"Last Date: {dates[-1]}")
-
-
-import rasterio
-from rasterio.session import DummySession
-
-# Identify the first and last product
-first_product = products[0]
-last_product = products[-1]
-
-# Replace 'data' or 'cog' with the actual asset key for your real data product
-# (You can check available keys via: print(first_product['assets'].keys()))
-first_asset_url = first_product["assets"]["data"]["href"]  # Example asset key
-last_asset_url = last_product["assets"]["data"]["href"]
-
-
-# Function to load raster data securely with Bearer token
-def load_raster_data(url, token):
-    with rasterio.Env(
-        GDAL_HTTP_HEADER=f"Authorization: Bearer {token}",
-        GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR",
-    ):
-        with rasterio.open(url) as src:
-            data = src.read()  # Reads all bands into a NumPy array
-            transform = src.transform
-            profile = src.profile
-            return data, profile, transform
-
-
-# Load data for the first date
-first_data, first_profile, first_transform = load_raster_data(
-    first_asset_url, access_token
-)
-print(f"First dataset shape: {first_data.shape}")
-
-# Load data for the last date
-last_data, last_profile, last_transform = load_raster_data(last_asset_url, access_token)
-print(f"Last dataset shape: {last_data.shape}")

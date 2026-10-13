@@ -19,12 +19,7 @@
           "datetime": "2026-07-06T04:41:43.896Z",
           "start_datetime": "2026-07-06T04:41:43.896Z",
           "end_datetime": "2026-07-06T04:42:04.280Z",
-          "bbox": [
-            16.329554,
-            0.5671474,
-            17.141962,
-            1.9234676
-          ],
+          "bbox": [16.329554, 0.5671474, 17.141962, 1.9234676],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.108069,
           "assets": {
@@ -63,9 +58,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-31T06:38:36Z"
@@ -77,12 +70,7 @@
           "datetime": "2026-07-09T04:41:45.741Z",
           "start_datetime": "2026-07-09T04:41:45.741Z",
           "end_datetime": "2026-07-09T04:42:06.125Z",
-          "bbox": [
-            16.329554,
-            0.5671474,
-            17.141962,
-            1.9234676
-          ],
+          "bbox": [16.329554, 0.5671474, 17.141962, 1.9234676],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.108069,
           "assets": {
@@ -121,9 +109,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-31T06:39:12Z"
@@ -135,12 +121,7 @@
           "datetime": "2026-07-12T04:41:47.565Z",
           "start_datetime": "2026-07-12T04:41:47.565Z",
           "end_datetime": "2026-07-12T04:42:07.949Z",
-          "bbox": [
-            16.329554,
-            0.5671474,
-            17.141962,
-            1.9234676
-          ],
+          "bbox": [16.329554, 0.5671474, 17.141962, 1.9234676],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.108069,
           "assets": {
@@ -179,9 +160,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-31T06:39:45Z"
@@ -193,12 +172,7 @@
           "datetime": "2026-07-15T04:41:49.358Z",
           "start_datetime": "2026-07-15T04:41:49.358Z",
           "end_datetime": "2026-07-15T04:42:09.742Z",
-          "bbox": [
-            16.329554,
-            0.5671474,
-            17.141962,
-            1.9234676
-          ],
+          "bbox": [16.329554, 0.5671474, 17.141962, 1.9234676],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.108069,
           "assets": {
@@ -233,9 +207,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-31T06:40:15Z"
@@ -247,12 +219,7 @@
           "datetime": "2026-07-18T04:41:51.248Z",
           "start_datetime": "2026-07-18T04:41:51.248Z",
           "end_datetime": "2026-07-18T04:42:11.632Z",
-          "bbox": [
-            16.329554,
-            0.5671474,
-            17.141962,
-            1.9234676
-          ],
+          "bbox": [16.329554, 0.5671474, 17.141962, 1.9234676],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.108069,
           "assets": {
@@ -291,9 +258,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-31T06:40:47Z"
@@ -305,12 +270,7 @@
           "datetime": "2026-07-21T04:41:53.243Z",
           "start_datetime": "2026-07-21T04:41:53.243Z",
           "end_datetime": "2026-07-21T04:42:13.627Z",
-          "bbox": [
-            16.329554,
-            0.5671474,
-            17.141962,
-            1.9234676
-          ],
+          "bbox": [16.329554, 0.5671474, 17.141962, 1.9234676],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.108069,
           "assets": {
@@ -349,9 +309,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-31T06:41:22Z"
@@ -363,12 +321,7 @@
           "datetime": "2026-07-24T04:41:55.148Z",
           "start_datetime": "2026-07-24T04:41:55.148Z",
           "end_datetime": "2026-07-24T04:42:15.532Z",
-          "bbox": [
-            16.329554,
-            0.5671474,
-            17.141962,
-            1.9234676
-          ],
+          "bbox": [16.329554, 0.5671474, 17.141962, 1.9234676],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.108069,
           "assets": {
@@ -407,9 +360,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-31T06:42:00Z"
@@ -421,12 +372,7 @@
           "datetime": "2026-09-16T17:01:46.382Z",
           "start_datetime": "2026-09-16T17:01:46.382Z",
           "end_datetime": "2026-09-16T17:02:06.766Z",
-          "bbox": [
-            16.825615,
-            0.46735606,
-            17.638458,
-            1.8240169
-          ],
+          "bbox": [16.825615, 0.46735606, 17.638458, 1.8240169],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.991766,
           "assets": {
@@ -465,9 +411,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-11T19:38:30.059Z"
@@ -479,12 +423,7 @@
           "datetime": "2026-09-19T17:01:48.525Z",
           "start_datetime": "2026-09-19T17:01:48.525Z",
           "end_datetime": "2026-09-19T17:02:08.910Z",
-          "bbox": [
-            16.825615,
-            0.46735606,
-            17.638458,
-            1.8240169
-          ],
+          "bbox": [16.825615, 0.46735606, 17.638458, 1.8240169],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.991766,
           "assets": {
@@ -523,9 +462,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-11T19:36:41.527Z"
@@ -537,12 +474,7 @@
           "datetime": "2026-09-22T17:01:50.659Z",
           "start_datetime": "2026-09-22T17:01:50.659Z",
           "end_datetime": "2026-09-22T17:02:11.043Z",
-          "bbox": [
-            16.825615,
-            0.46735606,
-            17.638458,
-            1.8240169
-          ],
+          "bbox": [16.825615, 0.46735606, 17.638458, 1.8240169],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.991766,
           "assets": {
@@ -581,9 +513,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-11T19:43:42.143Z"
@@ -595,12 +525,7 @@
           "datetime": "2026-09-25T17:01:52.817Z",
           "start_datetime": "2026-09-25T17:01:52.817Z",
           "end_datetime": "2026-09-25T17:02:13.201Z",
-          "bbox": [
-            16.825615,
-            0.46735606,
-            17.638458,
-            1.8240169
-          ],
+          "bbox": [16.825615, 0.46735606, 17.638458, 1.8240169],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.991766,
           "assets": {
@@ -635,9 +560,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-11T19:39:24.688Z"
@@ -649,12 +572,7 @@
           "datetime": "2026-09-28T17:01:55.006Z",
           "start_datetime": "2026-09-28T17:01:55.006Z",
           "end_datetime": "2026-09-28T17:02:15.391Z",
-          "bbox": [
-            16.825615,
-            0.46735606,
-            17.638458,
-            1.8240169
-          ],
+          "bbox": [16.825615, 0.46735606, 17.638458, 1.8240169],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.991766,
           "assets": {
@@ -693,9 +611,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-11T19:36:41.784Z"
@@ -707,12 +623,7 @@
           "datetime": "2026-10-01T17:01:57.278Z",
           "start_datetime": "2026-10-01T17:01:57.278Z",
           "end_datetime": "2026-10-01T17:02:17.663Z",
-          "bbox": [
-            16.825615,
-            0.46735606,
-            17.638458,
-            1.8240169
-          ],
+          "bbox": [16.825615, 0.46735606, 17.638458, 1.8240169],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.991766,
           "assets": {
@@ -751,9 +662,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-11T19:41:38.981Z"
@@ -765,12 +674,7 @@
           "datetime": "2026-10-04T17:01:59.505Z",
           "start_datetime": "2026-10-04T17:01:59.505Z",
           "end_datetime": "2026-10-04T17:02:19.890Z",
-          "bbox": [
-            16.825615,
-            0.46735606,
-            17.638458,
-            1.8240169
-          ],
+          "bbox": [16.825615, 0.46735606, 17.638458, 1.8240169],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.991766,
           "assets": {
@@ -809,9 +713,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-11T19:38:29.998Z"
@@ -823,12 +725,7 @@
           "datetime": "2026-05-16T04:37:19.691Z",
           "start_datetime": "2026-05-16T04:37:19.691Z",
           "end_datetime": "2026-05-16T04:37:40.075Z",
-          "bbox": [
-            17.079243,
-            0.48960048,
-            17.906824,
-            1.8492236
-          ],
+          "bbox": [17.079243, 0.48960048, 17.906824, 1.8492236],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.569596,
           "assets": {
@@ -867,9 +764,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-19T08:28:03Z"
@@ -881,12 +776,7 @@
           "datetime": "2026-05-19T04:37:21.351Z",
           "start_datetime": "2026-05-19T04:37:21.351Z",
           "end_datetime": "2026-05-19T04:37:41.735Z",
-          "bbox": [
-            17.079243,
-            0.48960048,
-            17.906824,
-            1.8492236
-          ],
+          "bbox": [17.079243, 0.48960048, 17.906824, 1.8492236],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.569596,
           "assets": {
@@ -925,9 +815,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-19T08:27:11Z"
@@ -939,12 +827,7 @@
           "datetime": "2026-05-22T04:37:23.129Z",
           "start_datetime": "2026-05-22T04:37:23.129Z",
           "end_datetime": "2026-05-22T04:37:43.513Z",
-          "bbox": [
-            17.079243,
-            0.48960048,
-            17.906824,
-            1.8492236
-          ],
+          "bbox": [17.079243, 0.48960048, 17.906824, 1.8492236],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.569596,
           "assets": {
@@ -983,9 +866,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-19T08:25:34Z"
@@ -997,12 +878,7 @@
           "datetime": "2026-05-25T04:37:24.945Z",
           "start_datetime": "2026-05-25T04:37:24.945Z",
           "end_datetime": "2026-05-25T04:37:45.329Z",
-          "bbox": [
-            17.079243,
-            0.48960048,
-            17.906824,
-            1.8492236
-          ],
+          "bbox": [17.079243, 0.48960048, 17.906824, 1.8492236],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.569596,
           "assets": {
@@ -1036,9 +912,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-19T08:29:20Z"
@@ -1050,12 +924,7 @@
           "datetime": "2026-05-28T04:37:26.716Z",
           "start_datetime": "2026-05-28T04:37:26.716Z",
           "end_datetime": "2026-05-28T04:37:47.100Z",
-          "bbox": [
-            17.079243,
-            0.48960048,
-            17.906824,
-            1.8492236
-          ],
+          "bbox": [17.079243, 0.48960048, 17.906824, 1.8492236],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.569596,
           "assets": {
@@ -1094,9 +963,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-19T08:26:25Z"
@@ -1108,12 +975,7 @@
           "datetime": "2026-05-31T04:37:28.307Z",
           "start_datetime": "2026-05-31T04:37:28.307Z",
           "end_datetime": "2026-05-31T04:37:48.691Z",
-          "bbox": [
-            17.079243,
-            0.48960048,
-            17.906824,
-            1.8492236
-          ],
+          "bbox": [17.079243, 0.48960048, 17.906824, 1.8492236],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.569596,
           "assets": {
@@ -1152,9 +1014,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-19T08:24:42Z"
@@ -1166,12 +1026,7 @@
           "datetime": "2026-06-03T04:37:29.875Z",
           "start_datetime": "2026-06-03T04:37:29.875Z",
           "end_datetime": "2026-06-03T04:37:50.258Z",
-          "bbox": [
-            17.079243,
-            0.48960048,
-            17.906824,
-            1.8492236
-          ],
+          "bbox": [17.079243, 0.48960048, 17.906824, 1.8492236],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.569596,
           "assets": {
@@ -1210,9 +1065,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-19T08:28:47Z"
@@ -1224,12 +1077,7 @@
           "datetime": "2026-06-06T04:37:32.010Z",
           "start_datetime": "2026-06-06T04:37:32.010Z",
           "end_datetime": "2026-06-06T04:37:52.394Z",
-          "bbox": [
-            16.723572,
-            0.42615417,
-            17.476654,
-            1.7695827
-          ],
+          "bbox": [16.723572, 0.42615417, 17.476654, 1.7695827],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.713244,
           "assets": {
@@ -1268,9 +1116,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-02T09:13:36Z"
@@ -1282,12 +1128,7 @@
           "datetime": "2026-06-09T04:37:34.320Z",
           "start_datetime": "2026-06-09T04:37:34.320Z",
           "end_datetime": "2026-06-09T04:37:54.704Z",
-          "bbox": [
-            16.723572,
-            0.42615417,
-            17.476654,
-            1.7695827
-          ],
+          "bbox": [16.723572, 0.42615417, 17.476654, 1.7695827],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.713244,
           "assets": {
@@ -1326,9 +1167,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-02T09:14:24Z"
@@ -1340,12 +1179,7 @@
           "datetime": "2026-06-12T04:37:36.408Z",
           "start_datetime": "2026-06-12T04:37:36.408Z",
           "end_datetime": "2026-06-12T04:37:56.792Z",
-          "bbox": [
-            16.723572,
-            0.42615417,
-            17.476654,
-            1.7695827
-          ],
+          "bbox": [16.723572, 0.42615417, 17.476654, 1.7695827],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.713244,
           "assets": {
@@ -1384,9 +1218,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-02T09:15:05Z"
@@ -1398,12 +1230,7 @@
           "datetime": "2026-06-15T04:37:38.098Z",
           "start_datetime": "2026-06-15T04:37:38.098Z",
           "end_datetime": "2026-06-15T04:37:58.482Z",
-          "bbox": [
-            16.723572,
-            0.42615417,
-            17.476654,
-            1.7695827
-          ],
+          "bbox": [16.723572, 0.42615417, 17.476654, 1.7695827],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.713244,
           "assets": {
@@ -1438,9 +1265,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-02T09:15:37Z"
@@ -1452,12 +1277,7 @@
           "datetime": "2026-06-18T04:37:39.913Z",
           "start_datetime": "2026-06-18T04:37:39.913Z",
           "end_datetime": "2026-06-18T04:38:00.297Z",
-          "bbox": [
-            16.723572,
-            0.42615417,
-            17.476654,
-            1.7695827
-          ],
+          "bbox": [16.723572, 0.42615417, 17.476654, 1.7695827],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.713244,
           "assets": {
@@ -1496,9 +1316,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-02T09:16:19Z"
@@ -1510,12 +1328,7 @@
           "datetime": "2026-06-21T04:37:41.831Z",
           "start_datetime": "2026-06-21T04:37:41.831Z",
           "end_datetime": "2026-06-21T04:38:02.215Z",
-          "bbox": [
-            16.723572,
-            0.42615417,
-            17.476654,
-            1.7695827
-          ],
+          "bbox": [16.723572, 0.42615417, 17.476654, 1.7695827],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.713244,
           "assets": {
@@ -1554,9 +1367,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-02T09:16:55Z"
@@ -1568,12 +1379,7 @@
           "datetime": "2026-06-24T04:37:43.765Z",
           "start_datetime": "2026-06-24T04:37:43.765Z",
           "end_datetime": "2026-06-24T04:38:04.149Z",
-          "bbox": [
-            16.723572,
-            0.42615417,
-            17.476654,
-            1.7695827
-          ],
+          "bbox": [16.723572, 0.42615417, 17.476654, 1.7695827],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.713244,
           "assets": {
@@ -1612,9 +1418,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-02T09:17:37Z"
@@ -1649,12 +1453,7 @@
           "datetime": "2026-04-25T04:36:46.850Z",
           "start_datetime": "2026-04-25T04:36:46.850Z",
           "end_datetime": "2026-04-25T04:37:07.235Z",
-          "bbox": [
-            17.745378,
-            -0.588483,
-            18.5561,
-            0.76765996
-          ],
+          "bbox": [17.745378, -0.588483, 18.5561, 0.76765996],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.889915,
           "assets": {
@@ -1693,9 +1492,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-05-30T20:09:26Z"
@@ -1707,12 +1504,7 @@
           "datetime": "2026-04-28T04:36:48.731Z",
           "start_datetime": "2026-04-28T04:36:48.731Z",
           "end_datetime": "2026-04-28T04:37:09.116Z",
-          "bbox": [
-            17.745378,
-            -0.588483,
-            18.5561,
-            0.76765996
-          ],
+          "bbox": [17.745378, -0.588483, 18.5561, 0.76765996],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.889915,
           "assets": {
@@ -1751,9 +1543,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-05-30T20:10:06Z"
@@ -1765,12 +1555,7 @@
           "datetime": "2026-05-01T04:36:50.647Z",
           "start_datetime": "2026-05-01T04:36:50.647Z",
           "end_datetime": "2026-05-01T04:37:11.032Z",
-          "bbox": [
-            17.745378,
-            -0.588483,
-            18.5561,
-            0.76765996
-          ],
+          "bbox": [17.745378, -0.588483, 18.5561, 0.76765996],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.889915,
           "assets": {
@@ -1809,9 +1594,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-05-30T20:07:12Z"
@@ -1823,12 +1606,7 @@
           "datetime": "2026-05-04T04:36:52.459Z",
           "start_datetime": "2026-05-04T04:36:52.459Z",
           "end_datetime": "2026-05-04T04:37:12.844Z",
-          "bbox": [
-            17.745378,
-            -0.588483,
-            18.5561,
-            0.76765996
-          ],
+          "bbox": [17.745378, -0.588483, 18.5561, 0.76765996],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.889915,
           "assets": {
@@ -1862,9 +1640,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-05-30T20:08:51Z"
@@ -1876,12 +1652,7 @@
           "datetime": "2026-05-07T04:36:54.315Z",
           "start_datetime": "2026-05-07T04:36:54.315Z",
           "end_datetime": "2026-05-07T04:37:14.700Z",
-          "bbox": [
-            17.745378,
-            -0.588483,
-            18.5561,
-            0.76765996
-          ],
+          "bbox": [17.745378, -0.588483, 18.5561, 0.76765996],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.889915,
           "assets": {
@@ -1920,9 +1691,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-05-30T20:08:23Z"
@@ -1934,12 +1703,7 @@
           "datetime": "2026-05-10T04:36:56.392Z",
           "start_datetime": "2026-05-10T04:36:56.392Z",
           "end_datetime": "2026-05-10T04:37:16.776Z",
-          "bbox": [
-            17.745378,
-            -0.588483,
-            18.5561,
-            0.76765996
-          ],
+          "bbox": [17.745378, -0.588483, 18.5561, 0.76765996],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.889915,
           "assets": {
@@ -1978,9 +1742,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-05-30T20:07:47Z"
@@ -1992,12 +1754,7 @@
           "datetime": "2026-05-13T04:36:58.501Z",
           "start_datetime": "2026-05-13T04:36:58.501Z",
           "end_datetime": "2026-05-13T04:37:18.886Z",
-          "bbox": [
-            17.745378,
-            -0.588483,
-            18.5561,
-            0.76765996
-          ],
+          "bbox": [17.745378, -0.588483, 18.5561, 0.76765996],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.889915,
           "assets": {
@@ -2036,9 +1793,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-05-30T20:06:37Z"
@@ -2050,12 +1805,7 @@
           "datetime": "2026-07-06T16:57:23.476Z",
           "start_datetime": "2026-07-06T16:57:23.476Z",
           "end_datetime": "2026-07-06T16:57:43.861Z",
-          "bbox": [
-            17.751211,
-            -0.68854463,
-            18.563883,
-            0.6679278
-          ],
+          "bbox": [17.751211, -0.68854463, 18.563883, 0.6679278],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.913964,
           "assets": {
@@ -2094,9 +1844,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-08-01T14:21:51Z"
@@ -2108,12 +1856,7 @@
           "datetime": "2026-07-09T16:57:25.322Z",
           "start_datetime": "2026-07-09T16:57:25.322Z",
           "end_datetime": "2026-07-09T16:57:45.707Z",
-          "bbox": [
-            17.751211,
-            -0.68854463,
-            18.563883,
-            0.6679278
-          ],
+          "bbox": [17.751211, -0.68854463, 18.563883, 0.6679278],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.913964,
           "assets": {
@@ -2152,9 +1895,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-08-01T14:22:30Z"
@@ -2166,12 +1907,7 @@
           "datetime": "2026-07-12T16:57:27.133Z",
           "start_datetime": "2026-07-12T16:57:27.133Z",
           "end_datetime": "2026-07-12T16:57:47.518Z",
-          "bbox": [
-            17.751211,
-            -0.68854463,
-            18.563883,
-            0.6679278
-          ],
+          "bbox": [17.751211, -0.68854463, 18.563883, 0.6679278],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.913964,
           "assets": {
@@ -2210,9 +1946,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-08-01T14:23:06Z"
@@ -2224,12 +1958,7 @@
           "datetime": "2026-07-15T16:57:28.933Z",
           "start_datetime": "2026-07-15T16:57:28.933Z",
           "end_datetime": "2026-07-15T16:57:49.318Z",
-          "bbox": [
-            17.751211,
-            -0.68854463,
-            18.563883,
-            0.6679278
-          ],
+          "bbox": [17.751211, -0.68854463, 18.563883, 0.6679278],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.913964,
           "assets": {
@@ -2264,9 +1993,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-08-01T14:23:35Z"
@@ -2278,12 +2005,7 @@
           "datetime": "2026-07-18T16:57:30.839Z",
           "start_datetime": "2026-07-18T16:57:30.839Z",
           "end_datetime": "2026-07-18T16:57:51.224Z",
-          "bbox": [
-            17.751211,
-            -0.68854463,
-            18.563883,
-            0.6679278
-          ],
+          "bbox": [17.751211, -0.68854463, 18.563883, 0.6679278],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.913964,
           "assets": {
@@ -2322,9 +2044,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-08-01T14:24:12Z"
@@ -2336,12 +2056,7 @@
           "datetime": "2026-07-21T16:57:32.829Z",
           "start_datetime": "2026-07-21T16:57:32.829Z",
           "end_datetime": "2026-07-21T16:57:53.214Z",
-          "bbox": [
-            17.751211,
-            -0.68854463,
-            18.563883,
-            0.6679278
-          ],
+          "bbox": [17.751211, -0.68854463, 18.563883, 0.6679278],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.913964,
           "assets": {
@@ -2380,9 +2095,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-08-01T14:24:51Z"
@@ -2394,12 +2107,7 @@
           "datetime": "2026-07-24T16:57:34.729Z",
           "start_datetime": "2026-07-24T16:57:34.729Z",
           "end_datetime": "2026-07-24T16:57:55.113Z",
-          "bbox": [
-            17.751211,
-            -0.68854463,
-            18.563883,
-            0.6679278
-          ],
+          "bbox": [17.751211, -0.68854463, 18.563883, 0.6679278],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.913964,
           "assets": {
@@ -2438,9 +2146,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-08-01T14:25:26Z"
@@ -2452,12 +2158,7 @@
           "datetime": "2026-05-16T04:37:00.691Z",
           "start_datetime": "2026-05-16T04:37:00.691Z",
           "end_datetime": "2026-05-16T04:37:21.075Z",
-          "bbox": [
-            17.325882,
-            -0.66553956,
-            18.15226,
-            0.6937779
-          ],
+          "bbox": [17.325882, -0.66553956, 18.15226, 0.6937779],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.058462,
           "assets": {
@@ -2496,9 +2197,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-14T21:48:21Z"
@@ -2510,12 +2209,7 @@
           "datetime": "2026-05-19T04:37:02.351Z",
           "start_datetime": "2026-05-19T04:37:02.351Z",
           "end_datetime": "2026-05-19T04:37:22.735Z",
-          "bbox": [
-            17.325882,
-            -0.66553956,
-            18.15226,
-            0.6937779
-          ],
+          "bbox": [17.325882, -0.66553956, 18.15226, 0.6937779],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.058462,
           "assets": {
@@ -2554,9 +2248,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-14T21:45:38Z"
@@ -2568,12 +2260,7 @@
           "datetime": "2026-05-22T04:37:04.130Z",
           "start_datetime": "2026-05-22T04:37:04.130Z",
           "end_datetime": "2026-05-22T04:37:24.513Z",
-          "bbox": [
-            17.325882,
-            -0.66553956,
-            18.15226,
-            0.6937779
-          ],
+          "bbox": [17.325882, -0.66553956, 18.15226, 0.6937779],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.058462,
           "assets": {
@@ -2612,9 +2299,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-14T21:49:04Z"
@@ -2626,12 +2311,7 @@
           "datetime": "2026-05-25T04:37:05.946Z",
           "start_datetime": "2026-05-25T04:37:05.946Z",
           "end_datetime": "2026-05-25T04:37:26.330Z",
-          "bbox": [
-            17.325882,
-            -0.66553956,
-            18.15226,
-            0.6937779
-          ],
+          "bbox": [17.325882, -0.66553956, 18.15226, 0.6937779],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.058462,
           "assets": {
@@ -2665,9 +2345,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-14T21:46:13Z"
@@ -2679,12 +2357,7 @@
           "datetime": "2026-05-28T04:37:07.718Z",
           "start_datetime": "2026-05-28T04:37:07.718Z",
           "end_datetime": "2026-05-28T04:37:28.102Z",
-          "bbox": [
-            17.325882,
-            -0.66553956,
-            18.15226,
-            0.6937779
-          ],
+          "bbox": [17.325882, -0.66553956, 18.15226, 0.6937779],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.058462,
           "assets": {
@@ -2723,9 +2396,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-14T21:46:53Z"
@@ -2737,12 +2408,7 @@
           "datetime": "2026-05-31T04:37:09.309Z",
           "start_datetime": "2026-05-31T04:37:09.309Z",
           "end_datetime": "2026-05-31T04:37:29.693Z",
-          "bbox": [
-            17.325882,
-            -0.66553956,
-            18.15226,
-            0.6937779
-          ],
+          "bbox": [17.325882, -0.66553956, 18.15226, 0.6937779],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.058462,
           "assets": {
@@ -2781,9 +2447,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-14T21:49:46Z"
@@ -2795,12 +2459,7 @@
           "datetime": "2026-06-03T04:37:10.876Z",
           "start_datetime": "2026-06-03T04:37:10.876Z",
           "end_datetime": "2026-06-03T04:37:31.259Z",
-          "bbox": [
-            17.325882,
-            -0.66553956,
-            18.15226,
-            0.6937779
-          ],
+          "bbox": [17.325882, -0.66553956, 18.15226, 0.6937779],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.058462,
           "assets": {
@@ -2839,9 +2498,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-06-14T21:47:38Z"
@@ -2853,12 +2510,7 @@
           "datetime": "2026-07-27T16:57:36.786Z",
           "start_datetime": "2026-07-27T16:57:36.786Z",
           "end_datetime": "2026-07-27T16:57:57.171Z",
-          "bbox": [
-            18.148777,
-            -0.7879717,
-            18.976248,
-            0.5714573
-          ],
+          "bbox": [18.148777, -0.7879717, 18.976248, 0.5714573],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396551,
           "assets": {
@@ -2897,9 +2549,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-19T03:55:06Z"
@@ -2911,12 +2561,7 @@
           "datetime": "2026-07-30T16:57:38.652Z",
           "start_datetime": "2026-07-30T16:57:38.652Z",
           "end_datetime": "2026-07-30T16:57:59.037Z",
-          "bbox": [
-            18.148777,
-            -0.7879717,
-            18.976248,
-            0.5714573
-          ],
+          "bbox": [18.148777, -0.7879717, 18.976248, 0.5714573],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396551,
           "assets": {
@@ -2955,9 +2600,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-19T03:56:02Z"
@@ -2969,12 +2612,7 @@
           "datetime": "2026-08-02T16:57:40.684Z",
           "start_datetime": "2026-08-02T16:57:40.684Z",
           "end_datetime": "2026-08-02T16:58:01.068Z",
-          "bbox": [
-            18.148777,
-            -0.7879717,
-            18.976248,
-            0.5714573
-          ],
+          "bbox": [18.148777, -0.7879717, 18.976248, 0.5714573],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396551,
           "assets": {
@@ -3013,9 +2651,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-19T03:56:50Z"
@@ -3027,12 +2663,7 @@
           "datetime": "2026-08-05T16:57:42.735Z",
           "start_datetime": "2026-08-05T16:57:42.735Z",
           "end_datetime": "2026-08-05T16:58:03.120Z",
-          "bbox": [
-            18.148777,
-            -0.7879717,
-            18.976248,
-            0.5714573
-          ],
+          "bbox": [18.148777, -0.7879717, 18.976248, 0.5714573],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396551,
           "assets": {
@@ -3067,9 +2698,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-19T03:57:36Z"
@@ -3081,12 +2710,7 @@
           "datetime": "2026-08-08T16:57:44.779Z",
           "start_datetime": "2026-08-08T16:57:44.779Z",
           "end_datetime": "2026-08-08T16:58:05.164Z",
-          "bbox": [
-            18.148777,
-            -0.7879717,
-            18.976248,
-            0.5714573
-          ],
+          "bbox": [18.148777, -0.7879717, 18.976248, 0.5714573],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396551,
           "assets": {
@@ -3125,9 +2749,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-19T03:58:20Z"
@@ -3139,12 +2761,7 @@
           "datetime": "2026-08-11T16:57:46.699Z",
           "start_datetime": "2026-08-11T16:57:46.699Z",
           "end_datetime": "2026-08-11T16:58:07.083Z",
-          "bbox": [
-            18.148777,
-            -0.7879717,
-            18.976248,
-            0.5714573
-          ],
+          "bbox": [18.148777, -0.7879717, 18.976248, 0.5714573],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396551,
           "assets": {
@@ -3183,9 +2800,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-19T03:54:18Z"
@@ -3197,12 +2812,7 @@
           "datetime": "2026-08-14T16:57:48.668Z",
           "start_datetime": "2026-08-14T16:57:48.668Z",
           "end_datetime": "2026-08-14T16:58:09.053Z",
-          "bbox": [
-            18.148777,
-            -0.7879717,
-            18.976248,
-            0.5714573
-          ],
+          "bbox": [18.148777, -0.7879717, 18.976248, 0.5714573],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396551,
           "assets": {
@@ -3241,9 +2851,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-19T03:53:28Z"
@@ -3267,12 +2875,7 @@
           "datetime": "2026-07-05T04:08:02.488Z",
           "start_datetime": "2026-07-05T04:08:02.488Z",
           "end_datetime": "2026-07-05T04:08:22.874Z",
-          "bbox": [
-            25.245983,
-            -2.900224,
-            26.056887,
-            -1.5448794
-          ],
+          "bbox": [25.245983, -2.900224, 26.056887, -1.5448794],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.028818,
           "assets": {
@@ -3311,9 +2914,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:37:45Z"
@@ -3325,12 +2926,7 @@
           "datetime": "2026-07-05T04:08:21.490Z",
           "start_datetime": "2026-07-05T04:08:21.490Z",
           "end_datetime": "2026-07-05T04:08:41.876Z",
-          "bbox": [
-            25.003578,
-            -1.7444649,
-            25.813677,
-            -0.38885447
-          ],
+          "bbox": [25.003578, -1.7444649, 25.813677, -0.38885447],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.059192,
           "assets": {
@@ -3369,9 +2965,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:10:53Z"
@@ -3383,12 +2977,7 @@
           "datetime": "2026-07-08T04:08:04.356Z",
           "start_datetime": "2026-07-08T04:08:04.356Z",
           "end_datetime": "2026-07-08T04:08:24.743Z",
-          "bbox": [
-            25.245983,
-            -2.900224,
-            26.056887,
-            -1.5448794
-          ],
+          "bbox": [25.245983, -2.900224, 26.056887, -1.5448794],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.028818,
           "assets": {
@@ -3427,9 +3016,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:38:31Z"
@@ -3441,12 +3028,7 @@
           "datetime": "2026-07-08T04:08:23.357Z",
           "start_datetime": "2026-07-08T04:08:23.357Z",
           "end_datetime": "2026-07-08T04:08:43.743Z",
-          "bbox": [
-            25.003578,
-            -1.7444649,
-            25.813677,
-            -0.38885447
-          ],
+          "bbox": [25.003578, -1.7444649, 25.813677, -0.38885447],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.059192,
           "assets": {
@@ -3485,9 +3067,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:11:28Z"
@@ -3499,12 +3079,7 @@
           "datetime": "2026-07-11T04:08:06.211Z",
           "start_datetime": "2026-07-11T04:08:06.211Z",
           "end_datetime": "2026-07-11T04:08:26.597Z",
-          "bbox": [
-            25.245983,
-            -2.900224,
-            26.056887,
-            -1.5448794
-          ],
+          "bbox": [25.245983, -2.900224, 26.056887, -1.5448794],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.028818,
           "assets": {
@@ -3543,9 +3118,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:39:10Z"
@@ -3557,12 +3130,7 @@
           "datetime": "2026-07-11T04:08:25.212Z",
           "start_datetime": "2026-07-11T04:08:25.212Z",
           "end_datetime": "2026-07-11T04:08:45.598Z",
-          "bbox": [
-            25.003578,
-            -1.7444649,
-            25.813677,
-            -0.38885447
-          ],
+          "bbox": [25.003578, -1.7444649, 25.813677, -0.38885447],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.059192,
           "assets": {
@@ -3601,9 +3169,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:12:02Z"
@@ -3615,12 +3181,7 @@
           "datetime": "2026-07-14T04:08:07.999Z",
           "start_datetime": "2026-07-14T04:08:07.999Z",
           "end_datetime": "2026-07-14T04:08:28.386Z",
-          "bbox": [
-            25.245983,
-            -2.900224,
-            26.056887,
-            -1.5448794
-          ],
+          "bbox": [25.245983, -2.900224, 26.056887, -1.5448794],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.028818,
           "assets": {
@@ -3655,9 +3216,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:39:38Z"
@@ -3669,12 +3228,7 @@
           "datetime": "2026-07-14T04:08:27.000Z",
           "start_datetime": "2026-07-14T04:08:27.000Z",
           "end_datetime": "2026-07-14T04:08:47.386Z",
-          "bbox": [
-            25.003578,
-            -1.7444649,
-            25.813677,
-            -0.38885447
-          ],
+          "bbox": [25.003578, -1.7444649, 25.813677, -0.38885447],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.059192,
           "assets": {
@@ -3709,9 +3263,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:12:32Z"
@@ -3723,12 +3275,7 @@
           "datetime": "2026-07-17T04:08:09.854Z",
           "start_datetime": "2026-07-17T04:08:09.854Z",
           "end_datetime": "2026-07-17T04:08:30.241Z",
-          "bbox": [
-            25.245983,
-            -2.900224,
-            26.056887,
-            -1.5448794
-          ],
+          "bbox": [25.245983, -2.900224, 26.056887, -1.5448794],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.028818,
           "assets": {
@@ -3767,9 +3314,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:40:11Z"
@@ -3781,12 +3326,7 @@
           "datetime": "2026-07-17T04:08:28.855Z",
           "start_datetime": "2026-07-17T04:08:28.855Z",
           "end_datetime": "2026-07-17T04:08:49.241Z",
-          "bbox": [
-            25.003578,
-            -1.7444649,
-            25.813677,
-            -0.38885447
-          ],
+          "bbox": [25.003578, -1.7444649, 25.813677, -0.38885447],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.059192,
           "assets": {
@@ -3825,9 +3365,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:13:03Z"
@@ -3839,12 +3377,7 @@
           "datetime": "2026-07-20T04:08:11.822Z",
           "start_datetime": "2026-07-20T04:08:11.822Z",
           "end_datetime": "2026-07-20T04:08:32.209Z",
-          "bbox": [
-            25.245983,
-            -2.900224,
-            26.056887,
-            -1.5448794
-          ],
+          "bbox": [25.245983, -2.900224, 26.056887, -1.5448794],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.028818,
           "assets": {
@@ -3883,9 +3416,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:41:01Z"
@@ -3897,12 +3428,7 @@
           "datetime": "2026-07-20T04:08:30.823Z",
           "start_datetime": "2026-07-20T04:08:30.823Z",
           "end_datetime": "2026-07-20T04:08:51.209Z",
-          "bbox": [
-            25.003578,
-            -1.7444649,
-            25.813677,
-            -0.38885447
-          ],
+          "bbox": [25.003578, -1.7444649, 25.813677, -0.38885447],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.059192,
           "assets": {
@@ -3941,9 +3467,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:13:39Z"
@@ -3955,12 +3479,7 @@
           "datetime": "2026-07-23T04:08:13.710Z",
           "start_datetime": "2026-07-23T04:08:13.710Z",
           "end_datetime": "2026-07-23T04:08:34.097Z",
-          "bbox": [
-            25.245983,
-            -2.900224,
-            26.056887,
-            -1.5448794
-          ],
+          "bbox": [25.245983, -2.900224, 26.056887, -1.5448794],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.028818,
           "assets": {
@@ -3999,9 +3518,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:41:35Z"
@@ -4013,12 +3530,7 @@
           "datetime": "2026-07-23T04:08:32.711Z",
           "start_datetime": "2026-07-23T04:08:32.711Z",
           "end_datetime": "2026-07-23T04:08:53.097Z",
-          "bbox": [
-            25.003578,
-            -1.7444649,
-            25.813677,
-            -0.38885447
-          ],
+          "bbox": [25.003578, -1.7444649, 25.813677, -0.38885447],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.059192,
           "assets": {
@@ -4057,9 +3569,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-07-29T10:14:12Z"
@@ -4071,12 +3581,7 @@
           "datetime": "2026-09-15T16:29:39.968Z",
           "start_datetime": "2026-09-15T16:29:39.968Z",
           "end_datetime": "2026-09-15T16:30:00.355Z",
-          "bbox": [
-            24.523123,
-            -1.8443737,
-            25.335289,
-            -0.4880911
-          ],
+          "bbox": [24.523123, -1.8443737, 25.335289, -0.4880911],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396949,
           "assets": {
@@ -4115,9 +3620,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:13:18.112Z"
@@ -4129,12 +3632,7 @@
           "datetime": "2026-09-15T16:29:58.968Z",
           "start_datetime": "2026-09-15T16:29:58.968Z",
           "end_datetime": "2026-09-15T16:30:19.356Z",
-          "bbox": [
-            24.279362,
-            -3.0001254,
-            25.091782,
-            -1.6444656
-          ],
+          "bbox": [24.279362, -3.0001254, 25.091782, -1.6444656],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.290388,
           "assets": {
@@ -4173,9 +3671,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:01:33.052Z"
@@ -4187,12 +3683,7 @@
           "datetime": "2026-09-18T16:29:42.080Z",
           "start_datetime": "2026-09-18T16:29:42.080Z",
           "end_datetime": "2026-09-18T16:30:02.467Z",
-          "bbox": [
-            24.523123,
-            -1.8443737,
-            25.335289,
-            -0.4880911
-          ],
+          "bbox": [24.523123, -1.8443737, 25.335289, -0.4880911],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396949,
           "assets": {
@@ -4231,9 +3722,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:13:06.221Z"
@@ -4245,12 +3734,7 @@
           "datetime": "2026-09-18T16:30:01.080Z",
           "start_datetime": "2026-09-18T16:30:01.080Z",
           "end_datetime": "2026-09-18T16:30:21.467Z",
-          "bbox": [
-            24.279362,
-            -3.0001254,
-            25.091782,
-            -1.6444656
-          ],
+          "bbox": [24.279362, -3.0001254, 25.091782, -1.6444656],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.290388,
           "assets": {
@@ -4289,9 +3773,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:01:31.270Z"
@@ -4303,12 +3785,7 @@
           "datetime": "2026-09-21T16:29:44.285Z",
           "start_datetime": "2026-09-21T16:29:44.285Z",
           "end_datetime": "2026-09-21T16:30:04.672Z",
-          "bbox": [
-            24.523123,
-            -1.8443737,
-            25.335289,
-            -0.4880911
-          ],
+          "bbox": [24.523123, -1.8443737, 25.335289, -0.4880911],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396949,
           "assets": {
@@ -4347,9 +3824,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:13:19.493Z"
@@ -4361,12 +3836,7 @@
           "datetime": "2026-09-21T16:30:03.285Z",
           "start_datetime": "2026-09-21T16:30:03.285Z",
           "end_datetime": "2026-09-21T16:30:23.672Z",
-          "bbox": [
-            24.279362,
-            -3.0001254,
-            25.091782,
-            -1.6444656
-          ],
+          "bbox": [24.279362, -3.0001254, 25.091782, -1.6444656],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.290388,
           "assets": {
@@ -4405,9 +3875,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:01:35.129Z"
@@ -4419,12 +3887,7 @@
           "datetime": "2026-09-24T16:29:46.344Z",
           "start_datetime": "2026-09-24T16:29:46.344Z",
           "end_datetime": "2026-09-24T16:30:06.731Z",
-          "bbox": [
-            24.523123,
-            -1.8443737,
-            25.335289,
-            -0.4880911
-          ],
+          "bbox": [24.523123, -1.8443737, 25.335289, -0.4880911],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396949,
           "assets": {
@@ -4459,9 +3922,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:13:18.257Z"
@@ -4473,12 +3934,7 @@
           "datetime": "2026-09-24T16:30:05.344Z",
           "start_datetime": "2026-09-24T16:30:05.344Z",
           "end_datetime": "2026-09-24T16:30:25.732Z",
-          "bbox": [
-            24.279362,
-            -3.0001254,
-            25.091782,
-            -1.6444656
-          ],
+          "bbox": [24.279362, -3.0001254, 25.091782, -1.6444656],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.290388,
           "assets": {
@@ -4513,9 +3969,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:01:30.815Z"
@@ -4527,12 +3981,7 @@
           "datetime": "2026-09-27T16:29:48.559Z",
           "start_datetime": "2026-09-27T16:29:48.559Z",
           "end_datetime": "2026-09-27T16:30:08.946Z",
-          "bbox": [
-            24.523123,
-            -1.8443737,
-            25.335289,
-            -0.4880911
-          ],
+          "bbox": [24.523123, -1.8443737, 25.335289, -0.4880911],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396949,
           "assets": {
@@ -4571,9 +4020,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:13:19.290Z"
@@ -4585,12 +4032,7 @@
           "datetime": "2026-09-27T16:30:07.559Z",
           "start_datetime": "2026-09-27T16:30:07.559Z",
           "end_datetime": "2026-09-27T16:30:27.947Z",
-          "bbox": [
-            24.279362,
-            -3.0001254,
-            25.091782,
-            -1.6444656
-          ],
+          "bbox": [24.279362, -3.0001254, 25.091782, -1.6444656],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.290388,
           "assets": {
@@ -4629,9 +4071,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T01:59:23.617Z"
@@ -4643,12 +4083,7 @@
           "datetime": "2026-09-30T16:29:50.830Z",
           "start_datetime": "2026-09-30T16:29:50.830Z",
           "end_datetime": "2026-09-30T16:30:11.216Z",
-          "bbox": [
-            24.523123,
-            -1.8443737,
-            25.335289,
-            -0.4880911
-          ],
+          "bbox": [24.523123, -1.8443737, 25.335289, -0.4880911],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396949,
           "assets": {
@@ -4687,9 +4122,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:13:19.609Z"
@@ -4701,12 +4134,7 @@
           "datetime": "2026-09-30T16:30:09.830Z",
           "start_datetime": "2026-09-30T16:30:09.830Z",
           "end_datetime": "2026-09-30T16:30:30.217Z",
-          "bbox": [
-            24.279362,
-            -3.0001254,
-            25.091782,
-            -1.6444656
-          ],
+          "bbox": [24.279362, -3.0001254, 25.091782, -1.6444656],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.290388,
           "assets": {
@@ -4745,9 +4173,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:01:33.425Z"
@@ -4759,12 +4185,7 @@
           "datetime": "2026-10-03T16:29:53.100Z",
           "start_datetime": "2026-10-03T16:29:53.100Z",
           "end_datetime": "2026-10-03T16:30:13.486Z",
-          "bbox": [
-            24.523123,
-            -1.8443737,
-            25.335289,
-            -0.4880911
-          ],
+          "bbox": [24.523123, -1.8443737, 25.335289, -0.4880911],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.396949,
           "assets": {
@@ -4803,9 +4224,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:13:08.152Z"
@@ -4817,12 +4236,7 @@
           "datetime": "2026-10-03T16:30:12.101Z",
           "start_datetime": "2026-10-03T16:30:12.101Z",
           "end_datetime": "2026-10-03T16:30:32.488Z",
-          "bbox": [
-            24.279362,
-            -3.0001254,
-            25.091782,
-            -1.6444656
-          ],
+          "bbox": [24.279362, -3.0001254, 25.091782, -1.6444656],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.290388,
           "assets": {
@@ -4861,9 +4275,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-10-10T02:01:32.670Z"
@@ -4875,12 +4287,7 @@
           "datetime": "2026-07-26T04:08:15.763Z",
           "start_datetime": "2026-07-26T04:08:15.763Z",
           "end_datetime": "2026-07-26T04:08:36.149Z",
-          "bbox": [
-            24.834637,
-            -2.9764967,
-            25.660337,
-            -1.6182975
-          ],
+          "bbox": [24.834637, -2.9764967, 25.660337, -1.6182975],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.548986,
           "assets": {
@@ -4919,9 +4326,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-17T17:41:58Z"
@@ -4933,12 +4338,7 @@
           "datetime": "2026-07-26T04:08:34.793Z",
           "start_datetime": "2026-07-26T04:08:34.793Z",
           "end_datetime": "2026-07-26T04:08:55.178Z",
-          "bbox": [
-            24.583895,
-            -1.8212811,
-            25.408773,
-            -0.46240124
-          ],
+          "bbox": [24.583895, -1.8212811, 25.408773, -0.46240124],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.538881,
           "assets": {
@@ -4977,9 +4377,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-18T14:06:26Z"
@@ -4991,12 +4389,7 @@
           "datetime": "2026-07-29T04:08:17.631Z",
           "start_datetime": "2026-07-29T04:08:17.631Z",
           "end_datetime": "2026-07-29T04:08:38.016Z",
-          "bbox": [
-            24.834637,
-            -2.9764967,
-            25.660337,
-            -1.6182975
-          ],
+          "bbox": [24.834637, -2.9764967, 25.660337, -1.6182975],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.548986,
           "assets": {
@@ -5035,9 +4428,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-17T17:42:37Z"
@@ -5049,12 +4440,7 @@
           "datetime": "2026-07-29T04:08:36.660Z",
           "start_datetime": "2026-07-29T04:08:36.660Z",
           "end_datetime": "2026-07-29T04:08:57.045Z",
-          "bbox": [
-            24.583895,
-            -1.8212811,
-            25.408773,
-            -0.46240124
-          ],
+          "bbox": [24.583895, -1.8212811, 25.408773, -0.46240124],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.538881,
           "assets": {
@@ -5093,9 +4479,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-18T14:05:07Z"
@@ -5107,12 +4491,7 @@
           "datetime": "2026-08-01T04:08:19.522Z",
           "start_datetime": "2026-08-01T04:08:19.522Z",
           "end_datetime": "2026-08-01T04:08:39.908Z",
-          "bbox": [
-            24.834637,
-            -2.9764967,
-            25.660337,
-            -1.6182975
-          ],
+          "bbox": [24.834637, -2.9764967, 25.660337, -1.6182975],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.548986,
           "assets": {
@@ -5147,9 +4526,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-17T17:43:08Z"
@@ -5161,12 +4538,7 @@
           "datetime": "2026-08-01T04:08:38.552Z",
           "start_datetime": "2026-08-01T04:08:38.552Z",
           "end_datetime": "2026-08-01T04:08:58.936Z",
-          "bbox": [
-            24.583895,
-            -1.8212811,
-            25.408773,
-            -0.46240124
-          ],
+          "bbox": [24.583895, -1.8212811, 25.408773, -0.46240124],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.538881,
           "assets": {
@@ -5205,9 +4577,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-18T14:07:06Z"
@@ -5219,12 +4589,7 @@
           "datetime": "2026-08-04T04:08:21.680Z",
           "start_datetime": "2026-08-04T04:08:21.680Z",
           "end_datetime": "2026-08-04T04:08:42.066Z",
-          "bbox": [
-            24.834637,
-            -2.9764967,
-            25.660337,
-            -1.6182975
-          ],
+          "bbox": [24.834637, -2.9764967, 25.660337, -1.6182975],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.548986,
           "assets": {
@@ -5263,9 +4628,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-17T17:43:43Z"
@@ -5277,12 +4640,7 @@
           "datetime": "2026-08-04T04:08:40.709Z",
           "start_datetime": "2026-08-04T04:08:40.709Z",
           "end_datetime": "2026-08-04T04:09:01.094Z",
-          "bbox": [
-            24.583895,
-            -1.8212811,
-            25.408773,
-            -0.46240124
-          ],
+          "bbox": [24.583895, -1.8212811, 25.408773, -0.46240124],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.538881,
           "assets": {
@@ -5317,9 +4675,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-18T14:04:27Z"
@@ -5331,12 +4687,7 @@
           "datetime": "2026-08-07T04:08:23.737Z",
           "start_datetime": "2026-08-07T04:08:23.737Z",
           "end_datetime": "2026-08-07T04:08:44.122Z",
-          "bbox": [
-            24.834637,
-            -2.9764967,
-            25.660337,
-            -1.6182975
-          ],
+          "bbox": [24.834637, -2.9764967, 25.660337, -1.6182975],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.548986,
           "assets": {
@@ -5375,9 +4726,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-17T17:44:20Z"
@@ -5389,12 +4738,7 @@
           "datetime": "2026-08-07T04:08:42.766Z",
           "start_datetime": "2026-08-07T04:08:42.766Z",
           "end_datetime": "2026-08-07T04:09:03.150Z",
-          "bbox": [
-            24.583895,
-            -1.8212811,
-            25.408773,
-            -0.46240124
-          ],
+          "bbox": [24.583895, -1.8212811, 25.408773, -0.46240124],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.538881,
           "assets": {
@@ -5433,9 +4777,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-18T14:03:54Z"
@@ -5447,12 +4789,7 @@
           "datetime": "2026-08-10T04:08:25.733Z",
           "start_datetime": "2026-08-10T04:08:25.733Z",
           "end_datetime": "2026-08-10T04:08:46.119Z",
-          "bbox": [
-            24.834637,
-            -2.9764967,
-            25.660337,
-            -1.6182975
-          ],
+          "bbox": [24.834637, -2.9764967, 25.660337, -1.6182975],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.548986,
           "assets": {
@@ -5491,9 +4828,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-17T17:41:19Z"
@@ -5505,12 +4840,7 @@
           "datetime": "2026-08-10T04:08:44.762Z",
           "start_datetime": "2026-08-10T04:08:44.762Z",
           "end_datetime": "2026-08-10T04:09:05.147Z",
-          "bbox": [
-            24.583895,
-            -1.8212811,
-            25.408773,
-            -0.46240124
-          ],
+          "bbox": [24.583895, -1.8212811, 25.408773, -0.46240124],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.538881,
           "assets": {
@@ -5549,9 +4879,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-18T14:05:46Z"
@@ -5563,12 +4891,7 @@
           "datetime": "2026-08-16T04:08:29.831Z",
           "start_datetime": "2026-08-16T04:08:29.831Z",
           "end_datetime": "2026-08-16T04:08:50.217Z",
-          "bbox": [
-            24.480467,
-            -3.0392349,
-            25.230734,
-            -1.697102
-          ],
+          "bbox": [24.480467, -3.0392349, 25.230734, -1.697102],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.230875,
           "assets": {
@@ -5607,9 +4930,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T22:37:14Z"
@@ -5621,12 +4942,7 @@
           "datetime": "2026-08-16T04:08:48.834Z",
           "start_datetime": "2026-08-16T04:08:48.834Z",
           "end_datetime": "2026-08-16T04:09:09.219Z",
-          "bbox": [
-            24.237602,
-            -1.8842316,
-            24.987816,
-            -0.54163927
-          ],
+          "bbox": [24.237602, -1.8842316, 24.987816, -0.54163927],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.193523,
           "assets": {
@@ -5665,9 +4981,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T23:04:54Z"
@@ -5679,12 +4993,7 @@
           "datetime": "2026-08-19T04:08:31.975Z",
           "start_datetime": "2026-08-19T04:08:31.975Z",
           "end_datetime": "2026-08-19T04:08:52.361Z",
-          "bbox": [
-            24.480467,
-            -3.0392349,
-            25.230734,
-            -1.697102
-          ],
+          "bbox": [24.480467, -3.0392349, 25.230734, -1.697102],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.230875,
           "assets": {
@@ -5723,9 +5032,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T22:38:02Z"
@@ -5737,12 +5044,7 @@
           "datetime": "2026-08-19T04:08:50.977Z",
           "start_datetime": "2026-08-19T04:08:50.977Z",
           "end_datetime": "2026-08-19T04:09:11.362Z",
-          "bbox": [
-            24.237602,
-            -1.8842316,
-            24.987816,
-            -0.54163927
-          ],
+          "bbox": [24.237602, -1.8842316, 24.987816, -0.54163927],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.193523,
           "assets": {
@@ -5781,9 +5083,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T23:05:30Z"
@@ -5795,12 +5095,7 @@
           "datetime": "2026-08-22T04:08:33.999Z",
           "start_datetime": "2026-08-22T04:08:33.999Z",
           "end_datetime": "2026-08-22T04:08:54.385Z",
-          "bbox": [
-            24.480467,
-            -3.0392349,
-            25.230734,
-            -1.697102
-          ],
+          "bbox": [24.480467, -3.0392349, 25.230734, -1.697102],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.230875,
           "assets": {
@@ -5835,9 +5130,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T22:38:39Z"
@@ -5849,12 +5142,7 @@
           "datetime": "2026-08-22T04:08:53.001Z",
           "start_datetime": "2026-08-22T04:08:53.001Z",
           "end_datetime": "2026-08-22T04:09:13.386Z",
-          "bbox": [
-            24.237602,
-            -1.8842316,
-            24.987816,
-            -0.54163927
-          ],
+          "bbox": [24.237602, -1.8842316, 24.987816, -0.54163927],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.193523,
           "assets": {
@@ -5889,9 +5177,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T23:05:59Z"
@@ -5903,12 +5189,7 @@
           "datetime": "2026-08-25T04:08:35.970Z",
           "start_datetime": "2026-08-25T04:08:35.970Z",
           "end_datetime": "2026-08-25T04:08:56.356Z",
-          "bbox": [
-            24.480467,
-            -3.0392349,
-            25.230734,
-            -1.697102
-          ],
+          "bbox": [24.480467, -3.0392349, 25.230734, -1.697102],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.230875,
           "assets": {
@@ -5947,9 +5228,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T22:39:22Z"
@@ -5961,12 +5240,7 @@
           "datetime": "2026-08-25T04:08:54.972Z",
           "start_datetime": "2026-08-25T04:08:54.972Z",
           "end_datetime": "2026-08-25T04:09:15.357Z",
-          "bbox": [
-            24.237602,
-            -1.8842316,
-            24.987816,
-            -0.54163927
-          ],
+          "bbox": [24.237602, -1.8842316, 24.987816, -0.54163927],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.193523,
           "assets": {
@@ -6005,9 +5279,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T23:06:32Z"
@@ -6019,12 +5291,7 @@
           "datetime": "2026-08-28T04:08:37.927Z",
           "start_datetime": "2026-08-28T04:08:37.927Z",
           "end_datetime": "2026-08-28T04:08:58.313Z",
-          "bbox": [
-            24.480467,
-            -3.0392349,
-            25.230734,
-            -1.697102
-          ],
+          "bbox": [24.480467, -3.0392349, 25.230734, -1.697102],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.230875,
           "assets": {
@@ -6063,9 +5330,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T22:40:08Z"
@@ -6077,12 +5342,7 @@
           "datetime": "2026-08-28T04:08:56.929Z",
           "start_datetime": "2026-08-28T04:08:56.929Z",
           "end_datetime": "2026-08-28T04:09:17.313Z",
-          "bbox": [
-            24.237602,
-            -1.8842316,
-            24.987816,
-            -0.54163927
-          ],
+          "bbox": [24.237602, -1.8842316, 24.987816, -0.54163927],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.193523,
           "assets": {
@@ -6121,9 +5381,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T23:07:10Z"
@@ -6135,12 +5393,7 @@
           "datetime": "2026-09-03T04:08:42.375Z",
           "start_datetime": "2026-09-03T04:08:42.375Z",
           "end_datetime": "2026-09-03T04:09:02.761Z",
-          "bbox": [
-            24.480467,
-            -3.0392349,
-            25.230734,
-            -1.697102
-          ],
+          "bbox": [24.480467, -3.0392349, 25.230734, -1.697102],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.230875,
           "assets": {
@@ -6179,9 +5432,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T22:40:53Z"
@@ -6193,12 +5444,7 @@
           "datetime": "2026-09-03T04:09:01.377Z",
           "start_datetime": "2026-09-03T04:09:01.377Z",
           "end_datetime": "2026-09-03T04:09:21.761Z",
-          "bbox": [
-            24.237602,
-            -1.8842316,
-            24.987816,
-            -0.54163927
-          ],
+          "bbox": [24.237602, -1.8842316, 24.987816, -0.54163927],
           "geometry_source": "geometry",
           "roi_overlap_fraction": 0.193523,
           "assets": {
@@ -6237,9 +5483,7 @@
           },
           "properties": {
             "platform": "Biomass",
-            "instruments": [
-              "P-SAR"
-            ],
+            "instruments": ["P-SAR"],
             "processing:level": "L1C",
             "sar:instrument_mode": "SM",
             "created": "2026-09-08T23:07:45Z"
