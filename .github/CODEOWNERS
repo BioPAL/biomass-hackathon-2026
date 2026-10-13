@@ -17,6 +17,9 @@
 # SOIL MOISTURE
 /topics/11-A-SOIL-MOISTURE/ @ArmandoMarino
 
+# Shared helpers (resources/)
+/resources/ @yreyricord
+
 # ---------------------------------------------------------------------------
 # Ownership TBD — uncomment and set the GitHub username when confirmed
 # ---------------------------------------------------------------------------
