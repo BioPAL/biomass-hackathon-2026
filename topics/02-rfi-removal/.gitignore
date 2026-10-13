@@ -1,0 +1,7 @@
+# Data / outputs (large or regenerable)
+rfi_data/
+out/
+*.json
+*.geojson
+*.html
+*.parquet
