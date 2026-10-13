@@ -20,7 +20,7 @@ body:
         - "02-RFI"
         - "03-QGIS"
         - "04-3D-TOMO-CANOPY-VISUALIZER"
-        - "05-BIOMASS&GEDI"
+        - "05_BIOMASS_AND_GEDI"
         - "06A-CARBON"
         - "06B-CARBON"
         - "07-GEOLOGY"

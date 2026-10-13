@@ -31,7 +31,7 @@ biomass-hackathon-2026/
 │   ├── 02-RFI/
 │   ├── 03-QGIS/
 │   ├── 04-3D-TOMO-CANOPY-VISUALIZER/
-│   ├── 05-BIOMASS&GEDI/
+│   ├── 05_BIOMASS_AND_GEDI/
 │   ├── 06A-CARBON/
 │   ├── 06B-CARBON/
 │   ├── 07-GEOLOGY/
@@ -52,7 +52,7 @@ Each project group works in `topics/<GROUP-LABEL>/` — the folder name matches 
 | `02-RFI` | RFI removal | `topics/02-RFI/` |
 | `03-QGIS` | QGIS plugin | `topics/03-QGIS/` |
 | `04-3D-TOMO-CANOPY-VISUALIZER` | 3D tomographic canopy visualiser | `topics/04-3D-TOMO-CANOPY-VISUALIZER/` |
-| `05-BIOMASS&GEDI` | BIOMASS and GEDI intercomparison | `topics/05-BIOMASS&GEDI/` |
+| `05_BIOMASS_AND_GEDI` | BIOMASS and GEDI intercomparison | `topics/05_BIOMASS_AND_GEDI/` |
 | `06A-CARBON` | Carbon map validation (table A) | `topics/06A-CARBON/` |
 | `06B-CARBON` | Carbon map validation (table B) | `topics/06B-CARBON/` |
 | `07-GEOLOGY` | BIOMASS for Geology | `topics/07-GEOLOGY/` |
