@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Lac Télé Community Reserve (LTCR)",
+    "region": "Likouala swamp forest, Republic of the Congo",
+    "bbox": {
+      "west": 16.9793,
+      "south": 0.9395,
+      "east": 17.4793,
+      "north": 1.4395
+    },
+    "bbox_units": "decimal degrees",
+    "note": "Representative 0.5° × 0.5° tile centered near the reserve; not the full reserve boundary."
+  },
+  {
+    "name": "LuiKotale study site",
+    "region": "Democratic Republic of the Congo",
+    "bbox": {
+      "west": 20.058,
+      "south": -3.135,
+      "east": 20.558,
+      "north": -2.635
+    },
+    "bbox_units": "decimal degrees",
+    "note": "Representative 0.5° × 0.5° tile centered near the study site."
+  },
+  {
+    "name": "Congo Basin river",
+    "region": "Congo River near Mbandaka, Democratic Republic of the Congo",
+    "bbox": {
+      "west": 18.0,
+      "south": -0.2,
+      "east": 18.5,
+      "north": 0.3
+    },
+    "bbox_units": "decimal degrees",
+    "note": "Representative tile along the Congo River; the request did not specify a river segment."
+  },
+  {
+    "name": "Lomami National Park",
+    "region": "Democratic Republic of the Congo",
+    "bbox": {
+      "west": 24.7999,
+      "south": -1.9986,
+      "east": 25.2999,
+      "north": -1.4986
+    },
+    "bbox_units": "decimal degrees",
+    "note": "Representative 0.5° × 0.5° tile centered near the park's published central coordinates; not the full park boundary."
+  },
+  {
+    "name": "Rio Negro basin (Wagner et al. study)",
+    "region": "Amazonas, Brazil",
+    "bbox": {
+      "west": -60.271,
+      "south": -3.369,
+      "east": -59.771,
+      "north": -2.869
+    },
+    "bbox_units": "decimal degrees",
+    "note": "Representative 0.5° × 0.5° tile near Manaus/lower Rio Negro. Wagner et al.'s basin-wide study covers a much larger area, so this is not its full study extent."
+  }
+]
