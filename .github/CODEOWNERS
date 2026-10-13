@@ -1,52 +1,51 @@
-# CODEOWNERS — requested reviewers for paths in this repo.
+# CODEOWNERS - requested reviewers for paths in this repo.
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 #
-# Owners need Write access (or be in a team with Write) for review requests to work.
-# Replace @USERNAME below once Francesco Banda and other referents confirm ownership.
+# Owners need Write access or a team with Write for review requests to work.
 
 # ---------------------------------------------------------------------------
 # Confirmed
 # ---------------------------------------------------------------------------
 
-# ICE (cryosphere)
-/topics/08-ICE-QUEEN/ @ArmandoMarino
+# ICE - cryosphere
+/topics/08-ICE-QUEEN/ @ArmandoMarino @francescobanda
 
-# DESERT / geology (paleochannels, dry sand)
+# DESERT / geology - paleochannels, dry sand
 /topics/07-GEOLOGY/ @ArmandoMarino
 
 # SOIL MOISTURE
 /topics/11-A-SOIL-MOISTURE/ @ArmandoMarino
 
-# Shared helpers (resources/)
+# Shared helpers
 /resources/ @yreyricord
 
 # ---------------------------------------------------------------------------
-# Ownership TBD — uncomment and set the GitHub username when confirmed
+# Other groups
 # ---------------------------------------------------------------------------
 
 # RFI removal
-# /topics/02-RFI/ @USERNAME
+/topics/02-RFI/ @francescobanda
 
 # QGIS plugin
-# /topics/03-QGIS/ @USERNAME
+/topics/03-QGIS/ @cristianoManuelLopes
 
 # 3D tomographic canopy visualiser
-# /topics/04-3D-TOMO-CANOPY-VISUALIZER/ @USERNAME
+/topics/04-3D-TOMO-CANOPY-VISUALIZER/ @francescobanda
 
-# BIOMASS and GEDI intercomparison
-# /topics/05-BIOMASS&GEDI/ @USERNAME
+# BIOMASS and GEDI intercomparison (& escaped for pattern matching)
+/topics/05-BIOMASS\&GEDI/ @francescobanda
 
-# Carbon map validation (table A)
-# /topics/06A-CARBON/ @USERNAME
+# Carbon map validation - table A
+/topics/06A-CARBON/ @francescobanda
 
-# Carbon map validation (table B)
-# /topics/06B-CARBON/ @USERNAME
+# Carbon map validation - table B
+/topics/06B-CARBON/ @francescobanda
 
 # Biodiversity
-# /topics/09-BIODIVERSITY/ @USERNAME
+/topics/09-BIODIVERSITY/ @francescobanda
 
 # TomoSAR forest height
-# /topics/10-TOMO-SAR-FOREST-HEIGHT/ @USERNAME
+/topics/10-TOMO-SAR-FOREST-HEIGHT/ @francescobanda
 
 # Flooded forest
-# /topics/11-B-FLOODED-FOREST/ @USERNAME
+/topics/11-B-FLOODED-FOREST/ @francescobanda
