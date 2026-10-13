@@ -25,4 +25,4 @@ Not started.
 
 Topic referent, feel free to ask on site.
 
-The user will work on his own Repository : DEMO
+The user will work on his own Repository : DEMO - Test
