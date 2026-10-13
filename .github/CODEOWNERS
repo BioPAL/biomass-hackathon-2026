@@ -1,16 +1,14 @@
 # CODEOWNERS - requested reviewers for paths in this repo.
-# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
-#
 # Owners need Write access or a team with Write for review requests to work.
 
 # ICE - cryosphere
-/topics/08-ICE-QUEEN/ @ArmandoMarino
+/topics/08-ICE-QUEEN/ @francescobanda @yreyricord
 
 # DESERT geology - paleochannels, dry sand
-/topics/07-GEOLOGY/ @ArmandoMarino
+/topics/07-GEOLOGY/ @francescobanda @yreyricord
 
 # SOIL MOISTURE
-/topics/11-A-SOIL-MOISTURE/ @ArmandoMarino
+/topics/11-A-SOIL-MOISTURE/ @francescobanda @yreyricord
 
 # Shared helpers
 /resources/ @yreyricord
@@ -20,28 +18,28 @@
 # ---------------------------------------------------------------------------
 
 # RFI removal
-/topics/02-RFI/ @francescobanda
+/topics/02-RFI/ @francescobanda @yreyricord
 
 # QGIS plugin
-/topics/03-QGIS/ @cristianoManuelLopes
+/topics/03-QGIS/ @cristianoManuelLopes @yreyricord
 
 # 3D tomographic canopy visualiser
-/topics/04-3D-TOMO-CANOPY-VISUALIZER/ @francescobanda
+/topics/04-3D-TOMO-CANOPY-VISUALIZER/ @francescobanda @yreyricord
 
 # BIOMASS and GEDI intercomparison
-/topics/05_BIOMASS_AND_GEDI/ @francescobanda
+/topics/05_BIOMASS_AND_GEDI/ @francescobanda @yreyricord
 
 # Carbon map validation - table A
-/topics/06A-CARBON/ @francescobanda
+/topics/06A-CARBON/ @francescobanda @yreyricord
 
 # Carbon map validation - table B
-/topics/06B-CARBON/ @francescobanda
+/topics/06B-CARBON/ @francescobanda @yreyricord
 
 # Biodiversity
-/topics/09-BIODIVERSITY/ @francescobanda
+/topics/09-BIODIVERSITY/ @francescobanda @yreyricord
 
 # TomoSAR forest height
-/topics/10-TOMO-SAR-FOREST-HEIGHT/ @francescobanda
+/topics/10-TOMO-SAR-FOREST-HEIGHT/ @francescobanda @yreyricord
 
 # Flooded forest
-/topics/11-B-FLOODED-FOREST/ @francescobanda
+/topics/11-B-FLOODED-FOREST/ @francescobanda @yreyricord

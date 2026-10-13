@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "CODEOWNERS": "plaintext",
+    "**/CODEOWNERS": "plaintext",
+    ".github/CODEOWNERS": "plaintext"
+  }
+}
