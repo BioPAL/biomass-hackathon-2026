@@ -21,12 +21,19 @@ classifiers = [
   "Topic :: Scientific/Engineering :: GIS",
   "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+  "numpy>=1.26",
+  "xarray>=2024.1",
+]
 
 [project.optional-dependencies]
 dev = [
   "pytest>=8",
   "ruff>=0.8",
+]
+examples = [
+  "jupyterlab>=4",
+  "matplotlib>=3.8",
 ]
 
 [tool.hatch.build.targets.wheel]
