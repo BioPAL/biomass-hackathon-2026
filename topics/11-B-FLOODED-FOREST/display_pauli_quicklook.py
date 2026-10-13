@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 # 1. Load the JSON file
-json_path = "/home/samuel/codes/HydroPol/sta_level1c_by_roi.json"
+json_path = "./sta_level1c_by_roi.json"
+
 with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 

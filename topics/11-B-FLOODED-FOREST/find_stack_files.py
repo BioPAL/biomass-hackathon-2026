@@ -36,11 +36,9 @@ from shapely.errors import ShapelyError
 
 # -------------------- Configuration --------------------
 
-CREDENTIALS_PATH = "/home/samuel/codes/HydroPol/credentials.txt"
-ROI_JSON_PATH = (
-    "/home/samuel/codes/HydroPol/rois.json"  # Change to where rois.json is stored
-)
-OUTPUT_JSON_PATH = "/home/samuel/codes/HydroPol/sta_level1c_by_roi.json"
+CREDENTIALS_PATH = "./credentials.txt"
+ROI_JSON_PATH = "/home/samuel/codes/biomass-hackathon-2026/topics/11-B-FLOODED-FOREST/rois.json"  # Change to where rois.json is stored
+OUTPUT_JSON_PATH = "./sta_level1c_by_roi.json"
 
 STAC_API_URL = "https://catalog.maap.eo.esa.int/catalogue/"
 TOKEN_URL = (
