@@ -11,9 +11,6 @@ Multi-scale LiDAR and BIOMASS tomogram processing and visualisation tools.
 - `transforms`: spatial, coordinate, and value transformations
 - `visualisation`: interactive and static visualisation backends
 
-Like `alsdb`, this project uses a flat package layout. The distribution is
-named `tomo-canopy`; import it in Python as `tomo_canopy`.
-
 ## Development setup
 
 ```bash
