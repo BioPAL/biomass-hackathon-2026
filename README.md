@@ -64,16 +64,30 @@ Each project group works in `topics/<GROUP-LABEL>/` — the folder name matches 
 
 ## Contributing
 
-Work from a **fork** (you do not push directly to `main`):
+Work from a **fork** (one fork per person; you do not push directly to `main`):
 
-1. Fork [BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026) on GitHub.
-2. Clone **your fork**, create a branch, commit your work.
-3. Push to your fork and open a pull request targeting `BioPAL/biomass-hackathon-2026` branch `main`.
+1. Create a **Task** issue and pick your **Group** (label is applied automatically).
+2. Fork [BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026), clone **your** fork, create a branch.
+3. When you start the work, open a **draft** pull request early with `Closes #<issue-number>` in the description.
+4. When ready for a maintainer, mark the PR **Ready for review**. A maintainer merges (do not merge yourself).
 
 - Group-specific code and notebooks → `topics/<GROUP-LABEL>/`
 - Code useful to several teams → `resources/` (load / process / evaluate / plot)
 
 Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Project board (Kanban)
+
+Task issues appear on the shared Project board. You do **not** need to drag cards — Status updates from GitHub events:
+
+| Event | Status |
+| --- | --- |
+| Task issue opened | **Todo** |
+| **Draft** PR opened with `Closes #N` | **Doing** |
+| PR marked **Ready for review** (or opened non-draft) | **In review** |
+| PR merged / issue closed | **Done** |
+
+Open the draft PR as soon as you start an issue so the board shows you are working on it.
 
 ## Data and resources
 
