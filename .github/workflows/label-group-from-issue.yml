@@ -1,7 +1,7 @@
 # Apply the group label chosen in the Task issue form or PR template.
-# Fails the check (and comments) when Group is missing or not an allowed label,
-# so incorrect values are visible in the PR/issue Checks tab.
-# Runs with GITHUB_TOKEN so reporters do not need Triage rights.
+# Fails the check (and comments) when Group is missing or not an allowed label.
+# Note: pull_request_target always runs the workflow from the *base* branch (main).
+#       Merge this file to main before the new fail behaviour applies to PRs.
 name: Label group from form
 
 on:
@@ -37,6 +37,7 @@ jobs:
               '11-A-SOIL-MOISTURE',
               '11-B-FLOODED-FOREST',
             ]);
+            const SKIP = new Set(['n/a', 'na', 'none', 'skip']);
             const ALLOWED_LIST = [...ALLOWED].join(', ');
             const MARKER = '<!-- group-label-bot -->';
 
@@ -46,25 +47,10 @@ jobs:
             const issue_number = item.number;
             const { owner, repo } = context.repo;
 
-            async function touchesGroupCode() {
-              if (!isPR) return true;
-              const files = await github.paginate(
-                github.rest.pulls.listFiles,
-                { owner, repo, pull_number: issue_number, per_page: 100 }
-              );
-              return files.some(
-                (f) =>
-                  f.filename.startsWith('topics/') ||
-                  f.filename.startsWith('resources/')
-              );
-            }
-
             async function notifyFailure(message) {
-              const commentBody = `${MARKER}\n:x: **Group label**\n\n${message}\n\nAllowed values: \`${ALLOWED_LIST}\``;
+              const commentBody = `${MARKER}\n:x: **Group label**\n\n${message}\n\nAllowed values: \`${ALLOWED_LIST}\`\n\nMaintainer-only escape: put \`n/a\` under \`## Group\`.`;
               const comments = await github.paginate(
-                isPR
-                  ? github.rest.issues.listComments
-                  : github.rest.issues.listComments,
+                github.rest.issues.listComments,
                 { owner, repo, issue_number, per_page: 100 }
               );
               const existing = comments.find((c) =>
@@ -112,15 +98,9 @@ jobs:
             );
 
             if (!match) {
-              if (isPR && !(await touchesGroupCode())) {
-                core.info(
-                  'No Group section; PR does not touch topics/ or resources/; OK.'
-                );
-                return;
-              }
               await notifyFailure(
                 isPR
-                  ? 'Add your group under `## Group` in the PR description (exact label name).'
+                  ? 'Add your group under `## Group` in the PR description (exact label name), or `n/a` for maintainer/docs PRs.'
                   : 'Group field is missing from the issue body.'
               );
               return;
@@ -129,8 +109,13 @@ jobs:
             const group = match[1]
               .trim()
               .replace(/^`+|`+$/g, '')
-              .replace(/^<!--.*-->$/g, '')
               .trim();
+
+            if (SKIP.has(group.toLowerCase())) {
+              await clearFailureComment();
+              core.info(`Group is "${group}"; skipping label (explicit escape).`);
+              return;
+            }
 
             if (
               !group ||
