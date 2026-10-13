@@ -35,12 +35,66 @@ Open [github.com/BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomas
 
 **2. Clone your fork**
 
+Use **HTTPS** (not SSH). The ESA public Wi‑Fi often blocks outbound SSH (port 22), so `git clone git@github.com:...` / `git pull` over SSH will hang or fail.
+
 ```bash
 git clone https://github.com/YOUR-USERNAME/biomass-hackathon-2026.git
 cd biomass-hackathon-2026
 ```
 
 Replace `YOUR-USERNAME` with your GitHub username.
+
+### “Git / GitHub does not allow HTTPS” — what that usually means
+
+Git **does** support HTTPS. What fails is almost always **login**, not the protocol:
+
+- GitHub **rejected account passwords** for `git` years ago. If you type your GitHub password, you get errors like `Authentication failed`, `Support for password authentication was removed`, or the client claims HTTPS “doesn’t work”.
+- **Fix (easiest):** install [GitHub CLI](https://cli.github.com/), then:
+
+```bash
+gh auth login
+# GitHub.com → HTTPS → Login with a web browser → yes to git credential helper
+gh auth setup-git
+```
+
+After that, `git clone` / `git pull` / `git push` over `https://github.com/...` should work on the ESA Wi‑Fi.
+
+- **Fix (token):** create a [Personal Access Token](https://github.com/settings/tokens) (classic: scope `repo`, or fine-grained with Contents read/write on your fork). When Git asks for a **password**, paste the **token**, not your GitHub password. Username = your GitHub username.
+
+**Read-only clone of the public BioPAL repo** (no push) does not need a password:
+
+```bash
+git clone https://github.com/BioPAL/biomass-hackathon-2026.git
+```
+
+**Already cloned with SSH?** Switch remotes to HTTPS:
+
+```bash
+git remote -v
+# if you see git@github.com:..., fix origin (your fork) and upstream:
+git remote set-url origin https://github.com/YOUR-USERNAME/biomass-hackathon-2026.git
+git remote set-url upstream https://github.com/BioPAL/biomass-hackathon-2026.git
+git pull upstream main
+```
+
+**Check Git is not forcing SSH** (some machines rewrite HTTPS → SSH):
+
+```bash
+git config --global --get-regexp 'url\..*insteadOf'
+# if you see https://github.com/ rewritten to git@github.com:, remove that rule, e.g.:
+# git config --global --unset-all url.git@github.com:.insteadOf
+```
+
+**Still need SSH keys?** Use GitHub’s SSH-over-443 (port 22 is what guest Wi‑Fi blocks). Add to `~/.ssh/config`:
+
+```
+Host github.com
+  Hostname ssh.github.com
+  Port 443
+  User git
+```
+
+Test with `ssh -T git@github.com`.
 
 **3. Add the original repository as a remote**
 
