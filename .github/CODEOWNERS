@@ -3,14 +3,10 @@
 #
 # Owners need Write access or a team with Write for review requests to work.
 
-# ---------------------------------------------------------------------------
-# Confirmed
-# ---------------------------------------------------------------------------
-
 # ICE - cryosphere
-/topics/08-ICE-QUEEN/ @ArmandoMarino @francescobanda
+/topics/08-ICE-QUEEN/ @ArmandoMarino
 
-# DESERT / geology - paleochannels, dry sand
+# DESERT geology - paleochannels, dry sand
 /topics/07-GEOLOGY/ @ArmandoMarino
 
 # SOIL MOISTURE
@@ -32,8 +28,8 @@
 # 3D tomographic canopy visualiser
 /topics/04-3D-TOMO-CANOPY-VISUALIZER/ @francescobanda
 
-# BIOMASS and GEDI intercomparison (& escaped for pattern matching)
-/topics/05-BIOMASS\&GEDI/ @francescobanda
+# BIOMASS and GEDI intercomparison
+/topics/05_BIOMASS_AND_GEDI/ @francescobanda
 
 # Carbon map validation - table A
 /topics/06A-CARBON/ @francescobanda
