@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tomo-canopy"
+version = "0.1.0"
+description = "Multi-scale LiDAR and BIOMASS tomogram processing and visualisation tools."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "BIOMASS Hackathon 2026 contributors" },
+]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: GIS",
+  "Typing :: Typed",
+]
+dependencies = [
+  "numpy>=1.26",
+  "xarray>=2024.1",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "ruff>=0.8",
+]
+examples = [
+  "jupyterlab>=4",
+  "matplotlib>=3.8",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["tomo_canopy"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
