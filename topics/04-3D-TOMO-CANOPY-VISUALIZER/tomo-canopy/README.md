@@ -116,6 +116,36 @@ a particular operation genuinely needs multiple sources.
 See [`examples/data_interface.ipynb`](examples/data_interface.ipynb) for a
 self-contained walkthrough with optional TLS and ALS layers.
 
+## GEDI provider
+
+Install the optional `gedidb` stack and query the public GFZ endpoint:
+
+```bash
+python -m pip install -e '.[gedi]'
+```
+
+```python
+import geopandas as gpd
+
+from tomo_canopy.providers import GEDIProvider
+
+provider = GEDIProvider()
+region = gpd.read_file("path/to/test.geojson")
+gedi = provider.get_data(
+    variables=["agbd", "rh"],
+    geometry=region,
+    start_time="2018-01-01",
+    end_time="2024-07-25",
+)
+```
+
+The returned shot-indexed Xarray dataset preserves `gedidb` variables and adds
+`x`/`y` aliases for longitude/latitude plus standard modality, geometry, CRS,
+query, and provenance metadata.
+
+See [`examples/gedi_provider.ipynb`](examples/gedi_provider.ipynb) for a full
+query, inspection, plotting, and `DataLayer` walkthrough.
+
 See [`examples/tls_provider.ipynb`](examples/tls_provider.ipynb) for a complete
 walkthrough. Install its optional dependencies with:
 
