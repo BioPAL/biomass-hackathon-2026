@@ -2,6 +2,11 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 #
 # Owners need Write access (or be in a team with Write) for review requests to work.
+# Replace @USERNAME below once Francesco Banda and other referents confirm ownership.
+
+# ---------------------------------------------------------------------------
+# Confirmed
+# ---------------------------------------------------------------------------
 
 # ICE (cryosphere)
 /topics/08-ICE-QUEEN/ @ArmandoMarino
@@ -11,3 +16,34 @@
 
 # SOIL MOISTURE
 /topics/11-A-SOIL-MOISTURE/ @ArmandoMarino
+
+# ---------------------------------------------------------------------------
+# Ownership TBD — uncomment and set the GitHub username when confirmed
+# ---------------------------------------------------------------------------
+
+# RFI removal
+# /topics/02-RFI/ @USERNAME
+
+# QGIS plugin
+# /topics/03-QGIS/ @USERNAME
+
+# 3D tomographic canopy visualiser
+# /topics/04-3D-TOMO-CANOPY-VISUALIZER/ @USERNAME
+
+# BIOMASS and GEDI intercomparison
+# /topics/05-BIOMASS&GEDI/ @USERNAME
+
+# Carbon map validation (table A)
+# /topics/06A-CARBON/ @USERNAME
+
+# Carbon map validation (table B)
+# /topics/06B-CARBON/ @USERNAME
+
+# Biodiversity
+# /topics/09-BIODIVERSITY/ @USERNAME
+
+# TomoSAR forest height
+# /topics/10-TOMO-SAR-FOREST-HEIGHT/ @USERNAME
+
+# Flooded forest
+# /topics/11-B-FLOODED-FOREST/ @USERNAME
