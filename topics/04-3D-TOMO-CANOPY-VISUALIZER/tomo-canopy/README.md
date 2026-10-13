@@ -73,6 +73,49 @@ machinery can later consume TLS, ALS, GEDI, and tomogram products.
 The complete processing workflow, including plots, is available in
 [`examples/tls_processor.ipynb`](examples/tls_processor.ipynb).
 
+## Harmonized data interface
+
+The shared interface represents only the modalities that are available. Missing
+sources do not require placeholder arrays:
+
+```python
+import numpy as np
+
+from tomo_canopy.types import (
+    DataCube,
+    DataLayer,
+    GeometryType,
+    GridSpec,
+    Modality,
+)
+
+grid = GridSpec(
+    x=np.arange(0.5, 100.0, 1.0),
+    y=np.arange(0.5, 100.0, 1.0),
+    z=np.arange(0.25, 50.0, 0.5),
+    crs="EPSG:32630",
+)
+cube = DataCube(grid=grid)
+cube.add_layer(
+    DataLayer(
+        name="tls_occupancy",
+        data=tls_occupancy,
+        modality=Modality.TLS,
+        geometry=GeometryType.VOLUME,
+    )
+)
+
+assert cube.has_modality(Modality.TLS)
+assert not cube.has_modality(Modality.GEDI)
+```
+
+Every layer that is present must match the shared grid and CRS. Consumers can
+use `missing_modalities()` for optional behavior or `require_modalities()` when
+a particular operation genuinely needs multiple sources.
+
+See [`examples/data_interface.ipynb`](examples/data_interface.ipynb) for a
+self-contained walkthrough with optional TLS and ALS layers.
+
 See [`examples/tls_provider.ipynb`](examples/tls_provider.ipynb) for a complete
 walkthrough. Install its optional dependencies with:
 
