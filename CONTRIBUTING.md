@@ -35,12 +35,38 @@ Open [github.com/BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomas
 
 **2. Clone your fork**
 
+Use **HTTPS** (not SSH). The ESA public Wi‑Fi often blocks outbound SSH (port 22), so `git clone git@github.com:...` / `git pull` over SSH will hang or fail.
+
 ```bash
 git clone https://github.com/YOUR-USERNAME/biomass-hackathon-2026.git
 cd biomass-hackathon-2026
 ```
 
 Replace `YOUR-USERNAME` with your GitHub username.
+
+If GitHub asks you to sign in on `git push`, use a [Personal Access Token](https://github.com/settings/tokens) as the password (or `gh auth login` and choose HTTPS).
+
+**Already cloned with SSH?** Switch the remotes to HTTPS:
+
+```bash
+git remote -v
+# if you see git@github.com:..., fix origin (your fork) and upstream:
+git remote set-url origin https://github.com/YOUR-USERNAME/biomass-hackathon-2026.git
+git remote set-url upstream https://github.com/BioPAL/biomass-hackathon-2026.git
+# then:
+git pull upstream main
+```
+
+**Need SSH anyway?** Tunnel SSH over HTTPS port 443 (often allowed on guest Wi‑Fi). Add to `~/.ssh/config`:
+
+```
+Host github.com
+  Hostname ssh.github.com
+  Port 443
+  User git
+```
+
+Test with `ssh -T git@github.com`. Prefer HTTPS for this hackathon if that still fails.
 
 **3. Add the original repository as a remote**
 
