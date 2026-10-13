@@ -4,12 +4,12 @@
 #   Ready / non-draft PR    → In review
 #   PR merged / issue closed → Done
 #
+# Targets the public board: https://github.com/orgs/BioPAL/projects/6
+#
 # Maintainer setup (once):
-# 1. Create a classic PAT with scopes: repo, project (account that can edit the Project).
+# 1. Classic PAT with scopes: repo, project (org member who can edit the Project).
 # 2. Repo → Settings → Secrets → Actions → PROJECT_TOKEN = that PAT.
-# 3. Repo → Settings → Variables → Actions → HACKATHON_PROJECT_NUMBER = e.g. 1
-#    (from https://github.com/orgs/BioPAL/projects/<NUMBER>)
-# 4. Board Status options must be named exactly: Todo, Doing, In review, Done
+# 3. Status columns on project 6: Todo (or Backlog), Doing (or Started), In review, Done
 name: Sync board Status
 
 on:
@@ -31,13 +31,13 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    if: ${{ vars.HACKATHON_PROJECT_NUMBER != '' }}
     steps:
       - name: Update Project Status
         uses: actions/github-script@v7
         env:
           PROJECT_OWNER: BioPAL
-          PROJECT_NUMBER: ${{ vars.HACKATHON_PROJECT_NUMBER }}
+          # Public Hackaton 2026 Board
+          PROJECT_NUMBER: ${{ vars.HACKATHON_PROJECT_NUMBER || '6' }}
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
@@ -47,11 +47,12 @@ jobs:
             }
             const owner = process.env.PROJECT_OWNER;
             const projectNumber = parseInt(process.env.PROJECT_NUMBER, 10);
-            const STATUS = {
-              todo: 'Todo',
-              doing: 'Doing',
-              review: 'In review',
-              done: 'Done',
+            // Prefer Todo/Doing; fall back to Backlog/Started if those are the column names.
+            const STATUS_ALIASES = {
+              todo: ['Todo', 'Backlog'],
+              doing: ['Doing', 'Started'],
+              review: ['In review', 'In Review'],
+              done: ['Done'],
             };
 
             function closesIssues(body) {
@@ -94,21 +95,23 @@ jobs:
                 (f) => f && f.name === 'Status' && f.options
               );
               if (!statusField) throw new Error('Status single-select field not found');
-              const optionId = (name) => {
-                const opt = statusField.options.find(
-                  (o) => o.name.toLowerCase() === name.toLowerCase()
-                );
-                if (!opt) {
-                  throw new Error(
-                    `Status option "${name}" not found. Need: Todo, Doing, In review, Done`
+              const optionIdFor = (key) => {
+                const aliases = STATUS_ALIASES[key] || [key];
+                for (const name of aliases) {
+                  const opt = statusField.options.find(
+                    (o) => o.name.toLowerCase() === name.toLowerCase()
                   );
+                  if (opt) return opt.id;
                 }
-                return opt.id;
+                const available = statusField.options.map((o) => o.name).join(', ');
+                throw new Error(
+                  `Status for "${key}" not found (tried ${aliases.join(', ')}). Available: ${available}`
+                );
               };
               return {
                 projectId: project.id,
                 statusFieldId: statusField.id,
-                optionId,
+                optionIdFor,
               };
             }
 
@@ -172,20 +175,21 @@ jobs:
               });
             }
 
-            async function setIssueStatus(issueNumber, statusName, ctx) {
+            async function setIssueStatus(issueNumber, statusKey, ctx) {
               const { data: issue } = await github.rest.issues.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
               });
               const itemId = await ensureItem(ctx.projectId, issue.node_id);
+              const optionId = ctx.optionIdFor(statusKey);
               await setStatus(
                 ctx.projectId,
                 itemId,
                 ctx.statusFieldId,
-                ctx.optionId(statusName)
+                optionId
               );
-              core.info(`Issue #${issueNumber} → ${statusName}`);
+              core.info(`Issue #${issueNumber} → ${statusKey} (project ${projectNumber})`);
             }
 
             const ctx = await getProject();
@@ -198,9 +202,9 @@ jobs:
                 core.info('Not a task issue; skipping.');
                 return;
               }
-              let status = STATUS.todo;
-              if (context.payload.action === 'closed') status = STATUS.done;
-              if (context.payload.action === 'reopened') status = STATUS.todo;
+              let status = 'todo';
+              if (context.payload.action === 'closed') status = 'done';
+              if (context.payload.action === 'reopened') status = 'todo';
               await setIssueStatus(issue.number, status, ctx);
               return;
             }
@@ -214,21 +218,21 @@ jobs:
                 return;
               }
 
-              let status = STATUS.review;
+              let status = 'review';
               if (action === 'closed') {
-                status = pr.merged ? STATUS.done : STATUS.todo;
+                status = pr.merged ? 'done' : 'todo';
               } else if (
                 action === 'converted_to_draft' ||
                 (action === 'opened' && pr.draft) ||
                 (action === 'reopened' && pr.draft)
               ) {
-                status = STATUS.doing;
+                status = 'doing';
               } else if (
                 action === 'ready_for_review' ||
                 (action === 'opened' && !pr.draft) ||
                 (action === 'reopened' && !pr.draft)
               ) {
-                status = STATUS.review;
+                status = 'review';
               }
 
               for (const n of issueNums) {

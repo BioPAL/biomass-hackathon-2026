@@ -78,12 +78,14 @@ Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## Project board (Kanban)
 
-Task issues appear on the shared Project board. You do **not** need to drag cards — Status updates from GitHub events:
+Public board: [Hackaton 2026 Board](https://github.com/orgs/BioPAL/projects/6)
+
+Task issues appear on that board. You do **not** need to drag cards — Status updates from GitHub events:
 
 | Event | Status |
 | --- | --- |
-| Task issue opened | **Todo** |
-| **Draft** PR opened with `Closes #N` | **Doing** |
+| Task issue opened | **Todo** (or Backlog) |
+| **Draft** PR opened with `Closes #N` | **Doing** (or Started) |
 | PR marked **Ready for review** (or opened non-draft) | **In review** |
 | PR merged / issue closed | **Done** |
 
