@@ -1,0 +1,4 @@
+paths:
+  data: /home/jovyan/biomass-hackathon-2026/topics/02-rfi-removal/rfi_data
+  output: /home/jovyan/biomass-hackathon-2026/topics/02-rfi-removal/out
+  token_file: /home/jovyan/Biomass_hackathon/token.txt 
