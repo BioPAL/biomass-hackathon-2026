@@ -1,0 +1,13 @@
+# CODEOWNERS — requested reviewers for paths in this repo.
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Owners need Write access (or be in a team with Write) for review requests to work.
+
+# ICE (cryosphere)
+/topics/08-ICE-QUEEN/ @ArmandoMarino
+
+# DESERT / geology (paleochannels, dry sand)
+/topics/07-GEOLOGY/ @ArmandoMarino
+
+# SOIL MOISTURE
+/topics/11-A-SOIL-MOISTURE/ @ArmandoMarino
