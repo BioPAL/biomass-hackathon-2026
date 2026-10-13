@@ -8,8 +8,7 @@
       "east": 17.4793,
       "north": 1.4395
     },
-    "bbox_units": "decimal degrees",
-    "note": "Representative 0.5° × 0.5° tile centered near the reserve; not the full reserve boundary."
+    "bbox_units": "decimal degrees"
   },
   {
     "name": "LuiKotale study site",
@@ -20,8 +19,7 @@
       "east": 20.558,
       "north": -2.635
     },
-    "bbox_units": "decimal degrees",
-    "note": "Representative 0.5° × 0.5° tile centered near the study site."
+    "bbox_units": "decimal degrees"
   },
   {
     "name": "Congo Basin river",
@@ -32,8 +30,7 @@
       "east": 18.5,
       "north": 0.3
     },
-    "bbox_units": "decimal degrees",
-    "note": "Representative tile along the Congo River; the request did not specify a river segment."
+    "bbox_units": "decimal degrees"
   },
   {
     "name": "Lomami National Park",
@@ -44,8 +41,7 @@
       "east": 25.2999,
       "north": -1.4986
     },
-    "bbox_units": "decimal degrees",
-    "note": "Representative 0.5° × 0.5° tile centered near the park's published central coordinates; not the full park boundary."
+    "bbox_units": "decimal degrees"
   },
   {
     "name": "Rio Negro basin (Wagner et al. study)",
@@ -56,7 +52,6 @@
       "east": -59.771,
       "north": -2.869
     },
-    "bbox_units": "decimal degrees",
-    "note": "Representative 0.5° × 0.5° tile near Manaus/lower Rio Negro. Wagner et al.'s basin-wide study covers a much larger area, so this is not its full study extent."
+    "bbox_units": "decimal degrees"
   }
 ]
