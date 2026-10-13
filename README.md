@@ -21,41 +21,46 @@ This repository is the shared home for all hackathon project groups. Add a folde
 biomass-hackathon-2026/
 ├── README.md
 ├── CONTRIBUTING.md
-├── resources/                 shared code reusable across topics
+├── resources/                 shared code reusable across groups
 │   ├── load/                  read products → arrays / xarray
 │   ├── process/               arrays in → arrays out
 │   ├── evaluate/              metrics, validation, stats
 │   ├── plot/                  figures, maps
 │   └── tests/                 pytest for shared code
-└── topics/
-    ├── 01-polsar-polinsar-analytics/
-    ├── 02-rfi-removal/
-    ├── 03-qgis-plugin/
-    ├── 04-3d-forest-structure/
-    ├── 05-biomass-gedi-intercomparison/
-    ├── 06-biomass-validation/
-    ├── 07-biomass-geology/
-    ├── 08-biomass-cryosphere/
-    ├── 11-biomass-biodiversity/
-    └── 12-forest-height-tomosar/
+├── topics/                    one folder per group (same name as the GitHub label)
+│   ├── 02-RFI/
+│   ├── 03-QGIS/
+│   ├── 04-3D-TOMO-CANOPY-VISUALIZER/
+│   ├── 05-BIOMASS&GEDI/
+│   ├── 06A-CARBON/
+│   ├── 06B-CARBON/
+│   ├── 07-GEOLOGY/
+│   ├── 08-ICE-QUEEN/
+│   ├── 09-BIODIVERSITY/
+│   ├── 10-TOMO-SAR-FOREST-HEIGHT/
+│   ├── 11-A-SOIL-MOISTURE/
+│   └── 11-B-FLOODED-FOREST/
+└── non-chosen-topics/         briefs not running as a group this week
 ```
 
-Each project group works mainly in its own folder under `topics/`. Put **shared** helpers in `resources/` (see [resources/README.md](resources/README.md)). Every topic folder already has a README with the challenge title, goal, roadmap (foundation and deep dive), and data sources from the hackathon brief to get you started.
+Each project group works in `topics/<GROUP-LABEL>/` — the folder name matches the GitHub group label. Put **shared** helpers in `resources/` (see [resources/README.md](resources/README.md)).
 
-## Hackathon topics
+## Hackathon groups
 
-| ID  | Topic                             | Folder                                    | Contact                          |
-| --- | --------------------------------- | ----------------------------------------- | -------------------------------- |
-| 1   | PolSAR and PolInSAR Analytics     | `topics/01-polsar-polinsar-analytics/`    | Topic referent                   |
-| 2   | RFI removal                       | `topics/02-rfi-removal/`                  | Topic referent                   |
-| 3   | QGIS plugin                       | `topics/03-qgis-plugin/`                  | Topic referent                   |
-| 4   | 3D forest structure visualisation | `topics/04-3d-forest-structure/`          | Topic referent                   |
-| 5   | BIOMASS and GEDI intercomparison  | `topics/05-biomass-gedi-intercomparison/` | not assigned                     |
-| 6   | BIOMASS validation                | `topics/06-biomass-validation/`           | Topic referent                   |
-| 7   | BIOMASS for Geology               | `topics/07-biomass-geology/`              | Topic referent                   |
-| 8   | BIOMASS for Cryosphere            | `topics/08-biomass-cryosphere/`           | Topic referent                   |
-| 11  | BIOMASS for biodiversity          | `topics/11-biomass-biodiversity/`         | not assigned                     |
-| 12  | Forest Height from TomoSAR        | `topics/12-forest-height-tomosar/`        | not assigned                     |
+| Group label | Topic | Folder |
+| --- | --- | --- |
+| `02-RFI` | RFI removal | `topics/02-RFI/` |
+| `03-QGIS` | QGIS plugin | `topics/03-QGIS/` |
+| `04-3D-TOMO-CANOPY-VISUALIZER` | 3D tomographic canopy visualiser | `topics/04-3D-TOMO-CANOPY-VISUALIZER/` |
+| `05-BIOMASS&GEDI` | BIOMASS and GEDI intercomparison | `topics/05-BIOMASS&GEDI/` |
+| `06A-CARBON` | Carbon map validation (table A) | `topics/06A-CARBON/` |
+| `06B-CARBON` | Carbon map validation (table B) | `topics/06B-CARBON/` |
+| `07-GEOLOGY` | BIOMASS for Geology | `topics/07-GEOLOGY/` |
+| `08-ICE-QUEEN` | BIOMASS for Cryosphere | `topics/08-ICE-QUEEN/` |
+| `09-BIODIVERSITY` | BIOMASS for biodiversity | `topics/09-BIODIVERSITY/` |
+| `10-TOMO-SAR-FOREST-HEIGHT` | Forest height from TomoSAR | `topics/10-TOMO-SAR-FOREST-HEIGHT/` |
+| `11-A-SOIL-MOISTURE` | Soil moisture | `topics/11-A-SOIL-MOISTURE/` |
+| `11-B-FLOODED-FOREST` | Flooded forest | `topics/11-B-FLOODED-FOREST/` |
 
 ## Contributing
 
@@ -65,7 +70,7 @@ Work from a **fork** (you do not push directly to `main`):
 2. Clone **your fork**, create a branch, commit your work.
 3. Push to your fork and open a pull request targeting `BioPAL/biomass-hackathon-2026` branch `main`.
 
-- Topic-specific code and notebooks → `topics/<num>-<name>/`
+- Group-specific code and notebooks → `topics/<GROUP-LABEL>/`
 - Code useful to several teams → `resources/` (load / process / evaluate / plot)
 
 Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md).

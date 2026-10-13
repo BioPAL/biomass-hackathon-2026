@@ -59,17 +59,19 @@ For shared-code work, `resources/<short-description>` is fine.
 **5. Work in your topic folder (or create it if needed)**
 
 ```bash
-mkdir -p topics/04-3d-forest-structure
+mkdir -p topics/04-3D-TOMO-CANOPY-VISUALIZER
 ```
+
+Use the folder that matches your **group label** (same string as on GitHub Issues).
 
 **6. Commit and push to your fork**
 
 `origin` points to your fork, not to `BioPAL/biomass-hackathon-2026`, so this push goes to your own copy.
 
 ```bash
-git add topics/04-3d-forest-structure/
+git add topics/04-3D-TOMO-CANOPY-VISUALIZER/
 git commit -m "Add first tomographic processing notebook"
-git push -u origin 04-3d-forest-structure/short-description
+git push -u origin 04-3D-TOMO-CANOPY-VISUALIZER/short-description
 ```
 
 **7. Open a pull request**
@@ -95,7 +97,7 @@ git push origin main
 
 | Put it in… | When… |
 | --- | --- |
-| `topics/<num>-<name>/` | Notebooks, scripts, and helpers for **one** challenge only |
+| `topics/<GROUP-LABEL>/` | Notebooks, scripts, and helpers for **one** group only (folder = GitHub label) |
 | `resources/load/` | Shared readers: products → arrays / xarray (no plotting) |
 | `resources/process/` | Shared transforms: arrays in → arrays out (no plotting) |
 | `resources/evaluate/` | Shared metrics, validation, stats |

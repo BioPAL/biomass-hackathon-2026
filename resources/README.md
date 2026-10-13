@@ -1,6 +1,6 @@
 # Shared resources
 
-Code and helpers useful to **several** project groups live here. Topic-specific notebooks and scripts stay under `topics/<num>-<name>/`.
+Code and helpers useful to **several** project groups live here. Group-specific notebooks and scripts stay under `topics/<GROUP-LABEL>/` (same name as the GitHub group label).
 
 Do not commit large datasets or credentials. Prefer MAAP links or small download scripts. See [CONTRIBUTING.md](../CONTRIBUTING.md).
 
