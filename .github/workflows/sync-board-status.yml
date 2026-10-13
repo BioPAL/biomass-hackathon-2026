@@ -1,0 +1,269 @@
+# Move linked Task issues on the hackathon Project board:
+#   Issue opened (task)     → Todo
+#   Draft PR (Closes #N)    → Doing
+#   Ready / non-draft PR    → In review
+#   PR merged / issue closed → Done
+#
+# Targets the public board: https://github.com/orgs/BioPAL/projects/6
+#
+# Maintainer setup (once):
+# 1. Classic PAT with scopes: repo, project (org member who can edit the Project).
+# 2. Repo → Settings → Secrets → Actions → PROJECT_TOKEN = that PAT.
+# 3. Status columns on project 6: Todo (or Backlog), Doing (or Started), In review, Done
+name: Sync board Status
+
+on:
+  issues:
+    types: [opened, closed, reopened]
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - converted_to_draft
+      - ready_for_review
+      - closed
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require PROJECT_TOKEN secret
+        env:
+          PROJECT_TOKEN: ${{ secrets.PROJECT_TOKEN }}
+        run: |
+          if [ -z "$PROJECT_TOKEN" ]; then
+            echo "::error::Missing Actions secret PROJECT_TOKEN."
+            echo "Create a classic PAT (scopes: repo, project) for an account that can edit"
+            echo "https://github.com/orgs/BioPAL/projects/6"
+            echo "Then: repo Settings → Secrets and variables → Actions → New repository secret"
+            echo "Name: PROJECT_TOKEN"
+            exit 1
+          fi
+
+      - name: Update Project Status
+        uses: actions/github-script@v7
+        env:
+          PROJECT_OWNER: BioPAL
+          # Public Hackaton 2026 Board
+          PROJECT_NUMBER: ${{ vars.HACKATHON_PROJECT_NUMBER || '6' }}
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            const owner = process.env.PROJECT_OWNER;
+            const projectNumber = parseInt(process.env.PROJECT_NUMBER, 10);
+            // Prefer Todo/Doing; fall back to Backlog/Started if those are the column names.
+            const STATUS_ALIASES = {
+              todo: ['Todo', 'Backlog'],
+              doing: ['Doing', 'Started'],
+              review: ['In review', 'In Review'],
+              done: ['Done'],
+            };
+
+            function closesIssues(body) {
+              if (!body) return [];
+              // Ignore HTML comments (PR template example: <!-- Closes #12 -->)
+              const cleaned = body.replace(/<!--[\s\S]*?-->/g, '');
+              const re =
+                /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#(\d+)/gi;
+              const nums = new Set();
+              let m;
+              while ((m = re.exec(cleaned)) !== null) {
+                nums.add(parseInt(m[1], 10));
+              }
+              return [...nums];
+            }
+
+            async function getProject() {
+              const query = `
+                query($owner: String!, $number: Int!) {
+                  organization(login: $owner) {
+                    projectV2(number: $number) {
+                      id
+                      fields(first: 50) {
+                        nodes {
+                          ... on ProjectV2SingleSelectField {
+                            id
+                            name
+                            options { id name }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }`;
+              const data = await github.graphql(query, {
+                owner,
+                number: projectNumber,
+              });
+              const project = data.organization?.projectV2;
+              if (!project) throw new Error(`Project ${owner}/${projectNumber} not found`);
+              const statusField = project.fields.nodes.find(
+                (f) => f && f.name === 'Status' && f.options
+              );
+              if (!statusField) throw new Error('Status single-select field not found');
+              const optionIdFor = (key) => {
+                const aliases = STATUS_ALIASES[key] || [key];
+                for (const name of aliases) {
+                  const opt = statusField.options.find(
+                    (o) => o.name.toLowerCase() === name.toLowerCase()
+                  );
+                  if (opt) return opt.id;
+                }
+                const available = statusField.options.map((o) => o.name).join(', ');
+                throw new Error(
+                  `Status for "${key}" not found (tried ${aliases.join(', ')}). Available: ${available}`
+                );
+              };
+              return {
+                projectId: project.id,
+                statusFieldId: statusField.id,
+                optionIdFor,
+              };
+            }
+
+            async function ensureItem(projectId, contentId) {
+              const q = `
+                query($owner: String!, $number: Int!, $cursor: String) {
+                  organization(login: $owner) {
+                    projectV2(number: $number) {
+                      items(first: 100, after: $cursor) {
+                        nodes {
+                          id
+                          content {
+                            ... on Issue { id number }
+                            ... on PullRequest { id number }
+                          }
+                        }
+                        pageInfo { hasNextPage endCursor }
+                      }
+                    }
+                  }
+                }`;
+              let cursor = null;
+              for (;;) {
+                const data = await github.graphql(q, {
+                  owner,
+                  number: projectNumber,
+                  cursor,
+                });
+                const conn = data.organization.projectV2.items;
+                for (const item of conn.nodes) {
+                  if (item.content && item.content.id === contentId) return item.id;
+                }
+                if (!conn.pageInfo.hasNextPage) break;
+                cursor = conn.pageInfo.endCursor;
+              }
+              const add = `
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                    item { id }
+                  }
+                }`;
+              const added = await github.graphql(add, { projectId, contentId });
+              return added.addProjectV2ItemById.item.id;
+            }
+
+            async function setStatus(projectId, itemId, statusFieldId, optionId) {
+              const mutation = `
+                mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $projectId
+                    itemId: $itemId
+                    fieldId: $fieldId
+                    value: { singleSelectOptionId: $optionId }
+                  }) { projectV2Item { id } }
+                }`;
+              await github.graphql(mutation, {
+                projectId,
+                itemId,
+                fieldId: statusFieldId,
+                optionId,
+              });
+            }
+
+            async function setIssueStatus(issueNumber, statusKey, ctx) {
+              let issue;
+              try {
+                const res = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                });
+                issue = res.data;
+              } catch (err) {
+                if (err.status === 404 || err.status === 410) {
+                  core.warning(
+                    `Issue #${issueNumber} is missing/deleted; skipping Status update.`
+                  );
+                  return;
+                }
+                throw err;
+              }
+              // Skip if this number is a pull request, not an issue
+              if (issue.pull_request) {
+                core.info(`#${issueNumber} is a PR, not an issue; skipping.`);
+                return;
+              }
+              const itemId = await ensureItem(ctx.projectId, issue.node_id);
+              const optionId = ctx.optionIdFor(statusKey);
+              await setStatus(
+                ctx.projectId,
+                itemId,
+                ctx.statusFieldId,
+                optionId
+              );
+              core.info(`Issue #${issueNumber} → ${statusKey} (project ${projectNumber})`);
+            }
+
+            const ctx = await getProject();
+            const event = context.eventName;
+
+            if (event === 'issues') {
+              const issue = context.payload.issue;
+              const labels = (issue.labels || []).map((l) => l.name);
+              if (!labels.includes('task') && context.payload.action !== 'closed') {
+                core.info('Not a task issue; skipping.');
+                return;
+              }
+              let status = 'todo';
+              if (context.payload.action === 'closed') status = 'done';
+              if (context.payload.action === 'reopened') status = 'todo';
+              await setIssueStatus(issue.number, status, ctx);
+              return;
+            }
+
+            if (event === 'pull_request_target' || event === 'pull_request') {
+              const pr = context.payload.pull_request;
+              const action = context.payload.action;
+              const issueNums = closesIssues(pr.body || '');
+              if (issueNums.length === 0) {
+                core.info('No Closes #N in PR body; skipping.');
+                return;
+              }
+
+              let status = 'review';
+              if (action === 'closed') {
+                status = pr.merged ? 'done' : 'todo';
+              } else if (
+                action === 'converted_to_draft' ||
+                (action === 'opened' && pr.draft) ||
+                (action === 'reopened' && pr.draft)
+              ) {
+                status = 'doing';
+              } else if (
+                action === 'ready_for_review' ||
+                (action === 'opened' && !pr.draft) ||
+                (action === 'reopened' && !pr.draft)
+              ) {
+                status = 'review';
+              }
+
+              for (const n of issueNums) {
+                await setIssueStatus(n, status, ctx);
+              }
+            }

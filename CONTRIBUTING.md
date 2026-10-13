@@ -17,12 +17,15 @@ This is a **hackathon** repo, not the main BPS production codebase. This week:
 You do not have write access to this repository, so you will work from your own fork.
 
 1. Create (or pick) a **Task** issue on GitHub and choose your **Group** (the group label is applied automatically).
-2. Fork the repository to your own GitHub account.
+2. Fork the repository to your own GitHub account (**one fork per person**).
 3. Clone **your fork**, create a branch, work in your group folder (or in `resources/` for shared code).
 4. Commit, push to your fork.
-5. Open a pull request: **base** = `BioPAL/biomass-hackathon-2026` / `main`, **head** = your fork + your branch. Put `Closes #<issue-number>` in the PR description.
+5. Open a **draft** pull request early: **base** = `BioPAL/biomass-hackathon-2026` / `main`, **head** = your fork + your branch. Put `Closes #<issue-number>` in the PR description (moves the board card to **Doing**).
+6. When ready, mark the PR **Ready for review** (moves the card to **In review**). A maintainer merges.
 
 `main` is protected: every change goes through a pull request. Do not merge your own pull request.
+
+Board Status is automated (Todo → Doing → In review → Done). See [README.md](README.md#project-board-kanban).
 
 ## Getting set up with Git
 
@@ -75,7 +78,7 @@ git commit -m "Add first tomographic processing notebook"
 git push -u origin 04-3D-TOMO-CANOPY-VISUALIZER/short-description
 ```
 
-**7. Open a pull request**
+**7. Open a draft pull request (early)**
 
 Go to your fork on github.com. GitHub shows a banner suggesting a pull request for your new branch; click it. Check that:
 
@@ -83,8 +86,9 @@ Go to your fork on github.com. GitHub shows a banner suggesting a pull request f
 - Base branch: `main`
 - Head: your fork and branch
 - Description includes `Closes #<issue-number>` (one PR = one issue)
+- Create as **Draft** while you are still coding (board → **Doing**)
 
-Then create the pull request. A maintainer will review and merge it.
+When the work is ready, click **Ready for review**. A maintainer will review and merge it.
 
 **Keeping your fork up to date** (optional, useful if the hackathon runs for several days)
 

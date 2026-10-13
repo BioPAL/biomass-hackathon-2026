@@ -2,7 +2,8 @@
 
 Closes #
 
-<!-- One PR = one issue. Example: Closes #12 -->
+<!-- One PR = one issue. Example: Closes #N (replace N with your issue number) -->
+<!-- Open as Draft while coding (board → Doing). Mark Ready for review when done (board → In review). -->
 
 ## Group
 
@@ -17,7 +18,8 @@ Closes #
 ## Checklist
 
 - [ ] PR description includes `Closes #<issue-number>`
-- [ ] Group label is applied to this PR
+- [ ] Opened as **Draft** while working; marked **Ready for review** when done
+- [ ] Group label is applied to this PR (automatic from ## Group above)
 - [ ] Changes stay in my group folder (or `resources/` for a shared Task)
 - [ ] No large data files committed (link to MAAP / external source instead)
 - [ ] No credentials or API keys committed
