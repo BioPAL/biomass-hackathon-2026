@@ -9,12 +9,12 @@ body:
         **Where:** `resources/` (load / process / evaluate / plot).
 
         Use this only if **another group** will reuse the code.
-        After submit: add your **group label**, **assign yourself**, avoid duplicates.
+        Your **group label** is applied automatically. Avoid duplicates. Work via a PR with `Closes #N` (no need to assign yourself).
   - type: dropdown
     id: group
     attributes:
       label: Proposing group
-      description: Also apply this as a GitHub label on the issue after creation.
+      description: A GitHub Action applies this as a colored label on the issue.
       options:
         - "02-RFI"
         - "03-QGIS"

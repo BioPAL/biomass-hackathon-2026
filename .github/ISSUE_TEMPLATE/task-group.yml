@@ -8,15 +8,14 @@ body:
       value: |
         **Where:** your group folder under `topics/`.
 
-        After you submit:
-        1. Add your **group label** (same as below)
-        2. **Assign yourself**
-        3. Search existing issues first to avoid duplicates
+        Your **group label** is applied automatically from the Group field below.
+        Search existing issues first to avoid duplicates.
+        You do not need to assign yourself to work on the issue (open a PR with `Closes #N`).
   - type: dropdown
     id: group
     attributes:
       label: Group
-      description: Also apply this as a GitHub label on the issue after creation.
+      description: A GitHub Action applies this as a colored label on the issue.
       options:
         - "02-RFI"
         - "03-QGIS"

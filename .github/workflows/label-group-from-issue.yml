@@ -1,0 +1,80 @@
+# Apply the group label chosen in the Task issue form.
+# Runs with GITHUB_TOKEN so reporters do not need Triage rights.
+name: Label issue from group form
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply group label from issue body
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const ALLOWED = new Set([
+              '02-RFI',
+              '03-QGIS',
+              '04-3D-TOMO-CANOPY-VISUALIZER',
+              '05-BIOMASS&GEDI',
+              '06A-CARBON',
+              '06B-CARBON',
+              '07-GEOLOGY',
+              '08-ICE-QUEEN',
+              '09-BIODIVERSITY',
+              '10-TOMO-SAR-FOREST-HEIGHT',
+              '11-A-SOIL-MOISTURE',
+              '11-B-FLOODED-FOREST',
+            ]);
+
+            const body = context.payload.issue.body || '';
+            // Issue forms render as: ### Group\n\n02-RFI  (or ### Proposing group)
+            const match = body.match(
+              /###\s*(?:Group|Proposing group)\s*\r?\n+([^\r\n]+)/i
+            );
+            if (!match) {
+              core.info('No Group / Proposing group section found; skipping.');
+              return;
+            }
+
+            const group = match[1].trim();
+            if (!ALLOWED.has(group)) {
+              core.warning('Group value is not an allowed label; skipping.');
+              return;
+            }
+
+            const issue_number = context.issue.number;
+            const { owner, repo } = context.repo;
+
+            const { data: current } = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number,
+            });
+            const toRemove = current
+              .map((l) => l.name)
+              .filter((name) => ALLOWED.has(name) && name !== group);
+
+            for (const name of toRemove) {
+              await github.rest.issues.removeLabel({
+                owner,
+                repo,
+                issue_number,
+                name,
+              });
+            }
+
+            await github.rest.issues.addLabels({
+              owner,
+              repo,
+              issue_number,
+              labels: [group],
+            });
+
+            core.info('Applied group label from form.');
