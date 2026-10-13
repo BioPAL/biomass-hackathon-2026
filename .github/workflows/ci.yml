@@ -1,0 +1,36 @@
+# Very light checks for hackathon PRs (syntax + obvious Python errors).
+# Not a merge gate unless you enable it in branch protection.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Syntax check (compileall)
+        run: python -m compileall -q -f resources topics
+
+      - name: Ruff (critical rules only)
+        uses: astral-sh/ruff-action@v3
+        with:
+          version: "0.9.10"
+          args: >-
+            check resources topics
+            --select E9,F821,F822,F823
+            --ignore F401
