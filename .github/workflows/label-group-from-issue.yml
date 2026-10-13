@@ -1,4 +1,6 @@
 # Apply the group label chosen in the Task issue form or PR template.
+# Fails the check (and comments) when Group is missing or not an allowed label,
+# so incorrect values are visible in the PR/issue Checks tab.
 # Runs with GITHUB_TOKEN so reporters do not need Triage rights.
 name: Label group from form
 
@@ -6,7 +8,7 @@ on:
   issues:
     types: [opened, edited]
   pull_request_target:
-    types: [opened, edited, reopened]
+    types: [opened, edited, reopened, synchronize]
 
 permissions:
   issues: write
@@ -35,29 +37,119 @@ jobs:
               '11-A-SOIL-MOISTURE',
               '11-B-FLOODED-FOREST',
             ]);
+            const ALLOWED_LIST = [...ALLOWED].join(', ');
+            const MARKER = '<!-- group-label-bot -->';
 
             const isPR = !!context.payload.pull_request;
             const item = isPR ? context.payload.pull_request : context.payload.issue;
             const body = item.body || '';
+            const issue_number = item.number;
+            const { owner, repo } = context.repo;
+
+            async function touchesGroupCode() {
+              if (!isPR) return true;
+              const files = await github.paginate(
+                github.rest.pulls.listFiles,
+                { owner, repo, pull_number: issue_number, per_page: 100 }
+              );
+              return files.some(
+                (f) =>
+                  f.filename.startsWith('topics/') ||
+                  f.filename.startsWith('resources/')
+              );
+            }
+
+            async function notifyFailure(message) {
+              const commentBody = `${MARKER}\n:x: **Group label**\n\n${message}\n\nAllowed values: \`${ALLOWED_LIST}\``;
+              const comments = await github.paginate(
+                isPR
+                  ? github.rest.issues.listComments
+                  : github.rest.issues.listComments,
+                { owner, repo, issue_number, per_page: 100 }
+              );
+              const existing = comments.find((c) =>
+                (c.body || '').includes(MARKER)
+              );
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                  body: commentBody,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number,
+                  body: commentBody,
+                });
+              }
+              core.setFailed(message);
+            }
+
+            async function clearFailureComment() {
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                { owner, repo, issue_number, per_page: 100 }
+              );
+              const existing = comments.find((c) =>
+                (c.body || '').includes(MARKER)
+              );
+              if (existing) {
+                await github.rest.issues.deleteComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                });
+              }
+            }
 
             // Issue forms: ### Group\n\n02-RFI
             // PR template: ## Group\n\n03-QGIS
             const match = body.match(
               /#{2,3}\s*(?:Group|Proposing group)\s*\r?\n+([^\r\n]+)/i
             );
+
             if (!match) {
-              core.info('No Group / Proposing group section found; skipping.');
+              if (isPR && !(await touchesGroupCode())) {
+                core.info(
+                  'No Group section; PR does not touch topics/ or resources/; OK.'
+                );
+                return;
+              }
+              await notifyFailure(
+                isPR
+                  ? 'Add your group under `## Group` in the PR description (exact label name).'
+                  : 'Group field is missing from the issue body.'
+              );
               return;
             }
 
-            const group = match[1].trim().replace(/^`+|`+$/g, '');
+            const group = match[1]
+              .trim()
+              .replace(/^`+|`+$/g, '')
+              .replace(/^<!--.*-->$/g, '')
+              .trim();
+
+            if (
+              !group ||
+              group.startsWith('<!--') ||
+              /^e\.g\./i.test(group) ||
+              /your group label/i.test(group)
+            ) {
+              await notifyFailure(
+                `Group value is empty or still a placeholder (\`${match[1].trim()}\`). Put an exact label, e.g. \`03-QGIS\`.`
+              );
+              return;
+            }
+
             if (!ALLOWED.has(group)) {
-              core.warning(`Group value "${group}" is not an allowed label; skipping.`);
+              await notifyFailure(
+                `Group value \`${group}\` is not a valid group label.`
+              );
               return;
             }
-
-            const issue_number = item.number;
-            const { owner, repo } = context.repo;
 
             const { data: current } = await github.rest.issues.listLabelsOnIssue({
               owner,
@@ -84,4 +176,7 @@ jobs:
               labels: [group],
             });
 
-            core.info(`Applied group label ${group} on ${isPR ? 'PR' : 'issue'} #${issue_number}.`);
+            await clearFailureComment();
+            core.info(
+              `Applied group label ${group} on ${isPR ? 'PR' : 'issue'} #${issue_number}.`
+            );
