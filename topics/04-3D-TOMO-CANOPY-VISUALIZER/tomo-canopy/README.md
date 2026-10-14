@@ -25,13 +25,14 @@ The package is under active development as part of the
 | **TLS provider** | Read ASCII or binary PLY point clouds and tree-segment TXT files, with memory mapping for large binary PLY data. |
 | **GEDI provider** | Query `gedidb` and return GEDI footprints, metrics, and waveforms as Xarray datasets. |
 | **Tomogram provider** | Inspect and lazily open BIOMASS TOM L1D and L2A product directories, including their STAC and annotation metadata. |
-| **Processing** | Validate, filter, sample, summarize, and transform TLS and GEDI observations. |
+| **Processing** | Validate, filter, sample, summarize, slice, and derive analysis quantities for TLS, GEDI, and tomograms. |
+| **Transforms** | Match vertical resolution with a Gaussian point-spread function and resample regular volumes onto a target grid. |
 | **Shared data interface** | Combine point clouds, meshes, tree segments, rasters, waveforms, and regular volumes without requiring every modality to be present. |
 | **Xarray first** | Providers and processors return labelled `xarray.Dataset` objects with spatial metadata. |
 
 > [!NOTE]
-> ALS support, cube-generation helpers, transforms, and the final visualisation
-> API are currently scaffolds for upcoming development.
+> ALS support, higher-level cube-generation helpers, and the final
+> visualisation API are currently scaffolds for upcoming development.
 
 ---
 
@@ -134,6 +135,33 @@ L1D products retain native SAR coordinates. L2A products are exposed as a
 regular geographic `x/y/z` volume after their reconstructed axes are checked
 against the product metadata.
 
+Process the native values and explicitly match their physical vertical
+resolution when needed:
+
+```python
+from tomo_canopy.processors import TomogramProcessor
+from tomo_canopy.transforms import match_vertical_resolution
+
+processor = TomogramProcessor()
+power = processor.to_power(tomogram)
+power_db = processor.to_db(power, floor_db=-40.0)
+vertical_slice = processor.vertical_slice(
+    power_db,
+    axis="x",
+    coordinate=float(power_db.x.mean()),
+)
+resolution_matched = match_vertical_resolution(
+    power,
+    target_resolution=20.0,
+    variables=["tomographic_power"],
+)
+```
+
+`vertical_sampling` records the coordinate spacing, while
+`vertical_resolution` records the broader physical resolving capability; a
+finely sampled tomogram should not be interpreted as having equally fine
+independent vertical detail.
+
 ---
 
 ## Shared data interface
@@ -184,6 +212,7 @@ and document any setup required at the top of each notebook.
 | [`gedi_provider.ipynb`](examples/gedi_provider.ipynb) | Querying GEDI observations with `gedidb` |
 | [`gedi_processor.ipynb`](examples/gedi_processor.ipynb) | GEDI filtering, subsetting, and spatial preparation |
 | [`tomogram_provider.ipynb`](examples/tomogram_provider.ipynb) | Inspecting and opening BIOMASS TOM L1D/L2A products |
+| [`tomogram_processor.ipynb`](examples/tomogram_processor.ipynb) | Tomogram power, slices, profiles, and resolution-aware preparation |
 | [`data_interface.ipynb`](examples/data_interface.ipynb) | Combining native and gridded layers and plotting them in 2D and 3D |
 
 Start JupyterLab from the package directory:
@@ -219,7 +248,7 @@ tomo_canopy/
 ├── types/           # DataLayer, GridSpec, and DataCube contracts
 ├── cubegen/         # Cube-generation workflows (planned)
 ├── methods/         # Shared algorithms (planned)
-├── transforms/      # Spatial transformations (planned)
+├── transforms/      # Resolution matching and regular-grid resampling
 └── visualisation/   # Rendering interfaces (planned)
 ```
 
