@@ -1,0 +1,11 @@
+numpy
+pandas
+scipy
+matplotlib
+rasterio
+netCDF4
+requests
+folium
+ipywidgets
+pyarrow
+Pillow

@@ -1,0 +1,13 @@
+{
+  "_doc": "Criteria for a 600 m block to count as a suitable analysis window (used by run_stack.py --candidates/--auto-points and by the notebook button 'Find candidate windows'). Edit the numbers, keep the keys. Land-cover fractions in percent of the block (ESA WorldCover 2021), slopes from the Copernicus DEM 30 m sampled every 90 m.",
+  "min_grass_crop_pct": 90,
+  "max_tree_pct": 5,
+  "max_built_pct": 1,
+  "max_water_pct": 1,
+  "max_slope_mean_deg": 5,
+  "max_slope_gt5_pct": 20,
+  "rank_by": ["slope_mean_deg", "tree_pct"],
+  "n_best": 5,
+  "min_separation_km": 5,
+  "_notes": "Ranking: suitable blocks sorted by the columns in rank_by (ascending). n_best stars are shown, at least min_separation_km apart. SilverSword (Hawaii, slope 13 deg) would NOT pass with max_slope_mean_deg = 5 although it gave the clearest moisture response so far; raise it to 10-15 if you want hillside grassland included."
+}
