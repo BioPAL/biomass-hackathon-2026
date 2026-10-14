@@ -26,8 +26,8 @@ The package is under active development as part of the
 | **LVIS provider** | Read complete LVIS-C Level-2 TXT footprint records and normalize all 23 RH percentiles. |
 | **GEDI provider** | Query `gedidb` and return GEDI footprints, metrics, and waveforms as Xarray datasets. |
 | **Tomogram provider** | Inspect and lazily open BIOMASS TOM L1D and L2A product directories, including their STAC and annotation metadata. |
-| **Processing** | Validate, filter, sample, summarize, slice, and derive analysis quantities for TLS, GEDI, and tomograms. |
-| **Transforms** | Match vertical resolution with a Gaussian point-spread function and resample regular volumes onto a target grid. |
+| **Processing** | Validate, filter, sample, summarize, slice, and derive analysis quantities for TLS, LVIS, GEDI, and tomograms. |
+| **Transforms** | Reproject irregular observations, match vertical resolution, and resample regular volumes onto a target grid. |
 | **Shared data interface** | Combine point clouds, meshes, tree segments, rasters, waveforms, and regular volumes without requiring every modality to be present. |
 | **Xarray first** | Providers and processors return labelled `xarray.Dataset` objects with spatial metadata. |
 
@@ -233,6 +233,7 @@ and document any setup required at the top of each notebook.
 |---|---|
 | [`tls_provider.ipynb`](examples/tls_provider.ipynb) | Reading PLY point clouds and tree-segment files |
 | [`tls_processor.ipynb`](examples/tls_processor.ipynb) | TLS validation, sampling, bounds, tree metrics, and plotting |
+| [`lvis_processor.ipynb`](examples/lvis_processor.ipynb) | LVIS filtering, RH metrics, canopy elevation, reprojection, and interface integration |
 | [`gedi_provider.ipynb`](examples/gedi_provider.ipynb) | Querying GEDI observations with `gedidb` |
 | [`gedi_processor.ipynb`](examples/gedi_processor.ipynb) | GEDI filtering, subsetting, and spatial preparation |
 | [`tomogram_provider.ipynb`](examples/tomogram_provider.ipynb) | Inspecting and opening BIOMASS TOM L1D/L2A products |
