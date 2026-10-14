@@ -1,5 +1,25 @@
-credentials_path: "./credentials.txt"
-roi_json_path: "/home/samuel/codes/biomass-hackathon-2026/topics/11-B-FLOODED-FOREST/rois.json"
-output_json_path: "./sta_level1c_by_roi.json"
-stac_api_url: "https://catalog.maap.eo.esa.int/catalogue/"
-token_url: "https://iam.maap.eo.esa.int/realms/esa-maap/protocol/openid-connect/token"
+# User-specific settings — edit this file. Relative paths resolve against this folder.
+
+# MAAP credentials: KEY=value file (OFFLINE_TOKEN=...) or a file with the raw token
+credentials_path: credentials.txt
+
+# Preset ROI list used by run_pipeline.py --roi
+roi_json_path: rois.json
+
+# All generated/downloaded files (git-ignored)
+assets_dir: assets
+
+# MAAP catalogue
+stac_api_url: https://catalog.maap.eo.esa.int/catalogue/
+token_url: https://iam.maap.eo.esa.int/realms/esa-maap/protocol/openid-connect/token
+collection: BiomassLevel1c
+
+# STAC search
+min_overlap_fraction: 0.0   # > 0 requires that fraction of the ROI covered by a product
+max_items_per_roi: 1000
+
+# Stack extraction defaults (see marcos_dev/1_data_extraction/extract_l1c_roi.py --help)
+max_files: 70
+min_coverage: 0.5
+workers: 6
+

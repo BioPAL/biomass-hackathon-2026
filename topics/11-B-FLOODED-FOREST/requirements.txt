@@ -1,0 +1,13 @@
+numpy
+scipy
+requests
+PyYAML
+pystac-client
+rasterio
+shapely>=2
+netCDF4
+folium
+geopandas
+matplotlib
+Pillow
+plotly
