@@ -69,7 +69,7 @@ class BasicPlotterApp:
         self.on_render()
 
         pl.add_axes()
-        self._first_render = False
+        pl.show_grid()
         pl.render()
 
     def run(self):
