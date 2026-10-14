@@ -21,9 +21,10 @@ from tomo_canopy.processors import TLSProcessor
 TLS_CRS = "EPSG:32630"
 TLS_VOXEL_SIZE = 1.0  # metres
 tls_candidates = [
-    Path("data/c01_r02_subsampled_1cm_trees_mesh.ply"),
-    Path("../data/c01_r02_subsampled_1cm_trees_mesh.ply"),
+    Path("data/TLS/Ankasa//c01_r02_subsampled_1cm_trees_mesh.ply"),
+    Path("../data/TLS/Ankasa//c01_r02_subsampled_1cm_trees_mesh.ply"),
 ]
+
 TLS_PATH = next((path for path in tls_candidates if path.is_file()), tls_candidates[0])
 
 tls_processor = TLSProcessor()
