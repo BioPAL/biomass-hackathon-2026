@@ -1,0 +1,3 @@
+[submodule "topics/02-rfi-removal/src/lambda1_bsf"]
+	path = topics/02-rfi-removal/src/lambda1_bsf
+	url = git@github.com:huizhangyang/lambda1-bsf.git
