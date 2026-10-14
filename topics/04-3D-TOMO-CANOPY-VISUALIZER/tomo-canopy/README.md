@@ -81,15 +81,18 @@ python -m pip install -e ".[dev,examples,gedi,tomogram]"
 from tomo_canopy.providers import TLSProvider
 
 tls = TLSProvider().open(
-    "data/TLS/c01_r02_subsampled_1cm.ply",
-    properties=["red", "green", "blue"],
-    crs="EPSG:32630",
+    "data/TLS/Lope/LPG-01/000_T0.ply",
+    properties=["branch"],
+    crs="LOCAL:Lope",
 )
 
 print(tls)
 ```
 
-Binary PLY arrays remain memory-mapped unless `load=True` is requested.
+The Lope collection is organized into the `LPG-01`, `OKO-01`, `OKO-02`, and
+`OKO-03` plot directories. Each tree-level PLY is a triangular mesh with a
+`branch` vertex attribute. Binary PLY arrays remain memory-mapped unless
+`load=True` is requested; the Lope files themselves are ASCII PLY.
 
 ### Query GEDI data
 
@@ -146,18 +149,18 @@ import numpy as np
 from tomo_canopy.types import DataCube, DataLayer, GeometryType, GridSpec, Modality
 
 grid = GridSpec(
-    x=np.arange(533_900.0, 534_100.0, 1.0),
-    y=np.arange(582_200.0, 582_400.0, 1.0),
-    z=np.arange(100.0, 150.0, 1.0),
-    crs="EPSG:32630",
+    x=np.arange(-150.0, 151.0, 1.0),
+    y=np.arange(-150.0, 151.0, 1.0),
+    z=np.arange(-50.0, 101.0, 1.0),
+    crs="LOCAL:Lope",
 )
 cube = DataCube(grid=grid)
 cube.add_layer(
     DataLayer(
-        name="tls_points",
+        name="tls_mesh",
         data=tls,
         modality=Modality.TLS,
-        geometry=GeometryType.POINT_CLOUD,
+        geometry=GeometryType.TRIANGULAR_MESH,
     )
 )
 
