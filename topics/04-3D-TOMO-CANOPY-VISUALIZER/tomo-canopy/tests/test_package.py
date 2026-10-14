@@ -2,7 +2,7 @@
 
 import tomo_canopy
 from tomo_canopy import cubegen, methods, processors, transforms, visualisation
-from tomo_canopy.providers import als, gedi, tls, tomograms
+from tomo_canopy.providers import gedi, lvis, tls, tomograms
 
 
 def test_public_modules_are_importable() -> None:
@@ -11,9 +11,9 @@ def test_public_modules_are_importable() -> None:
     assert all(
         module.__name__.startswith("tomo_canopy")
         for module in (
-            als,
             cubegen,
             gedi,
+            lvis,
             methods,
             processors,
             tls,

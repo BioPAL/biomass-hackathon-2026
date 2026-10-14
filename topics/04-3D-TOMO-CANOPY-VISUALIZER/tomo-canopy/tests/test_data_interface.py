@@ -37,8 +37,8 @@ def test_cube_allows_no_modalities(grid: GridSpec) -> None:
     assert cube.layers == {}
     assert cube.modalities == frozenset()
     assert cube.missing_modalities(
-        {Modality.TLS, Modality.ALS, Modality.GEDI, Modality.TOMOGRAM}
-    ) == frozenset({"tls", "als", "gedi", "tomogram"})
+        {Modality.TLS, Modality.LVIS, Modality.GEDI, Modality.TOMOGRAM}
+    ) == frozenset({"tls", "lvis", "gedi", "tomogram"})
 
 
 def test_cube_allows_tls_without_other_modalities(grid: GridSpec) -> None:
@@ -46,20 +46,20 @@ def test_cube_allows_tls_without_other_modalities(grid: GridSpec) -> None:
     cube.add_layer(make_tls_layer(grid))
 
     assert cube.has_modality(Modality.TLS)
-    assert not cube.has_modality(Modality.ALS)
+    assert not cube.has_modality(Modality.LVIS)
     assert cube.missing_modalities(
-        {Modality.TLS, Modality.ALS, Modality.GEDI}
-    ) == frozenset({"als", "gedi"})
+        {Modality.TLS, Modality.LVIS, Modality.GEDI}
+    ) == frozenset({"gedi", "lvis"})
     assert len(cube.layers_for("tls")) == 1
-    assert cube.layers_for("als") == ()
+    assert cube.layers_for("lvis") == ()
 
 
 def test_require_modalities_reports_only_missing_data(grid: GridSpec) -> None:
     cube = DataCube(grid=grid, layers={"tls_occupancy": make_tls_layer(grid)})
 
     cube.require_modalities(Modality.TLS)
-    with pytest.raises(ValueError, match="als, gedi"):
-        cube.require_modalities(Modality.TLS, Modality.GEDI, Modality.ALS)
+    with pytest.raises(ValueError, match="gedi, lvis"):
+        cube.require_modalities(Modality.TLS, Modality.GEDI, Modality.LVIS)
 
 
 def test_reject_layer_on_different_grid(grid: GridSpec) -> None:
@@ -69,9 +69,9 @@ def test_reject_layer_on_different_grid(grid: GridSpec) -> None:
         attrs={"crs": grid.crs},
     )
     layer = DataLayer(
-        name="als_height",
+        name="lvis_height",
         data=shifted,
-        modality=Modality.ALS,
+        modality=Modality.LVIS,
         geometry=GeometryType.RASTER,
     )
 
@@ -86,9 +86,9 @@ def test_reject_layer_on_different_crs(grid: GridSpec) -> None:
         attrs={"crs": "EPSG:4326"},
     )
     layer = DataLayer(
-        name="als_height",
+        name="lvis_height",
         data=dataset,
-        modality=Modality.ALS,
+        modality=Modality.LVIS,
         geometry=GeometryType.RASTER,
     )
 
@@ -133,6 +133,25 @@ def test_cube_accepts_native_gedi_shots_without_z(grid: GridSpec) -> None:
         data=dataset,
         modality=Modality.GEDI,
         geometry=GeometryType.POINT_CLOUD,
+    )
+
+    DataCube(grid=grid).add_layer(layer)
+
+
+def test_cube_accepts_native_lvis_footprints_without_z(grid: GridSpec) -> None:
+    dataset = xr.Dataset(
+        {"rh98": ("shot", [32.0, 41.0])},
+        coords={
+            "x": ("shot", [0.7, 1.2]),
+            "y": ("shot", [1.1, 2.1]),
+        },
+        attrs={"crs": grid.crs},
+    )
+    layer = DataLayer(
+        name="lvis_footprints",
+        data=dataset,
+        modality=Modality.LVIS,
+        geometry=GeometryType.FOOTPRINTS,
     )
 
     DataCube(grid=grid).add_layer(layer)

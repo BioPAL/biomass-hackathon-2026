@@ -39,6 +39,9 @@ gedi = [
   "gedidb",
   "pyproj>=3.6",
 ]
+lvis = [
+  "pandas>=2.2",
+]
 tomogram = [
   "dask[array]>=2024.1",
   "netCDF4>=1.6",
