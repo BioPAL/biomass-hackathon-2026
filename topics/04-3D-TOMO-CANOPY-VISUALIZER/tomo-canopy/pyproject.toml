@@ -35,6 +35,10 @@ examples = [
   "jupyterlab>=4",
   "matplotlib>=3.8",
 ]
+gedi = [
+  "gedidb",
+  "pyproj>=3.6",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["tomo_canopy"]

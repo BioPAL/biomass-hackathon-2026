@@ -67,7 +67,7 @@ Each project group works in `topics/<GROUP-LABEL>/` — the folder name matches 
 Work from a **fork** (one fork per person; you do not push directly to `main`):
 
 1. Create a **Task** issue and pick your **Group** (label is applied automatically).
-2. Fork [BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026), clone **your** fork, create a branch.
+2. Fork [BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026), clone **your** fork with **HTTPS** (ESA public Wi‑Fi often blocks SSH), create a branch.
 3. When you start the work, open a **draft** pull request early with `Closes #<issue-number>` in the description.
 4. When ready for a maintainer, mark the PR **Ready for review**. A maintainer merges (do not merge yourself).
 
