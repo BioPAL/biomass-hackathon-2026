@@ -39,6 +39,10 @@ gedi = [
   "gedidb",
   "pyproj>=3.6",
 ]
+tomogram = [
+  "dask[array]>=2024.1",
+  "netCDF4>=1.6",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["tomo_canopy"]
