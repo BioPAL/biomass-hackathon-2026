@@ -1,4 +1,5 @@
 # Generated data & figures — large, reproducible, never commit
+outputs/
 assets/
 pauli_tif/
 figures/

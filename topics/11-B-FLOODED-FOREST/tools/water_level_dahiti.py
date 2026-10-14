@@ -13,8 +13,14 @@ import argparse
 import json
 import os
 import pprint
+import sys
+from pathlib import Path
 
 import requests
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from flooded_forest.core import config as ffconfig
 
 URL = "https://dahiti.dgfi.tum.de/api/v2/download-water-level/"
 
@@ -39,7 +45,8 @@ def main():
     elif args.format in ("ascii", "csv"):
         print(response.text)
     elif args.format == "netcdf":
-        out = f"assets/validation/{args.dahiti_id}_water_level_altimetry.nc"
+        out = ffconfig.load_config().outputs_dir / "validation" / f"{args.dahiti_id}_water_level_altimetry.nc"
+        out.parent.mkdir(parents=True, exist_ok=True)
         with open(out, "wb") as f:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:

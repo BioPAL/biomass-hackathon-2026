@@ -23,7 +23,7 @@ def _fetch_bytes(url, token):
 
 
 def show_quicklooks(config, roi_entry, token, limit=None, show=False):
-    """Download Pauli quicklooks of a ROI's products into <roi>/quicklooks/.
+    """Download Pauli quicklooks of a ROI's products into <roi>/quicklooks/catalogue/.
 
     limit=None downloads all products of the ROI entry.
     """
@@ -32,7 +32,7 @@ def show_quicklooks(config, roi_entry, token, limit=None, show=False):
         print("No products, skipping quicklooks")
         return []
 
-    out_dir = config.roi_dir(roi_entry["slug"]) / "quicklooks"
+    out_dir = config.roi_paths(roi_entry["slug"]).quicklooks / "catalogue"
     out_dir.mkdir(parents=True, exist_ok=True)
     name = roi_entry["name"]
     selected = products if limit is None else products[:limit]
@@ -67,13 +67,13 @@ def show_quicklooks(config, roi_entry, token, limit=None, show=False):
 
 
 def quicklooks_for_stack(config, roi_entry, stack_info, token, show=False):
-    """Download the quicklook of each product of an extracted stack into its folder.
+    """Download the quicklook of each product of an extracted stack into <roi>/quicklooks/<stack>/.
 
-    stack_info: the parsed stack_info.json of the stack folder.
+    stack_info: core.io.load_stack_info() of the stack folder.
     Failures (missing asset, bad token) are reported but do not stop the pipeline.
     """
     by_id = {p["id"]: p for p in roi_entry.get("products", [])}
-    out_dir = stack_info["_dir"] / "quicklooks"
+    out_dir = config.roi_paths(roi_entry["slug"]).quicklooks / stack_info["_dir"].name
     out_dir.mkdir(parents=True, exist_ok=True)
 
     saved = []

@@ -6,11 +6,9 @@ credentials_path: credentials.txt
 # Preset ROI list used by run_pipeline.py --roi
 roi_json_path: rois.json
 
-# Catalogue search output (shared by flooded_forest.search and find_stack_files.py)
-output_json_path: assets/catalogue/sta_level1c_by_roi.json
-
-# All generated/downloaded files (git-ignored)
-assets_dir: assets
+# Everything generated/downloaded goes here (git-ignored):
+#   outputs/catalogue/  and  outputs/<roi>/{extraction,quicklooks,coherence,polsar}/
+outputs_dir: outputs
 
 # MAAP catalogue
 stac_api_url: https://catalog.maap.eo.esa.int/catalogue/
@@ -21,10 +19,22 @@ collection: BiomassLevel1c
 min_overlap_fraction: 0.0   # > 0 requires that fraction of the ROI covered by a product
 max_items_per_roi: 1000
 
-# Stack extraction defaults (see marcos_dev/1_data_extraction/extract_l1c_roi.py --help)
+# Stack extraction defaults (run_pipeline.py --max-files / --min-coverage / --workers override them)
 max_files: 70
 min_coverage: 0.5
 workers: 6
+# phase corrections applied to every product before it is saved (as in Thesis_v2):
+#   s * exp(1j * skpCalibrationPhaseScreen) * exp(1j * flatteningPhaseScreen)
+apply_skp: true
+apply_flat: true
 
-# MBMP coherence (see marcos_dev/1_data_extraction/compute_coherence.py --help)
-coherence_window: 250   # averaging window side on ground [m]
+# Spatial averaging window side on ground [m], shared by the MBMP coherence and the
+# PolSAR coherency matrix T3 (same window, same output grid)
+averaging_window: 250
+
+# PolSAR: one incidence angle per swath [deg] (BIOMASS mean swath incidence).
+# The L1C amplitude is sqrt(beta0); S is scaled by sqrt(sin(theta)) towards sigma0.
+swath_incidence_deg:
+  S1: 25.4
+  S2: 29.1
+  S3: 32.2

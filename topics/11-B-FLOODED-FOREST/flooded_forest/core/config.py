@@ -1,10 +1,31 @@
-"""config.yaml loader. Relative paths resolve against the topic root."""
+"""config.yaml loader and output layout. Relative paths resolve against the topic root."""
 
+import json
 from pathlib import Path
 
 import yaml
 
-TOPIC_ROOT = Path(__file__).resolve().parent.parent
+TOPIC_ROOT = Path(__file__).resolve().parents[2]
+
+
+class RoiPaths:
+    """Output folders of one ROI: outputs/<roi>/{extraction,quicklooks,coherence,polsar}/."""
+
+    def __init__(self, root):
+        self.root = Path(root)
+        self.extraction = self.root / "extraction"    # common area, summaries, one folder per stack
+        self.quicklooks = self.root / "quicklooks"    # catalogue/ and one folder per stack
+        self.coherence = self.root / "coherence"      # one folder per stack
+        self.polsar = self.root / "polsar"            # one folder per stack
+        self.figures = self.extraction / "figures"    # ROI-level figures (time series)
+
+    def stack_dirs(self):
+        """Stack folders of the last extraction (same common area); every stack folder if no summary."""
+        summary = self.extraction / "extraction_summary.json"
+        if summary.exists():
+            names = [st["folder"] for st in json.loads(summary.read_text(encoding="utf-8"))["stacks"]]
+            return [self.extraction / n for n in names if (self.extraction / n / "stack_info.json").exists()]
+        return sorted(p.parent for p in self.extraction.glob("*/stack_info.json"))
 
 
 class Config:
@@ -17,7 +38,7 @@ class Config:
         # paths (relative -> topic root)
         self.credentials_path = self._resolve(raw.get("credentials_path", "credentials.txt"))
         self.roi_json_path = self._resolve(raw.get("roi_json_path", "rois.json"))
-        self.assets_dir = self._resolve(raw.get("assets_dir", "assets"))
+        self.outputs_dir = self._resolve(raw.get("outputs_dir", "outputs"))
 
         # MAAP catalogue
         self.stac_api_url = raw.get("stac_api_url", "https://catalog.maap.eo.esa.int/catalogue/")
@@ -32,13 +53,21 @@ class Config:
         self.max_items_per_roi = int(raw.get("max_items_per_roi", 1000))
         self.request_pause_seconds = float(raw.get("request_pause_seconds", 0.1))
 
-        # stack extraction defaults (passed to marcos_dev/1_data_extraction/extract_l1c_roi.py)
-        self.max_files = raw.get("max_files")
-        self.min_coverage = raw.get("min_coverage")
+        # stack extraction
+        self.max_files = int(raw.get("max_files", 70))
+        self.min_coverage = float(raw.get("min_coverage", 0.5))
         self.workers = int(raw.get("workers", 6))
+        self.apply_skp = bool(raw.get("apply_skp", True))
+        self.apply_flat = bool(raw.get("apply_flat", True))
 
-        # MBMP coherence (passed to marcos_dev/1_data_extraction/compute_coherence.py)
-        self.coherence_window = float(raw.get("coherence_window", 250))
+        # spatial averaging shared by coherence and PolSAR
+        self.averaging_window = float(raw.get("averaging_window", raw.get("coherence_window", 250)))
+
+        # PolSAR
+        self.swath_incidence_deg = {
+            str(k).upper(): float(v)
+            for k, v in (raw.get("swath_incidence_deg") or {"S1": 25.4, "S2": 29.1, "S3": 32.2}).items()
+        }
 
     def _resolve(self, value):
         path = Path(value).expanduser()
@@ -46,19 +75,21 @@ class Config:
 
     @property
     def catalogue_dir(self):
-        return self.assets_dir / "catalogue"
+        return self.outputs_dir / "catalogue"
 
-    @property
-    def stacks_dir(self):
-        return self.assets_dir / "stacks"
+    def roi_paths(self, slug):
+        return RoiPaths(self.outputs_dir / slug)
 
-    def roi_dir(self, slug):
-        """Folder of one ROI under assets/stacks (figures, quicklooks, stacks)."""
-        return self.stacks_dir / slug
+    def incidence_deg(self, swath):
+        """Mean incidence angle of a swath ('S1', 'S2', 'S3')."""
+        try:
+            return self.swath_incidence_deg[swath.upper()]
+        except KeyError:
+            raise KeyError(f"no incidence angle for swath {swath} in config.yaml "
+                           f"(swath_incidence_deg has {sorted(self.swath_incidence_deg)})") from None
 
     def ensure_dirs(self):
-        for folder in (self.catalogue_dir, self.stacks_dir):
-            folder.mkdir(parents=True, exist_ok=True)
+        self.catalogue_dir.mkdir(parents=True, exist_ok=True)
 
 
 def load_config(path=None):

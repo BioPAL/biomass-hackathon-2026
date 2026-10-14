@@ -1,7 +1,7 @@
 """Search the MAAP STAC catalogue for STA Level-1C products over a ROI.
 
-Ported from find_stack_files.py. Results are merged per ROI into
-assets/catalogue/sta_level1c_by_roi.json.
+Results are merged per ROI into outputs/catalogue/sta_level1c_by_roi.json. They
+feed the Pauli quicklooks; the stack extraction runs its own stack-level search.
 """
 
 import json
@@ -138,7 +138,7 @@ def search_roi(config, roi, token):
 
 
 def run_search(config, roi, token, catalogue_path=None):
-    """Search and merge the ROI entry into assets/catalogue/sta_level1c_by_roi.json."""
+    """Search and merge the ROI entry into outputs/catalogue/sta_level1c_by_roi.json."""
     catalogue_path = catalogue_path or config.catalogue_dir / CATALOGUE_FILENAME
     catalogue_path.parent.mkdir(parents=True, exist_ok=True)
 

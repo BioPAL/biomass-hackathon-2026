@@ -1,139 +1,35 @@
-"""MBMP coherence: run the marcos_dev coherence computer and plot its output.
+"""Coherence figures and the manual scene review (port of visualize_coherence.ipynb).
 
-Two parts:
-- run_coherence: shells out to marcos_dev/1_data_extraction/compute_coherence.py
-  (kept untouched). For every stack folder of the ROI it downloads the
-  flattening LUT of each product (cached in flattening_lut.nc) and writes
-  coherence_w<L>m.npz / coherence_w<L>m.json next to the products.
-- plot_coherence_outputs: reads those npz files and saves the figures of
-  marcos_dev/1_data_extraction/visualize_coherence.ipynb into <stack>/figures/:
-  the mean MBMP correlation matrix, the |gamma| pair grids of the kept
-  acquisitions for every polarisation and the RGB of the temporal
-  decorrelation. The stack summary and the acquisition-filter table go to
-  <stack>/coherence_filter.md.
+Per stack, into <roi>/coherence/<stack>/figures/ (all scenes, scene index [k] in every label):
+    mbmp_matrix.png        mean |γ| of the 3Nb x 3Nb MBMP correlation matrix (HH, XP, VV blocks)
+    coherence_<pol>.png    single-pol pair grid: |γ| maps above the diagonal, intensity on it
+    temporal_rgb.png       RGB of |γ| at 3 / 6 / 9 days, KEPT scenes only
+
+Manual scene review (review=True): for every stack the MBMP matrix and the HH, HV
+and VV pair grids open in desktop windows and the scenes to keep are typed in the
+terminal. The choice is saved in <roi>/extraction/<stack>/scene_selection.json
+(core.scenes) and every later step (stack figures, PolSAR, comparisons, temporal
+mechanism plot) uses only the kept scenes. The coherence itself is not recomputed:
+the |γ| of a pair does not depend on the other scenes.
+
+<roi>/coherence/<stack>/coherence_scenes.md: window, scenes (kept / removed), and the
+3-day |γ| of every scene as a hint for the review.
 """
 
 import json
-import subprocess
-import sys
-import warnings
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-warnings.filterwarnings("ignore", message="Mean of empty slice")
-warnings.filterwarnings("ignore", message="All-NaN slice encountered")
-
-COMPUTE_SCRIPT = (
-    Path(__file__).resolve().parent.parent / "marcos_dev" / "1_data_extraction" / "compute_coherence.py"
-)
+from ..core.scenes import format_selection, parse_selection, removed_ids, save_selection
+from ..processing.coherence import coherence_paths
+from .common import CMAP, ask_with_figures, cell_geometry, save, show_map
 
 MIN_VALID = 0.5        # cells with a smaller share of valid pixels in the window are masked
-N_STD = 1.0            # acquisitions below mean - N_STD * std of the 3-day |gamma| are dropped
+N_STD = 1.0            # 3-day |γ| below mean - N_STD * std is flagged in the review hint
 RGB_LAGS_DAYS = (3, 6, 9)      # temporal baselines shown as R, G, B
 RGB_POLS = ("HH", "XP", "VV")  # XP = (HV + VH) / 2, block order as in BPS
-
-
-# -------------------- coherence computer (marcos_dev subprocess) --------------------
-
-
-def _valid_products(stack_dir):
-    """Products compute_coherence.py uses: extracted and still on disk, sorted by date."""
-    info_path = stack_dir / "stack_info.json"
-    if not info_path.exists():
-        return []
-    info = json.loads(info_path.read_text(encoding="utf-8"))
-    products = [
-        p for p in info["products"]
-        if p.get("status") in ("ok", "skipped (exists)") and (stack_dir / p["file"]).exists()
-    ]
-    products.sort(key=lambda p: p["datetime"])
-    return products
-
-
-def coherence_paths(stack_dir, window):
-    """npz / json written by compute_coherence.py for this averaging window."""
-    stem = f"coherence_w{window:g}m"
-    return stack_dir / f"{stem}.npz", stack_dir / f"{stem}.json"
-
-
-def _up_to_date(stack_dir, window):
-    """True when the coherence of this stack exists and matches its current products."""
-    npz_path, json_path = coherence_paths(stack_dir, window)
-    if not (npz_path.exists() and json_path.exists()):
-        return False
-    try:
-        meta = json.loads(json_path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return False
-    return [p["id"] for p in _valid_products(stack_dir)] == list(meta.get("products", []))
-
-
-def pending_stacks(roi_dir, window):
-    """Stack folders of an ROI folder whose coherence is missing or stale."""
-    roi_dir = Path(roi_dir)
-    todo = []
-    for stack_dir in sorted(p.parent for p in roi_dir.glob("*/stack_info.json")):
-        if _up_to_date(stack_dir, window):
-            continue
-        if len(_valid_products(stack_dir)) < 2:
-            print(f"  {stack_dir.name}: fewer than 2 extracted products, no coherence")
-            continue
-        todo.append(stack_dir)
-    return todo
-
-
-def build_command(config, roi_slug, window, token_file, stacks=None, workers=None, yes=True):
-    """Command line for marcos_dev/1_data_extraction/compute_coherence.py."""
-    cmd = [
-        sys.executable,
-        str(COMPUTE_SCRIPT),
-        "--roi-dir", str(config.roi_dir(roi_slug)),
-        "--window", f"{window:g}",
-        "--token-file", str(token_file),
-    ]
-    if stacks:
-        names = list(stacks) if isinstance(stacks, (list, tuple)) else [stacks]
-        cmd += ["--stacks", ",".join(names)]
-    if workers is not None:
-        cmd += ["--workers", str(workers)]
-    if yes:
-        cmd.append("--yes")
-    return cmd
-
-
-def run_coherence(config, roi, window, token_file, workers=None, yes=True):
-    """Compute the coherence of every stack of the ROI whose result is missing or stale.
-
-    Stacks whose coherence_w<L>m.npz already matches their products are skipped,
-    so re-running the pipeline (or a plots-only run) does not redo the work.
-    Delete <stack>/coherence_w<L>m.npz to force a recompute.
-    """
-    roi_dir = config.roi_dir(roi["slug"])
-    todo = pending_stacks(roi_dir, window)
-    if not todo:
-        print(f"Coherence ({window:g} m window) already up to date in {roi_dir}")
-        return roi_dir
-    cmd = build_command(config, roi["slug"], window, token_file,
-                        stacks=[d.name for d in todo], workers=workers, yes=yes)
-    print("Running:", " ".join(cmd))
-    subprocess.run(cmd, check=True)
-    return roi_dir
-
-
-# -------------------- figures (port of visualize_coherence.ipynb) --------------------
-
-
-def _save(fig, out_dir, tag, show=False):
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"{tag}.png"
-    fig.savefig(out, dpi=300, bbox_inches="tight")
-    print(f"    saved {out}")
-    if show:
-        plt.show()
-    plt.close(fig)
-    return out
+REVIEW_POLS = ("HH", "HV", "VV")
 
 
 def _load_stack(path, min_valid=MIN_VALID):
@@ -142,21 +38,11 @@ def _load_stack(path, min_valid=MIN_VALID):
     with np.load(path) as data:
         st = {k: data[k] for k in data.files}
     st["meta"] = meta
-    st["name"] = path.parent.name
+    st["name"] = meta["stack"]
     st["good"] = st["valid_fraction"] >= min_valid
-    win = meta["window"]
-    # maps in radar geometry with crop pixel axes: one output cell = d_az x d_rg crop pixels
-    if st["az_index"].size >= 2 and st["rg_index"].size >= 2:
-        d_az, d_rg = np.diff(st["az_index"][:2])[0], np.diff(st["rg_index"][:2])[0]
-    else:  # single-cell grid
-        d_az, d_rg = win["output_spacing_az_m"], win["output_spacing_rg_m"]
-    st["extent"] = [
-        st["rg_index"][0] - d_rg / 2, st["rg_index"][-1] + d_rg / 2,
-        st["az_index"][-1] + d_az / 2, st["az_index"][0] - d_az / 2,
-    ]
-    # imshow aspect = ground height / width of one crop pixel (azimuth vs ground range)
-    st["px_aspect"] = (win["output_spacing_az_m"] / d_az) / (win["output_spacing_rg_m"] / d_rg)
-    st["aspect"] = win["output_spacing_az_m"] / win["output_spacing_rg_m"]  # of one output cell
+    # maps in radar geometry with crop pixel axes, same cells as the PolSAR maps
+    st["geo"] = cell_geometry(meta["window"], st["az_index"], st["rg_index"])
+    st["aspect"] = st["geo"]["aspect"]
     st["days"] = np.array([np.datetime64(d) for d in meta["dates"]])
     nb = len(meta["dates"])
     # (Naz, Nrg, Nb, Nb) complex coherence per pol; XP = diagonal block of the MBMP matrix
@@ -172,18 +58,11 @@ def _lag_days(st, i, j):
 
 def _show_map(ax, st, img, labels=True, **kw):
     """(Naz, Nrg) image or RGB(A) in radar geometry, crop pixel axes, invalid cells masked."""
-    if img.ndim == 2:
-        img = np.where(st["good"], img, np.nan)
-    im = ax.imshow(img, extent=st["extent"], aspect=st["px_aspect"], interpolation="nearest", **kw)
-    ax.tick_params(labelsize=6)
-    if labels:
-        ax.set_xlabel("range pixel", fontsize=7)
-        ax.set_ylabel("azimuth pixel", fontsize=7)
-    return im
+    return show_map(ax, img, st["geo"], st["good"], labels, **kw)
 
 
 def _three_day_coherence(st, pol):
-    """Per acquisition: mean of the spatially averaged |gamma| of its pairs at +-3 days."""
+    """Per scene: mean of the spatially averaged |γ| of its pairs at +-3 days."""
     mean_abs = np.abs(st["coh"][pol][st["good"]]).mean(axis=0)
     nb = mean_abs.shape[0]
     return np.array([
@@ -192,123 +71,116 @@ def _three_day_coherence(st, pol):
     ])
 
 
-def _stack_summary(st):
-    """Markdown header of coherence_filter.md: window, grid, dates and mean kz."""
+def _three_day_table(st, n_std=N_STD):
+    """Markdown table of the 3-day |γ| per scene and pol; values below mean - n_std * std are flagged (!)."""
+    m = st["meta"]
+    head = " | ".join(f"[{k}] {d[5:]}" for k, d in enumerate(m["dates"]))
+    lines = [f"| pol | {head} | mean | std | flag below |", "|---" * (len(m["dates"]) + 4) + "|"]
+    for pol in list(m["coh_pols"]) + ["XP"]:
+        c3 = _three_day_coherence(st, pol)
+        threshold = np.nanmean(c3) - n_std * np.nanstd(c3)
+        cells = [f"{v:.3f}" + (" (!)" if v < threshold else "") for v in c3]
+        lines.append(f"| {pol} | " + " | ".join(cells)
+                     + f" | {np.nanmean(c3):.3f} | {np.nanstd(c3):.3f} | {threshold:.3f} |")
+    return "\n".join(lines)
+
+
+def _scenes_report(st, kept):
+    """Markdown of coherence_scenes.md: window, grid, scenes (kept / removed) and the 3-day hint table."""
     m, w = st["meta"], st["meta"]["window"]
     rows = "\n".join(
-        f"| {k} | {d} | {kz:+.3f} |{' primary' if k == m['primary_index'] else ''}"
+        f"| {k} | {d} | {kz:+.4f} | {'kept' if k in kept else '**removed**'} |"
+        f"{' primary' if k == m['primary_index'] else ''}"
         for k, (d, kz) in enumerate(zip(m["dates"], m["kz_mean_rad_per_m"]))
     )
     return (
         f"## {st['name']}\n\n"
-        f"{m['orbit_state']}, {len(m['dates'])} acquisitions. Window {w['NW_a']} x {w['NW_r']} px = "
+        f"{m['orbit_state']}, {len(m['dates'])} scenes, {len(kept)} kept. Window {w['NW_a']} x {w['NW_r']} px = "
         f"**{w['window_ground_az_m']:.0f} x {w['window_ground_rg_m']:.0f} m** "
         f"(az x rg, rg/az = {w['aspect_rg_over_az']:.2f}), "
         f"{w['looks']} looks, output grid {w['output_spacing_az_m']:.0f} x {w['output_spacing_rg_m']:.0f} m, "
         f"{int(st['good'].sum())} valid cells.\n\n"
-        f"| idx | date | mean kz [rad/m] |\n|---|---|---|\n{rows}"
+        f"| scene | date | mean kz [rad/m] | review |\n|---|---|---|---|\n{rows}\n\n"
+        f"### Mean |γ| of each scene with its ±3-day partners (hint for the review)\n\n"
+        f"(!) = below mean − {N_STD:g} std of the row.\n\n{_three_day_table(st)}"
     )
 
 
-def _filter_acquisitions(st, n_std=N_STD):
-    """st['kept'][pol] = acquisitions reaching mean - n_std * std of the 3-day |gamma|."""
-    m = st["meta"]
-    st["kept"] = {}
-    dates = " | ".join(f"{k}: {d[5:]}" for k, d in enumerate(m["dates"]))
-    lines = [f"| pol | {dates} | mean | std | threshold | kept |", "|---" * (len(m["dates"]) + 5) + "|"]
-    for pol in list(m["coh_pols"]) + ["XP"]:
-        c3 = _three_day_coherence(st, pol)
-        threshold = np.nanmean(c3) - n_std * np.nanstd(c3)
-        kept = [k for k, v in enumerate(c3) if v >= threshold]
-        st["kept"][pol] = kept
-        cells = [f"{v:.3f}" if k in kept else f"~~{v:.3f}~~" for k, v in enumerate(c3)]
-        lines.append(
-            f"| {pol} | " + " | ".join(cells)
-            + f" | {np.nanmean(c3):.3f} | {np.nanstd(c3):.3f} | **{threshold:.3f}** | {len(kept)}/{len(c3)} |"
-        )
-    print("    acquisition filter: " + ", ".join(
-        f"{pol} {len(st['kept'][pol])}/{len(m['dates'])}" for pol in st["kept"]))
-    return "\n".join(lines)
+# -------------------- figures --------------------
 
 
-def _plot_mean_matrix(st, out_dir, show=False):
-    """Mean over the valid cells of the 3Nb x 3Nb MBMP correlation: |gamma| and phase."""
+def fig_mean_matrix(st):
+    """Mean |γ| over the valid cells of the 3Nb x 3Nb MBMP correlation matrix."""
     m = st["meta"]
     nb, pols = len(m["dates"]), m["mbmp_pols"]
-    corr = st["mbmp_corr"][st["good"]]                 # (Ncells, 3Nb, 3Nb)
-    mean_abs = np.abs(corr).mean(axis=0)
-    mean_phase = np.rad2deg(np.angle(corr.mean(axis=0)))
-    labels = [f"{p} {d[5:]}" for p in pols for d in m["dates"]]
+    mean_abs = np.abs(st["mbmp_corr"][st["good"]]).mean(axis=0)
+    labels = [f"{p} [{k}] {d[5:]}" for p in pols for k, d in enumerate(m["dates"])]
     n = len(labels)
 
-    fig, axes = plt.subplots(1, 2, figsize=(22, 10), layout="constrained")
-    panels = [(mean_abs, "Blues", (0, 1), "mean |γ|"),
-              (mean_phase, "twilight", (-180, 180), "phase of mean γ [deg]")]
-    for ax, (mat, cmap, (vmin, vmax), title) in zip(axes, panels):
-        im = ax.imshow(mat, cmap=cmap, vmin=vmin, vmax=vmax)
-        for b in range(1, len(pols)):                  # polarisation block borders
-            ax.axhline(b * nb - 0.5, color="black", lw=1.5)
-            ax.axvline(b * nb - 0.5, color="black", lw=1.5)
-        ax.set_xticks(range(n), labels, rotation=90, fontsize=8)
-        ax.set_yticks(range(n), labels, fontsize=8)
-        ax.set_title(title, fontsize=13)
-        fig.colorbar(im, ax=ax, shrink=0.8)
-    for i in range(n):                                 # values of mean |gamma|
+    fig, ax = plt.subplots(figsize=(12, 10.5), layout="constrained")
+    im = ax.imshow(mean_abs, cmap=CMAP, vmin=0, vmax=1)
+    for b in range(1, len(pols)):                      # polarisation block borders
+        ax.axhline(b * nb - 0.5, color="white", lw=2)
+        ax.axvline(b * nb - 0.5, color="white", lw=2)
+    ax.set_xticks(range(n), labels, rotation=90, fontsize=8)
+    ax.set_yticks(range(n), labels, fontsize=8)
+    for i in range(n):
         for j in range(n):
             v = mean_abs[i, j]
-            axes[0].text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=6,
-                         color="white" if v > 0.55 else "black")
-    fig.suptitle(f"{st['name']} — MBMP correlation {n} x {n} (HH, XP, VV x {nb} acquisitions), "
-                 f"mean over {corr.shape[0]} cells", fontsize=14)
-    return _save(fig, out_dir, "mbmp_matrix", show)
+            ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=6,
+                    color="black" if 0.3 < v < 0.75 else "white")
+    fig.colorbar(im, ax=ax, shrink=0.8, label="mean |γ| over the valid cells")
+    ax.set_title(f"{st['name']}\nMBMP coherence: mean |γ| of the {n} x {n} correlation matrix "
+                 f"(blocks HH, XP = (HV+VH)/2, VV x {nb} scenes [index] MM-DD), "
+                 f"{int(st['good'].sum())} valid cells", fontsize=11)
+    return fig
 
 
-def _plot_pair_grid(st, pol, out_dir, show=False):
-    """Grid of the kept acquisitions of one polarisation: |gamma| above the diagonal, intensity on it."""
+def fig_pair_grid(st, pol):
+    """All scenes of one pol: |γ| maps above the diagonal, intensity <|pol|²> on the diagonal."""
     m = st["meta"]
-    kept = st["kept"][pol]
-    if len(kept) < 2:
-        print(f"    {st['name']} {pol}: {len(kept)} acquisition(s) above the 3-day threshold, no pairs to show")
-        return None
+    n = len(m["dates"])
     p = m["coh_pols"].index(pol)
     coh = st["coh"][pol]
     power_db = 10 * np.log10(st["power_pol"][:, :, p] + 1e-12)
     db_lim = np.nanpercentile(power_db[st["good"]], [2, 98])
-    n = len(kept)
 
     fig, axes = plt.subplots(n, n, figsize=(2.6 * n + 1.5, 2.6 * n * min(st["aspect"], 1.6) + 1),
                              layout="constrained", squeeze=False)
-    for a, i in enumerate(kept):
-        for b, j in enumerate(kept):
-            ax = axes[a, b]
-            if a > b:
+    im_db = im_abs = None
+    for i in range(n):
+        for j in range(n):
+            ax = axes[i, j]
+            if i > j:
                 ax.axis("off")
                 continue
-            if a == b:
-                img, kw = power_db[:, :, i], dict(cmap="gray", vmin=db_lim[0], vmax=db_lim[1])
-                txt = f'{m["dates"][i]}  [dB]'
+            if i == j:
+                img, kw = power_db[:, :, i], dict(cmap=CMAP, vmin=db_lim[0], vmax=db_lim[1])
+                txt = f"[{i}] {m['dates'][i]}\n<|{pol}|²> [dB]"
             else:
-                img, kw = np.abs(coh[:, :, i, j]), dict(cmap="Blues", vmin=0, vmax=1)
-                txt = f'|γ| {i}-{j} ({_lag_days(st, i, j)} d)  μ={np.nanmean(img[st["good"]]):.2f}'
-            im = _show_map(ax, st, img, labels=(a == b), **kw)
-            ax.set_title(txt, fontsize=8)
-            if a == b == 0:
+                img, kw = np.abs(coh[:, :, i, j]), dict(cmap=CMAP, vmin=0, vmax=1)
+                txt = (f"|γ {pol}| [{i}]-[{j}] ({_lag_days(st, i, j)} d)\n"
+                       f"mean {np.nanmean(img[st['good']]):.2f}")
+            im = _show_map(ax, st, img, labels=(i == j), **kw)
+            ax.set_title(txt, fontsize=7)
+            if i == j and im_db is None:
                 im_db = im
-            if (a, b) == (0, 1):
+            if i != j and im_abs is None:
                 im_abs = im
     # colorbars in the empty lower triangle
     half = max(n // 2, 1)
-    fig.colorbar(im_abs, ax=list(axes[-1, :half]), location="bottom", shrink=0.9, label="|γ|")
+    if im_abs is not None:
+        fig.colorbar(im_abs, ax=list(axes[-1, :half]), location="bottom", shrink=0.9,
+                     label=f"single-pol coherence |γ {pol}|")
     fig.colorbar(im_db, ax=list(axes[-1, half:]) if n > 1 else [axes[-1, 0]],
-                 location="bottom", shrink=0.9, label="intensity [dB]")
-    fig.suptitle(f"{st['name']} — {pol}: |γ| (upper), intensity (diagonal), {n}/{len(m['dates'])} acquisitions "
-                 f"kept  [crop pixels: rows = azimuth, columns = slant range]", fontsize=13)
-    return _save(fig, out_dir, f"coherence_{pol.lower()}", show)
+                 location="bottom", shrink=0.9, label=f"intensity <|{pol}|²> [dB, uncalibrated]")
+    fig.suptitle(f"{st['name']} — {pol}: single-pol coherence |γ| (upper triangle) and intensity (diagonal), "
+                 f"{n} scenes [index]  [rows = azimuth, columns = slant range]", fontsize=12)
+    return fig
 
 
-def _rgb_anchors(st, pol, rgb_lags):
-    """Kept acquisitions i whose partners at the given lags are kept too -> [(i, [j_lag1, ...]), ...]"""
-    kept = st["kept"][pol]
+def _rgb_anchors(st, kept, rgb_lags):
+    """Kept scenes i whose partners at the given lags are kept too -> [(i, [j_lag1, ...]), ...]"""
     out = []
     for i in kept:
         partners = [next((j for j in kept if _lag_days(st, i, j) == lag), None) for lag in rgb_lags]
@@ -317,67 +189,104 @@ def _rgb_anchors(st, pol, rgb_lags):
     return out
 
 
-def _plot_rgb(st, out_dir, rgb_lags=RGB_LAGS_DAYS, rgb_pols=RGB_POLS, show=False):
-    """One RGB image per valid anchor and per pol: R, G, B = |gamma| at the three lags."""
+def _plot_rgb(st, kept, out_dir, rgb_lags=RGB_LAGS_DAYS, rgb_pols=RGB_POLS, show=False):
+    """One RGB image per anchor and per pol: R, G, B = |γ| at the three lags (kept scenes only)."""
     m = st["meta"]
-    anchors = {pol: _rgb_anchors(st, pol, rgb_lags) for pol in rgb_pols}
-    n_col = max(len(a) for a in anchors.values())
-    if n_col == 0:
-        print(f"    {st['name']}: no kept acquisition has kept partners at {rgb_lags} days, no RGB to show")
+    anchors = _rgb_anchors(st, kept, rgb_lags)
+    if not anchors:
+        print(f"    {st['name']}: no kept scene has kept partners at {rgb_lags} days, no temporal RGB")
         return None
     lag_txt = "/".join(map(str, rgb_lags))
+    n_col = len(anchors)
     fig, axes = plt.subplots(len(rgb_pols), n_col, squeeze=False, layout="constrained",
                              figsize=(3.2 * n_col + 1, 3.2 * len(rgb_pols) * min(st["aspect"], 1.6) + 0.6))
     for r, pol in enumerate(rgb_pols):
-        for c in range(n_col):
+        for c, (i, partners) in enumerate(anchors):
             ax = axes[r, c]
-            if c >= len(anchors[pol]):
-                ax.axis("off")
-                continue
-            i, partners = anchors[pol][c]
-            # absolute 0-1 scale: each channel is the raw |gamma| (no stretch to the max of the image)
+            # absolute 0-1 scale: each channel is the raw |γ| (no stretch to the max of the image)
             rgb = np.stack([np.abs(st["coh"][pol][:, :, i, j]) for j in partners], axis=-1)
             rgba = np.concatenate([np.clip(rgb, 0, 1), st["good"][..., None].astype(float)], axis=-1)
             _show_map(ax, st, rgba, labels=(c == 0))
             means = rgb[st["good"]].mean(axis=0)
-            ax.set_title(f"{pol}  {m['dates'][i]} ({i} -> {', '.join(map(str, partners))})\n"
-                         f"mean R {means[0]:.2f}  G {means[1]:.2f}  B {means[2]:.2f}", fontsize=8)
-        if len(anchors[pol]) == 0:
-            axes[r, 0].text(0.5, 0.5, f"{pol}: no valid anchor", ha="center", va="center",
-                            transform=axes[r, 0].transAxes)
-    fig.suptitle(f"{st['name']} — RGB of |γ|: R = {rgb_lags[0]} d, G = {rgb_lags[1]} d, "
-                 f"B = {rgb_lags[2]} d  (white = stable over {lag_txt} d, red = fast decorrelation)",
-                 fontsize=12)
-    return _save(fig, out_dir, "temporal_rgb", show)
+            ax.set_title(f"{pol}  [{i}] {m['dates'][i]} -> [{', '.join(map(str, partners))}]\n"
+                         f"mean |γ| R {means[0]:.2f}  G {means[1]:.2f}  B {means[2]:.2f}", fontsize=8)
+    fig.suptitle(f"{st['name']} — temporal RGB of |γ|: R = {rgb_lags[0]} d, G = {rgb_lags[1]} d, "
+                 f"B = {rgb_lags[2]} d baseline (white = coherent over {lag_txt} d, red = fast decorrelation), "
+                 f"{len(kept)}/{len(m['dates'])} scenes kept", fontsize=11)
+    return save(fig, out_dir, "temporal_rgb", show)
 
 
-def plot_coherence_outputs(roi_dir, window, min_valid=MIN_VALID, n_std=N_STD,
+# -------------------- review --------------------
+
+
+def _ask_scenes(st, figs, default):
+    """Interactive choice of the scenes to keep; the figures stay open (and zoomable) meanwhile."""
+    n = len(st["meta"]["dates"])
+    default_txt = format_selection(default)
+    while True:
+        answer = ask_with_figures(
+            figs, f"  {st['name']}: scenes to keep (e.g. 0,2,4-6 | all | Enter = {default_txt}): ")
+        try:
+            chosen = parse_selection(answer or default_txt, n)
+        except ValueError as exc:
+            print(f"    {exc}")
+            continue
+        if not chosen:
+            print("    keep at least one scene")
+            continue
+        removed = [k for k in range(n) if k not in chosen]
+        note = " (fewer than 2 scenes: no coherence pairs left)" if len(chosen) < 2 else ""
+        confirm = ask_with_figures(
+            figs, f"    keep {format_selection(chosen)}, remove {format_selection(removed) or 'none'}{note}. "
+                  f"OK? (y/n) [y]: ")
+        if confirm.strip().lower() in ("", "y", "yes"):
+            return chosen
+
+
+def plot_coherence_outputs(roi_paths, window, review=False, interactive=True, min_valid=MIN_VALID,
                            rgb_lags=RGB_LAGS_DAYS, rgb_pols=RGB_POLS, show=False):
-    """Coherence figures of every stack of an ROI folder into <stack>/figures/.
+    """Coherence figures of every stack of the last extraction, with the manual scene review.
 
-    Stacks without a coherence_w<L>m.npz for this window are skipped, so this is
-    safe to call whether or not the coherence was computed in this run.
+    review=True and interactive: the MBMP matrix and the HH, HV, VV pair grids of each stack
+    open in windows and the scenes to keep are asked in the terminal (saved per stack).
+    Otherwise the saved selection is used (all scenes when there is none).
     """
-    roi_dir = Path(roi_dir)
-    files = sorted(roi_dir.glob(f"*/coherence_w{window:g}m.npz"))
-    if not files:
-        print(f"No coherence results for a {window:g} m window in {roi_dir}")
+    stacks = [(d, coherence_paths(roi_paths.coherence / d.name, window)[0]) for d in roi_paths.stack_dirs()]
+    stacks = [(d, f) for d, f in stacks if f.exists()]
+    if not stacks:
+        print(f"No coherence results for a {window:g} m window in {roi_paths.coherence}")
         return []
-    print(f"Coherence figures ({window:g} m window):")
+    print(f"Coherence figures ({window:g} m window){' + manual scene review' if review and interactive else ''}:")
     figures = []
-    for path in files:
-        stack_dir = path.parent
-        print(f"  {stack_dir.name}:")
+    for stack_dir, path in stacks:
+        out_dir = path.parent
+        print(f"  {out_dir.name}:")
         st = _load_stack(path, min_valid)
         if not st["good"].any():
             print("    no valid cell inside the common area, skipped")
-            del st
             continue
-        report = [_stack_summary(st), _filter_acquisitions(st, n_std)]
-        (stack_dir / "coherence_filter.md").write_text("\n\n".join(report) + "\n", encoding="utf-8")
-        figures.append(_plot_mean_matrix(st, stack_dir / "figures", show))
-        for pol in st["meta"]["coh_pols"]:
-            figures.append(_plot_pair_grid(st, pol, stack_dir / "figures", show))
-        figures.append(_plot_rgb(st, stack_dir / "figures", rgb_lags, rgb_pols, show))
+        products = [{"id": pid, "datetime": d} for pid, d in zip(st["meta"]["products"], st["meta"]["dates"])]
+        removed = removed_ids(stack_dir)
+        kept = [k for k, p in enumerate(products) if p["id"] not in removed]
+
+        figs = {"mbmp_matrix": fig_mean_matrix(st)}
+        figs.update({f"coherence_{pol.lower()}": fig_pair_grid(st, pol) for pol in st["meta"]["coh_pols"]})
+        for tag, fig in figs.items():
+            figures.append(save(fig, out_dir / "figures", tag, close=False))
+
+        if review and interactive:
+            print(f"    mean |γ| of each scene with its ±3-day partners ((!) = below mean − {N_STD:g} std):")
+            print("    " + _three_day_table(st).replace("\n", "\n    "))
+            shown = [figs["mbmp_matrix"]] + [figs[f"coherence_{pol.lower()}"] for pol in REVIEW_POLS]
+            for tag, fig in figs.items():
+                if fig not in shown:
+                    plt.close(fig)
+            kept = _ask_scenes(st, shown, kept)
+            save_selection(stack_dir, products, kept)
+        print(f"    scenes kept: {format_selection(kept)} of 0-{len(products) - 1}")
+        plt.close("all")
+
+        (out_dir / "coherence_scenes.md").write_text(_scenes_report(st, kept) + "\n", encoding="utf-8")
+        figures.append(_plot_rgb(st, kept, out_dir / "figures", rgb_lags, rgb_pols, show))
         del st
     return [f for f in figures if f is not None]

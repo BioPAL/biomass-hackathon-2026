@@ -3,10 +3,10 @@
     "name": "Lac Télé Community Reserve (LTCR)",
     "region": "Likouala swamp forest, Republic of the Congo",
     "bbox": {
-      "west": 17,
-      "south": 1,
-      "east": 17.1,
-      "north": 1.2
+      "west": 16.9,
+      "south": 0.5,
+      "east": 17.3,
+      "north": 1.45
     },
     "bbox_units": "decimal degrees"
   },
