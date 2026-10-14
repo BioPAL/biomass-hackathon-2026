@@ -60,23 +60,4 @@ print("Grid shape (z, y, x):", grid.shape)
 print(tls_point_layer)
 # cube = DataCube(grid=grid)
 # cube.add_layer(tls_point_layer)
-TomographicPlotter(tls_point_layer).run()
-print(tls_layer)
-fig = plt.figure(figsize=(10, 7))
-ax = fig.add_subplot(projection="3d")
-# print(tls_layer.data.x)
-# print(tls_layer.data.y)
-# print(tls_layer.data.occupancy)
-
-
-# points = ax.scatter(
-#     tls_point_layer.data.x,
-#     tls_point_layer.data.y,
-#     tls_point_layer.data.z,
-#     c=tls_point_layer.data.z,
-#     cmap="viridis",
-#     s=0.2,
-# )
-# ax.set(xlabel="Local x [m]", ylabel="Local y [m]", zlabel="Local z [m]")
-# fig.colorbar(points, ax=ax, label="Local height [m]", shrink=0.7)
-# plt.show()
+TomographicPlotter.from_data_layer(tls_point_layer).run()

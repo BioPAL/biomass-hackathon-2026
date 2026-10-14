@@ -1,4 +1,4 @@
-from tomo_canopy.types import Modality
+from tomo_canopy.types import Modality, DataLayer
 import numpy as np
 import pyvista as pv
 
@@ -93,18 +93,27 @@ def build_volume(xx, yy, z, nz=60, max_xy=150):
 # The interactive app
 # --------------------------------------------------------------------------
 class TomographicPlotter(BasicPlotterApp):
-    def __init__(self, data: DataCube):
+    def __init__(self, x, y, z):
+        # def __init__(self, data: DataCube):
         self.mode = "volume"
         self.exaggeration = 1.0
         self.n_contours = 12
         self._first_render = True
-        self.cube = data
-
+        # self.cube = data
         # Build the geometry once; switching modes only rebuilds the view of it
         # self.surface = build_surface(xx, yy, z)
         # self.voxels, self.z_range, self.fill = build_volume(xx, yy, z, nz=60)
+        self.x = x
+        self.y = y
+        self.z = z
 
         super().__init__()
+
+    @classmethod
+    def from_data_layer(cls, data_layer: DataLayer):
+        return TomographicPlotter(
+            data_layer.data.x, data_layer.data.y, data_layer.data.z
+        )
 
     def build_ui(self):
         for _, mode in enumerate(MODES):
@@ -160,12 +169,16 @@ class TomographicPlotter(BasicPlotterApp):
         keep_camera = not self._first_render
         common = dict(name=self.MAIN, reset_camera=not keep_camera)
         bar = {"title": "Elevation"}
-
+        self.mode = "surface"
         if self.mode == "surface":
             # grid = self._scaled(build_surface(self.cube))
 
-            x, y, z = self.cube.layers_for("TLS").get_xyz_arrays()
-
+            # x, y, z = self.cube.layers_for("TLS").get_xyz_arrays()
+            x, y, z = (
+                self.x,
+                self.y,
+                self.z,
+            )
             points = np.column_stack((x, y, z))  # shape (N, 3)
             cloud = pv.PolyData(points)
             # pl.add_mesh(
@@ -209,7 +222,7 @@ class TomographicPlotter(BasicPlotterApp):
 
         else:  # volume
             voxels = self.cube.layers_for(Modality.TLS)[0].data
-            voxels
+            print(np.unique(voxels.point_count.values))
             pl.add_volume(
                 self._scaled(voxels),
                 scalars="density",
