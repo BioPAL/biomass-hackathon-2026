@@ -93,9 +93,9 @@ def build_volume(xx, yy, z, nz=60, max_xy=150):
 # The interactive app
 # --------------------------------------------------------------------------
 class TomographicPlotter(BasicPlotterApp):
-    def __init__(self, x, y, z):
+    def __init__(self, data_layer, x, y, z, mode="surface"):
         # def __init__(self, data: DataCube):
-        self.mode = "volume"
+        self.mode = mode
         self.exaggeration = 1.0
         self.n_contours = 12
         self._first_render = True
@@ -106,13 +106,14 @@ class TomographicPlotter(BasicPlotterApp):
         self.x = x
         self.y = y
         self.z = z
+        self.data_layer = data_layer
 
         super().__init__()
 
     @classmethod
-    def from_data_layer(cls, data_layer: DataLayer):
+    def from_data_layer(cls, data_layer: DataLayer, mode="surface"):
         return TomographicPlotter(
-            data_layer.data.x, data_layer.data.y, data_layer.data.z
+            data_layer, data_layer.data.x, data_layer.data.y, data_layer.data.z, mode
         )
 
     def build_ui(self):
@@ -168,27 +169,21 @@ class TomographicPlotter(BasicPlotterApp):
         pl = self.pl
         keep_camera = not self._first_render
         common = dict(name=self.MAIN, reset_camera=not keep_camera)
-        bar = {"title": "Elevation"}
-        self.mode = "surface"
+        bar = {"title": "TODO"}
         if self.mode == "surface":
             # grid = self._scaled(build_surface(self.cube))
-
-            # x, y, z = self.cube.layers_for("TLS").get_xyz_arrays()
             x, y, z = (
                 self.x,
                 self.y,
                 self.z,
             )
+
+            # print(f"x: {x.shape}, y: {y.shape}, z: {z.shape}")
+            # if z shape is 2D
+            # if z.ndim == 2:
+
             points = np.column_stack((x, y, z))  # shape (N, 3)
             cloud = pv.PolyData(points)
-            # pl.add_mesh(
-            #     cloud,
-            #     scalars="elevation",
-            #     cmap="terrain",
-            #     smooth_shading=True,
-            #     scalar_bar_args=bar,
-            #     **common,
-            # )
             cloud["elevation"] = z
             pl.add_mesh(
                 cloud,
@@ -197,15 +192,6 @@ class TomographicPlotter(BasicPlotterApp):
                 point_size=8,
                 render_points_as_spheres=True,
             )
-            # contours = grid.contour(isosurfaces=self.n_contours, scalars="elevation")
-            # if contours.n_points:
-            #     pl.add_mesh(
-            #         contours,
-            #         color="black",
-            #         line_width=1.5,
-            #         name=self.CONTOURS,
-            #         reset_camera=False,
-            #     )
 
         elif self.mode == "solid":
             solid = self._scaled(self.voxels).threshold(
@@ -221,19 +207,43 @@ class TomographicPlotter(BasicPlotterApp):
             pl.add_mesh_clip_plane(solid, normal="y", **opts)
 
         else:  # volume
-            voxels = self.cube.layers_for(Modality.TLS)[0].data
-            print(np.unique(voxels.point_count.values))
+            # Build the grid from the 1D coordinates
+            ds = self.data_layer.data
+            grid = pv.RectilinearGrid(ds["x"].values, ds["y"].values, ds["z"].values)
+
+            # Transpose (z, y, x) -> (x, y, z), then flatten in Fortran order
+            grid.point_data["point_count"] = (
+                ds["point_count"].transpose("x", "y", "z").values.ravel(order="F")
+            )
+            grid.point_data["occupancy"] = (
+                ds["occupancy"]
+                .transpose("x", "y", "z")
+                .values.ravel(order="F")
+                .astype(np.uint8)
+            )
+
+            # Volume rendering of point counts
             pl.add_volume(
-                self._scaled(voxels),
-                scalars="density",
-                cmap="terrain",
-                # clim=(self.fill, top),
-                # A short list of opacity nodes is spread evenly across clim and
-                # works in every renderer; long per-bin arrays rendered blank.
+                grid,
+                scalars="point_count",
+                cmap="viridis",
                 opacity=[0, 0.35, 0.55, 0.75, 0.95],
                 scalar_bar_args=bar,
                 **common,
             )
+
+            # volume = pv.DataSet()
+            # pl.add_volume(
+            #     grid,
+            #     scalars="density",
+            #     cmap="terrain",
+            #     # clim=(self.fill, top),
+            #     # A short list of opacity nodes is spread evenly across clim and
+            #     # works in every renderer; long per-bin arrays rendered blank.
+            #     # opacity=[0, 0.35, 0.55, 0.75, 0.95],
+            #     # scalar_bar_args=bar,
+            #     **common,
+            # )
 
         pl.add_text(
             f"Terrain: {LABELS[self.mode].lower()}",
