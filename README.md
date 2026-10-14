@@ -31,7 +31,7 @@ biomass-hackathon-2026/
 │   ├── 02-RFI/
 │   ├── 03-QGIS/
 │   ├── 04-3D-TOMO-CANOPY-VISUALIZER/
-│   ├── 05-BIOMASS&GEDI/
+│   ├── 05_BIOMASS_AND_GEDI/
 │   ├── 06A-CARBON/
 │   ├── 06B-CARBON/
 │   ├── 07-GEOLOGY/
@@ -52,7 +52,7 @@ Each project group works in `topics/<GROUP-LABEL>/` — the folder name matches 
 | `02-RFI` | RFI removal | `topics/02-RFI/` |
 | `03-QGIS` | QGIS plugin | `topics/03-QGIS/` |
 | `04-3D-TOMO-CANOPY-VISUALIZER` | 3D tomographic canopy visualiser | `topics/04-3D-TOMO-CANOPY-VISUALIZER/` |
-| `05-BIOMASS&GEDI` | BIOMASS and GEDI intercomparison | `topics/05-BIOMASS&GEDI/` |
+| `05_BIOMASS_AND_GEDI` | BIOMASS and GEDI intercomparison | `topics/05_BIOMASS_AND_GEDI/` |
 | `06A-CARBON` | Carbon map validation (table A) | `topics/06A-CARBON/` |
 | `06B-CARBON` | Carbon map validation (table B) | `topics/06B-CARBON/` |
 | `07-GEOLOGY` | BIOMASS for Geology | `topics/07-GEOLOGY/` |
@@ -67,7 +67,7 @@ Each project group works in `topics/<GROUP-LABEL>/` — the folder name matches 
 Work from a **fork** (one fork per person; you do not push directly to `main`):
 
 1. Create a **Task** issue and pick your **Group** (label is applied automatically).
-2. Fork [BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026), clone **your** fork, create a branch.
+2. Fork [BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026), clone **your** fork with **HTTPS** (ESA public Wi‑Fi often blocks SSH), create a branch.
 3. When you start the work, open a **draft** pull request early with `Closes #<issue-number>` in the description.
 4. When ready for a maintainer, mark the PR **Ready for review**. A maintainer merges (do not merge yourself).
 
