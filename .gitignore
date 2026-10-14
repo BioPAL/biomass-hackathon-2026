@@ -223,6 +223,10 @@ __marimo__/
 **/.DS_Store
 *.pptx
 
+# Derived Pauli GeoTIFFs and notebook figures (large; regenerate from data_view.ipynb)
+topics/11-B-FLOODED-FOREST/pauli_tif/
+topics/11-B-FLOODED-FOREST/figures/
+
 # MAAP / local secrets (never commit)
 credentials.txt
 **/credentials.txt
