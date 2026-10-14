@@ -176,9 +176,7 @@ def load_rois(path):
             raise ValueError(f"ROI '{name}' has invalid geographic bounds: {bbox}")
 
         if (east - west) > 0.5 + 1e-9 or (north - south) > 0.5 + 1e-9:
-            raise ValueError(
-                f"ROI '{name}' exceeds 0.5 degrees in longitude or latitude."
-            )
+            print(f"ROI '{name}' exceeds 0.5 degrees in longitude or latitude.")
 
         rois.append(
             {
