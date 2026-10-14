@@ -109,9 +109,10 @@ assert cube.has_modality(Modality.TLS)
 assert not cube.has_modality(Modality.GEDI)
 ```
 
-Every layer that is present must match the shared grid and CRS. Consumers can
-use `missing_modalities()` for optional behavior or `require_modalities()` when
-a particular operation genuinely needs multiple sources.
+Every layer must match the cube CRS. Raster and volume layers must also match
+the shared grid; native point clouds and meshes retain their irregular
+coordinates. Consumers can use `missing_modalities()` for optional behavior or
+`require_modalities()` when an operation genuinely needs multiple sources.
 
 See [`examples/data_interface.ipynb`](examples/data_interface.ipynb) for a
 self-contained walkthrough with optional TLS and ALS layers.
@@ -172,6 +173,36 @@ local-coordinate conversion. Gridding remains a `cubegen` responsibility.
 
 See [`examples/gedi_processor.ipynb`](examples/gedi_processor.ipynb) for the
 complete query-to-processing workflow with plots and empty-result handling.
+
+## BIOMASS tomogram provider
+
+Install the optional lazy NetCDF stack:
+
+```bash
+python -m pip install -e '.[tomogram]'
+```
+
+One provider discovers and opens both TOM L1D and L2A product directories:
+
+```python
+from tomo_canopy.providers import TomogramProvider
+
+provider = TomogramProvider()
+metadata = provider.inspect("data/TOM/BIO_TP_TOM_L2A_...")
+tomogram = provider.open(
+    metadata.root,
+    polarization="HV",
+    height_range=(-20.0, 60.0),
+    bounds=(-0.2, 11.0, 0.2, 11.4),
+    chunks="auto",
+)
+```
+
+L1D remains in native azimuth/slant-range coordinates and uses its LUT for the
+axis values. L2A is normalized to a regular geographic `x/y/z` volume after
+checking reconstructed coordinates against the STAC footprint. The provider
+does not load the multi-gigabyte cube unless `load=True` or values are
+explicitly computed.
 
 See [`examples/tls_provider.ipynb`](examples/tls_provider.ipynb) for a complete
 walkthrough. Install its optional dependencies with:
