@@ -121,6 +121,12 @@ log = logging.getLogger("extract")
 # outputs are in radar geometry: georeferencing is given by GCPs, set after opening
 warnings.filterwarnings("ignore", category=rasterio.errors.NotGeoreferencedWarning)
 
+# netCDF-C/HDF5 is not built thread-safe in this environment, so opening several
+# netCDF4.Dataset files from the download threads segfaults intermittently
+# (SIGSEGV). Serialise every netCDF4 access through this process-wide lock; the
+# (much slower) network downloads around it stay parallel.
+NC_LOCK = threading.Lock()
+
 
 # -------------------- Authentication --------------------
 
@@ -359,12 +365,13 @@ def load_reference_lut(stack, tokens):
         tmp.write(response.content)
         tmp.flush()
         del response
-        with netCDF4.Dataset(tmp.name) as ds:
-            geo = ds["geometry"]
-            lut = {
-                name: np.ma.filled(geo[name][:].astype(np.float64), np.nan)
-                for name in ("latitude", "longitude", "height", "incidenceAngle")
-            }
+        with NC_LOCK:  # HDF5 crashes when opened from several threads at once
+            with netCDF4.Dataset(tmp.name) as ds:
+                geo = ds["geometry"]
+                lut = {
+                    name: np.ma.filled(geo[name][:].astype(np.float64), np.nan)
+                    for name in ("latitude", "longitude", "height", "incidenceAngle")
+                }
 
     # image size from the COG header, data/no-data from a small overview
     href = ref.assets["enclosure_i_abs_tiff"].href
@@ -486,20 +493,21 @@ def write_stack_geometry(stack, folder, area):
 
     i0, i1, j0, j1 = stack["lut_slice"]
     step_az, step_rg = stack["lut_step"]
-    with netCDF4.Dataset(str(folder / "geometry_lut.nc"), "w") as ds:
-        ds.createDimension("azimuth", i1 - i0)
-        ds.createDimension("range", j1 - j0)
-        ds.source_product = stack["reference"].id
-        ds.description = (
-            "LUT geometry cropped to the window. LUT node (a, r) is crop pixel "
-            "(a*azimuth_step + lut_row_offset, r*range_step + lut_col_offset)."
-        )
-        ds.azimuth_step, ds.range_step = step_az, step_rg
-        ds.lut_row_offset = i0 * step_az - w.row_off
-        ds.lut_col_offset = j0 * step_rg - w.col_off
-        for name, data in stack["lut"].items():
-            var = ds.createVariable(name, "f8", ("azimuth", "range"), fill_value=np.nan, zlib=True)
-            var[:] = data[i0:i1, j0:j1]
+    with NC_LOCK:  # same thread-safety rule as the LUT reads above
+        with netCDF4.Dataset(str(folder / "geometry_lut.nc"), "w") as ds:
+            ds.createDimension("azimuth", i1 - i0)
+            ds.createDimension("range", j1 - j0)
+            ds.source_product = stack["reference"].id
+            ds.description = (
+                "LUT geometry cropped to the window. LUT node (a, r) is crop pixel "
+                "(a*azimuth_step + lut_row_offset, r*range_step + lut_col_offset)."
+            )
+            ds.azimuth_step, ds.range_step = step_az, step_rg
+            ds.lut_row_offset = i0 * step_az - w.row_off
+            ds.lut_col_offset = j0 * step_rg - w.col_off
+            for name, data in stack["lut"].items():
+                var = ds.createVariable(name, "f8", ("azimuth", "range"), fill_value=np.nan, zlib=True)
+                var[:] = data[i0:i1, j0:j1]
 
 
 # -------------------- Product extraction --------------------

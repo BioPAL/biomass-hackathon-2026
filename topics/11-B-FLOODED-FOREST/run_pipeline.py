@@ -8,6 +8,8 @@ Steps
 3. optional Pauli quicklooks             -> assets/stacks/<roi>/quicklooks/
 4. stack selection + extraction (marcos_dev, interactive) -> assets/stacks/<roi>/
 5. QGIS dB rasters, per-stack quicklooks and figures -> assets/stacks/<roi>/
+6. MBMP coherence (marcos_dev/compute_coherence.py) + per-stack coherence figures
+   -> assets/stacks/<roi>/<stack>/figures/
 
 Examples
 --------
@@ -24,7 +26,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from flooded_forest import auth, config, extract, plots, qgis, quicklook, roi as roi_mod, search
+from flooded_forest import auth, coherence, config, extract, plots, qgis, quicklook, roi as roi_mod, search
 
 
 def parse_args(argv=None):
@@ -46,6 +48,11 @@ def parse_args(argv=None):
     parser.add_argument("--skip-search", action="store_true", help="reuse the existing catalogue JSON")
     parser.add_argument("--skip-extract", action="store_true", help="skip the stack extraction")
     parser.add_argument("--skip-plots", action="store_true", help="skip the figures")
+    # MBMP coherence (marcos_dev/1_data_extraction/compute_coherence.py)
+    parser.add_argument("--window", type=float,
+                        help="coherence averaging window side on ground [m] (default: config coherence_window)")
+    parser.add_argument("--skip-coherence", action="store_true",
+                        help="skip the coherence computation and its per-stack figures")
     # extraction passthrough (marcos_dev/1_data_extraction/extract_l1c_roi.py)
     parser.add_argument("--stacks", help='stack indices to keep, e.g. "0,2,5-7" or "all"')
     parser.add_argument("--yes", action="store_true", help="keep the recommended stacks without asking")
@@ -136,8 +143,17 @@ def main(argv=None):
             return
         roi_dir = candidates[-1].parent
     post_extract(cfg, roi_entry, roi_dir, token)
+
+    # 6. MBMP coherence of the extracted stacks + its per-stack figures
+    window = args.window if args.window is not None else cfg.coherence_window
+    if not args.skip_coherence:
+        coherence.run_coherence(cfg, roi, window, cfg.credentials_path,
+                                workers=args.workers if args.workers is not None else cfg.workers)
+
     print(f"Plotting from: {roi_dir}")
     plots.plot_stack_outputs(cfg, roi_dir, show=args.show and sys.stdin.isatty())
+    if not args.skip_coherence:
+        coherence.plot_coherence_outputs(roi_dir, window, show=args.show and sys.stdin.isatty())
 
 
 if __name__ == "__main__":

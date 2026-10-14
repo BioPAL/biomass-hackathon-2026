@@ -37,6 +37,9 @@ class Config:
         self.min_coverage = raw.get("min_coverage")
         self.workers = int(raw.get("workers", 6))
 
+        # MBMP coherence (passed to marcos_dev/1_data_extraction/compute_coherence.py)
+        self.coherence_window = float(raw.get("coherence_window", 250))
+
     def _resolve(self, value):
         path = Path(value).expanduser()
         return path if path.is_absolute() else (TOPIC_ROOT / path).resolve()

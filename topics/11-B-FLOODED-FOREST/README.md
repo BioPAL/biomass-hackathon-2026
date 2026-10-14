@@ -13,7 +13,7 @@ pip install -r requirements.txt
 
 ## Configure (once)
 
-1. **`config.yaml`** — user-specific settings. Edit `credentials_path`, the ROI list path, and the extraction defaults (`max_files`, `min_coverage`, `workers`). Paths are relative to this folder.
+1. **`config.yaml`** — user-specific settings. Edit `credentials_path`, the ROI list path, the extraction defaults (`max_files`, `min_coverage`, `workers`) and the coherence window (`coherence_window`). Paths are relative to this folder.
 2. **`credentials.txt`** (git-ignored, next to `config.yaml` by default) — either a raw MAAP offline token, or:
    ```
    OFFLINE_TOKEN=eyJ...
@@ -46,6 +46,10 @@ python run_pipeline.py --roi bolobo --start 2026-05-01 --pauli --skip-extract --
 # plots only, from already-extracted stacks
 python run_pipeline.py --roi bolobo --start 2026-05-01 --skip-search --skip-extract --show
 
+# MBMP coherence + its per-stack figures with a custom averaging window
+# (default: coherence_window in config.yaml; --skip-coherence skips step 6)
+python run_pipeline.py --roi bolobo --start 2026-05-01 --window 300
+
 python run_pipeline.py --list-rois    # preset ROIs
 python run_pipeline.py --help         # all flags (extraction flags pass through to the extractor)
 ```
@@ -59,8 +63,11 @@ python run_pipeline.py --help         # all flags (extraction flags pass through
 | 3. Quicklooks (optional, `--quicklook` / `--pauli`) | Pauli RGB PNG of the scene; `--pauli` also renders Pauli/component/mechanism maps from one product's COGs | `assets/quicklooks/`, `assets/figures/` |
 | 4. Stack selection + extraction | runs `marcos_dev/1_data_extraction/extract_l1c_roi.py`: stack table + interactive folium map in the browser, then downloads the selected stacks | `assets/stacks/<roi>/` |
 | 5. Post-processing + plots | QGIS dB rasters + quicklooks per stack; per-stack figures and ROI overview/time series (`flooded_forest/plots.py`, `flooded_forest/qgis.py`) | `assets/stacks/<roi>/` (see below) |
+| 6. MBMP coherence + figures | runs `marcos_dev/1_data_extraction/compute_coherence.py` (flattening LUT per product, MBMP + single-pol coherence on an averaging window), then saves its figures (`flooded_forest/coherence.py`) | `assets/stacks/<roi>/<stack>/figures/`, `coherence_w<L>m.npz/.json` |
 
 The stack selection at step 4 is interactive: a table of stacks is printed and a map (`stack_selection_map.html`) opens in the browser; Enter keeps the recommended stacks. `--stacks "0,2,5-7"` or `--yes` skip the prompt. Use `--dry-run` to preview the windows without downloading.
+
+Step 6 runs `compute_coherence.py` only for the stacks whose `coherence_w<L>m.npz` is missing or out of date (delete it to force a recompute), then saves the figures of `marcos_dev/1_data_extraction/visualize_coherence.ipynb` into each stack's `figures/` folder (`flooded_forest/coherence.py`): the mean MBMP correlation matrix, the |γ| pair grids of the kept acquisitions for every polarisation and the RGB of the temporal decorrelation, plus `coherence_filter.md` (window, dates, mean kz and the acquisition-filter table). It downloads the flattening LUT of every product and holds a whole flattened stack in memory, so it is the heaviest step — skip it with `--skip-coherence` or choose the window with `--window` (default: `coherence_window` in `config.yaml`).
 
 ## Outputs (all in `assets/`, never committed)
 
@@ -74,9 +81,12 @@ assets/
     └── STA1_ascending_.../                 one folder per extracted stack
         ├── BIO_S1_STA__...tif              complex64 products (4 bands HH HV VH VV)
         ├── BIO_S1_STA__..._dB.tif          QGIS-friendly float32 dB version of each product
-        ├── figures/                        Pauli RGB, HH backscatter per date (dpi 300)
+        ├── figures/                        Pauli RGB, HH backscatter per date, MBMP coherence (dpi 300)
         ├── quicklooks/                     Pauli quicklook of each product
         ├── overlap_mask.tif, latlon.tif, geometry_lut.nc, stack_info.json
+        ├── flattening_lut.nc               flattening phase + kz of every product (LUT grid)
+        ├── coherence_w<L>m.npz, .json      MBMP + single-pol coherence and its metadata
+        └── coherence_filter.md             stack summary + acquisition-filter table
 ```
 
 ## QGIS
@@ -89,15 +99,15 @@ The product tifs are **complex (CFloat32)** — QGIS cannot render complex raste
 ├── run_pipeline.py        entry point: runs everything
 ├── config.yaml            user-specific settings (edit this)
 ├── rois.json              preset ROI list
-├── flooded_forest/        pipeline package (search, quicklook, extract, plots, qgis)
+├── flooded_forest/        pipeline package (search, quicklook, extract, plots, qgis, coherence)
 ├── tools/                 one-off scripts (refine_roi, kml globe, DAHITI water levels)
-├── marcos_dev/            collaborator code (extraction + visualization) — do not edit here
+├── marcos_dev/            collaborator code (extractor, coherence, visualization) — do not edit here
 ├── sams_dev/              development tests — do not edit here
 ├── assets/                generated/downloaded files (git-ignored)
 └── resources.md           papers, links, ROI notes
 ```
 
-`marcos_dev/` and `sams_dev/` are development areas kept as-is; the pipeline calls `marcos_dev`'s extractor as a subprocess. More plots: `marcos_dev/1_data_extraction/visualize_stacks.ipynb` (run it with an ROI folder inside `assets/stacks/`).
+`marcos_dev/` and `sams_dev/` are development areas kept as-is; the pipeline calls `marcos_dev`'s extractor and `compute_coherence.py` as subprocesses. More plots: `marcos_dev/1_data_extraction/visualize_stacks.ipynb` and `visualize_coherence.ipynb` (run them with an ROI folder inside `assets/stacks/`).
 
 ## Tools (`tools/`, one-off scripts)
 

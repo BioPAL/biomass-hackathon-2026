@@ -25,3 +25,6 @@ max_items_per_roi: 1000
 max_files: 70
 min_coverage: 0.5
 workers: 6
+
+# MBMP coherence (see marcos_dev/1_data_extraction/compute_coherence.py --help)
+coherence_window: 250   # averaging window side on ground [m]
