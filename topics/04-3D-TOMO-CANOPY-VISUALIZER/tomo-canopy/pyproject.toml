@@ -41,6 +41,7 @@ gedi = [
 ]
 lvis = [
   "pandas>=2.2",
+  "pyproj>=3.6",
 ]
 tomogram = [
   "dask[array]>=2024.1",
