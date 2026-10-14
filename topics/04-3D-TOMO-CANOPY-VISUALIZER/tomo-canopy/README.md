@@ -1,213 +1,235 @@
-# tomo-canopy
+<h1 align="center">tomo-canopy</h1>
 
-Multi-scale LiDAR and BIOMASS tomogram processing and visualisation tools.
+<h3 align="center">Multi-scale LiDAR and BIOMASS tomogram tools for canopy visualisation</h3>
 
-## Package layout
+<p align="center">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-blue">
+  <img alt="Development status: pre-alpha" src="https://img.shields.io/badge/status-pre--alpha-orange">
+  <img alt="Code style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-261230">
+</p>
 
-- `providers`: readers and adapters for TLS, ALS, GEDI, and tomogram data
-- `processors`: processing pipelines and data preparation
-- `cubegen`: generation and assembly of three-dimensional data cubes
-- `methods`: scientific algorithms and analysis methods
-- `transforms`: spatial, coordinate, and value transformations
-- `visualisation`: interactive and static visualisation backends
+---
 
-Like `alsdb`, this project uses a flat package layout. The distribution is
-named `tomo-canopy`; import it in Python as `tomo_canopy`.
+**tomo-canopy** is a Python package for bringing terrestrial laser scanning
+(TLS), GEDI observations, and BIOMASS tomographic products into a shared,
+Xarray-based interface. It preserves each source's natural geometry while
+providing a path towards aligned 2D and 3D canopy visualisation.
 
-## Development setup
+The package is under active development as part of the
+[BIOMASS Hackathon 2026](https://github.com/BioPAL/biomass-hackathon-2026).
+
+## Features
+
+| Capability | Description |
+|---|---|
+| **TLS provider** | Read ASCII or binary PLY point clouds and tree-segment TXT files, with memory mapping for large binary PLY data. |
+| **GEDI provider** | Query `gedidb` and return GEDI footprints, metrics, and waveforms as Xarray datasets. |
+| **Tomogram provider** | Inspect and lazily open BIOMASS TOM L1D and L2A product directories, including their STAC and annotation metadata. |
+| **Processing** | Validate, filter, sample, summarize, and transform TLS and GEDI observations. |
+| **Shared data interface** | Combine point clouds, meshes, tree segments, rasters, waveforms, and regular volumes without requiring every modality to be present. |
+| **Xarray first** | Providers and processors return labelled `xarray.Dataset` objects with spatial metadata. |
+
+> [!NOTE]
+> ALS support, cube-generation helpers, transforms, and the final visualisation
+> API are currently scaffolds for upcoming development.
+
+---
+
+## Installation
+
+The distribution name is `tomo-canopy`; the Python import name is
+`tomo_canopy`. The package is not yet published on PyPI, so install it from a
+local clone:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -e '.[dev]'
-pytest
+git clone https://github.com/BioPAL/biomass-hackathon-2026.git
+cd biomass-hackathon-2026/topics/04-3D-TOMO-CANOPY-VISUALIZER/tomo-canopy
+python -m pip install -e .
 ```
 
-## TLS point clouds
+Install the optional dependencies needed for your workflow:
 
-Open an ASCII or binary PLY point cloud as an Xarray dataset:
+```bash
+# Notebooks and plotting
+python -m pip install -e ".[examples]"
+
+# GEDI access
+python -m pip install -e ".[gedi]"
+
+# Lazy BIOMASS NetCDF access
+python -m pip install -e ".[tomogram]"
+
+# Full development environment
+python -m pip install -e ".[dev,examples,gedi,tomogram]"
+```
+
+| Dependency group | Main packages | Purpose |
+|---|---|---|
+| Core | NumPy, Xarray | Labelled scientific arrays and datasets |
+| `gedi` | gedidb, pyproj | GEDI queries and coordinate transforms |
+| `tomogram` | Dask, netCDF4 | Lazy, chunked tomogram reading |
+| `examples` | JupyterLab, Matplotlib | Example notebooks and plots |
+| `dev` | pytest, Ruff | Testing and code quality |
+
+---
+
+## Quick start
+
+### Open a TLS point cloud
 
 ```python
 from tomo_canopy.providers import TLSProvider
 
-tls = TLSProvider().open("data/TLS/Ankasa/point_cloud.ply", crs="EPSG:32630")
+tls = TLSProvider().open(
+    "data/TLS/c01_r02_subsampled_1cm.ply",
+    properties=["red", "green", "blue"],
+    crs="EPSG:32630",
+)
+
 print(tls)
 ```
 
-Point clouds use a `point` dimension. Meshes use `vertex`, `face`, and `corner`
-dimensions and expose triangle connectivity as `face_vertices`. In both cases,
-`x`, `y`, and `z` are coordinates and other PLY vertex properties are data
-variables. Binary files are memory-mapped unless `load=True` is supplied.
+Binary PLY arrays remain memory-mapped unless `load=True` is requested.
 
-The companion tree-structure text format is supported by the same provider:
-
-```python
-trees = TLSProvider().open("data/TLS/Ankasa/trees.txt", crs="EPSG:32630")
-```
-
-It produces a flattened `segment` dimension with tree and segment identifiers,
-radius, parent connectivity, section identifiers, and spatial coordinates.
-
-## TLS processing
-
-The TLS processor validates provider outputs and offers common preparation
-steps without coupling them to file parsing:
-
-```python
-from tomo_canopy.processors import TLSProcessor
-
-processor = TLSProcessor()
-mesh = processor.open("data/TLS/Ankasa/mesh.ply", crs="EPSG:32630")
-
-bounds = processor.bounds(mesh)
-local_mesh = processor.to_local_coordinates(mesh)
-preview_points = processor.sample_vertices(mesh, count=100_000, seed=42)
-
-trees = processor.open("data/TLS/Ankasa/trees.txt", crs="EPSG:32630")
-metrics = processor.tree_metrics(trees)
-```
-
-Voxelization belongs to the shared `cubegen` layer so the same grid-generation
-machinery can later consume TLS, ALS, GEDI, and tomogram products.
-
-The complete processing workflow, including plots, is available in
-[`examples/tls_processor.ipynb`](examples/tls_processor.ipynb).
-
-## Harmonized data interface
-
-The shared interface represents only the modalities that are available. Missing
-sources do not require placeholder arrays:
-
-```python
-import numpy as np
-
-from tomo_canopy.types import (
-    DataCube,
-    DataLayer,
-    GeometryType,
-    GridSpec,
-    Modality,
-)
-
-grid = GridSpec(
-    x=np.arange(0.5, 100.0, 1.0),
-    y=np.arange(0.5, 100.0, 1.0),
-    z=np.arange(0.25, 50.0, 0.5),
-    crs="EPSG:32630",
-)
-cube = DataCube(grid=grid)
-cube.add_layer(
-    DataLayer(
-        name="tls_occupancy",
-        data=tls_occupancy,
-        modality=Modality.TLS,
-        geometry=GeometryType.VOLUME,
-    )
-)
-
-assert cube.has_modality(Modality.TLS)
-assert not cube.has_modality(Modality.GEDI)
-```
-
-Every layer must match the cube CRS. Raster and volume layers must also match
-the shared grid; native point clouds and meshes retain their irregular
-coordinates. Consumers can use `missing_modalities()` for optional behavior or
-`require_modalities()` when an operation genuinely needs multiple sources.
-
-See [`examples/data_interface.ipynb`](examples/data_interface.ipynb) for a
-self-contained walkthrough with optional TLS and ALS layers.
-
-## GEDI provider
-
-Install the optional `gedidb` stack and query the public GFZ endpoint:
-
-```bash
-python -m pip install -e '.[gedi]'
-```
+### Query GEDI data
 
 ```python
 import geopandas as gpd
 
 from tomo_canopy.providers import GEDIProvider
 
-provider = GEDIProvider()
-region = gpd.read_file("path/to/test.geojson")
-gedi = provider.get_data(
-    variables=["agbd", "rh"],
-    geometry=region,
-    start_time="2018-01-01",
-    end_time="2024-07-25",
-)
-```
-
-The returned shot-indexed Xarray dataset preserves `gedidb` variables and adds
-`x`/`y` aliases for longitude/latitude plus standard modality, geometry, CRS,
-query, and provenance metadata.
-
-See [`examples/gedi_provider.ipynb`](examples/gedi_provider.ipynb) for a full
-query, inspection, plotting, and `DataLayer` walkthrough.
-
-## GEDI processing
-
-`GEDIProcessor` validates and prepares native shot data before common-grid cube
-generation:
-
-```python
-from tomo_canopy.processors import GEDIProcessor
-
-processor = GEDIProcessor()
-shots = processor.open(
-    region,
+roi = gpd.read_file("path/to/area.geojson")
+gedi = GEDIProvider(
+    storage_type="s3",
+    s3_bucket="dog-ext.gedidb.gedi-l2-l4-v002.0",
+    url="https://s3.gfz-potsdam.de",
+).open(
+    roi,
     variables=["agbd", "rh"],
     start_time="2018-01-01",
     end_time="2024-07-25",
 )
-shots = processor.filter_valid(shots, variables=["agbd", "rh"])
-shots = processor.add_rh_metric(shots, percentile=98)
-projected = processor.reproject(shots, target_crs="EPSG:32630")
-layer = processor.to_data_layer(projected)
 ```
 
-The processor also provides spatial bounds, reproducible shot sampling, and
-local-coordinate conversion. Gridding remains a `cubegen` responsibility.
-
-See [`examples/gedi_processor.ipynb`](examples/gedi_processor.ipynb) for the
-complete query-to-processing workflow with plots and empty-result handling.
-
-## BIOMASS tomogram provider
-
-Install the optional lazy NetCDF stack:
-
-```bash
-python -m pip install -e '.[tomogram]'
-```
-
-One provider discovers and opens both TOM L1D and L2A product directories:
+### Open a BIOMASS tomogram
 
 ```python
 from tomo_canopy.providers import TomogramProvider
 
 provider = TomogramProvider()
-metadata = provider.inspect("data/TOM/BIO_TP_TOM_L2A_...")
+product = provider.inspect("data/TOM/path/to/product")
 tomogram = provider.open(
-    metadata.root,
-    polarization="HV",
-    height_range=(-20.0, 60.0),
-    bounds=(-0.2, 11.0, 0.2, 11.4),
+    product.root,
+    polarization="HH",
     chunks="auto",
 )
+
+print(product.product_level, tomogram)
 ```
 
-L1D remains in native azimuth/slant-range coordinates and uses its LUT for the
-axis values. L2A is normalized to a regular geographic `x/y/z` volume after
-checking reconstructed coordinates against the STAC footprint. The provider
-does not load the multi-gigabyte cube unless `load=True` or values are
-explicitly computed.
+L1D products retain native SAR coordinates. L2A products are exposed as a
+regular geographic `x/y/z` volume after their reconstructed axes are checked
+against the product metadata.
 
-See [`examples/tls_provider.ipynb`](examples/tls_provider.ipynb) for a complete
-walkthrough. Install its optional dependencies with:
+---
+
+## Shared data interface
+
+`DataCube` is a geometry-aware collection rather than a single dense array.
+All layers share a CRS, but only raster and volume layers must align with the
+cube grid. Native TLS point clouds, meshes, GEDI shots, and waveforms keep
+their irregular coordinates.
+
+```python
+import numpy as np
+
+from tomo_canopy.types import DataCube, DataLayer, GeometryType, GridSpec, Modality
+
+grid = GridSpec(
+    x=np.arange(533_900.0, 534_100.0, 1.0),
+    y=np.arange(582_200.0, 582_400.0, 1.0),
+    z=np.arange(100.0, 150.0, 1.0),
+    crs="EPSG:32630",
+)
+cube = DataCube(grid=grid)
+cube.add_layer(
+    DataLayer(
+        name="tls_points",
+        data=tls,
+        modality=Modality.TLS,
+        geometry=GeometryType.POINT_CLOUD,
+    )
+)
+
+print(cube.modalities)
+```
+
+Any subset of modalities is valid: a cube can contain only TLS, only a
+tomogram, or several compatible sources.
+
+---
+
+## Examples
+
+The notebooks use real datasets when paths or service access are available,
+and document any setup required at the top of each notebook.
+
+| Notebook | Demonstrates |
+|---|---|
+| [`tls_provider.ipynb`](examples/tls_provider.ipynb) | Reading PLY point clouds and tree-segment files |
+| [`tls_processor.ipynb`](examples/tls_processor.ipynb) | TLS validation, sampling, bounds, tree metrics, and plotting |
+| [`gedi_provider.ipynb`](examples/gedi_provider.ipynb) | Querying GEDI observations with `gedidb` |
+| [`gedi_processor.ipynb`](examples/gedi_processor.ipynb) | GEDI filtering, subsetting, and spatial preparation |
+| [`tomogram_provider.ipynb`](examples/tomogram_provider.ipynb) | Inspecting and opening BIOMASS TOM L1D/L2A products |
+| [`data_interface.ipynb`](examples/data_interface.ipynb) | Combining native and gridded layers and plotting them in 2D and 3D |
+
+Start JupyterLab from the package directory:
 
 ```bash
-python -m pip install -e '.[examples]'
+jupyter lab examples/
 ```
+
+---
+
+## Architecture
+
+```text
+TLS files       GEDI service       BIOMASS TOM products
+    │                │                       │
+    └──────────── providers ─────────────────┘
+                     │
+              xarray.Dataset
+                     │
+          processors / transforms
+                     │
+                  DataLayer
+                     │
+                  DataCube
+                     │
+        2D and 3D visualisation
+```
+
+```text
+tomo_canopy/
+├── providers/       # Data access and format normalization
+├── processors/      # Modality-specific processing
+├── types/           # DataLayer, GridSpec, and DataCube contracts
+├── cubegen/         # Cube-generation workflows (planned)
+├── methods/         # Shared algorithms (planned)
+├── transforms/      # Spatial transformations (planned)
+└── visualisation/   # Rendering interfaces (planned)
+```
+
+---
+
+## Development
+
+```bash
+python -m pip install -e ".[dev,examples,gedi,tomogram]"
+python -m pytest
+python -m ruff check tomo_canopy tests
+```
+
+Small TLS fixtures are kept under `tests/data/`; large source datasets under
+`data/` remain outside version control.
 
