@@ -146,6 +146,33 @@ query, and provenance metadata.
 See [`examples/gedi_provider.ipynb`](examples/gedi_provider.ipynb) for a full
 query, inspection, plotting, and `DataLayer` walkthrough.
 
+## GEDI processing
+
+`GEDIProcessor` validates and prepares native shot data before common-grid cube
+generation:
+
+```python
+from tomo_canopy.processors import GEDIProcessor
+
+processor = GEDIProcessor()
+shots = processor.open(
+    region,
+    variables=["agbd", "rh"],
+    start_time="2018-01-01",
+    end_time="2024-07-25",
+)
+shots = processor.filter_valid(shots, variables=["agbd", "rh"])
+shots = processor.add_rh_metric(shots, percentile=98)
+projected = processor.reproject(shots, target_crs="EPSG:32630")
+layer = processor.to_data_layer(projected)
+```
+
+The processor also provides spatial bounds, reproducible shot sampling, and
+local-coordinate conversion. Gridding remains a `cubegen` responsibility.
+
+See [`examples/gedi_processor.ipynb`](examples/gedi_processor.ipynb) for the
+complete query-to-processing workflow with plots and empty-result handling.
+
 See [`examples/tls_provider.ipynb`](examples/tls_provider.ipynb) for a complete
 walkthrough. Install its optional dependencies with:
 

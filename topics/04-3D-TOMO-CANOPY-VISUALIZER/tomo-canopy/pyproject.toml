@@ -37,6 +37,7 @@ examples = [
 ]
 gedi = [
   "gedidb",
+  "pyproj>=3.6",
 ]
 
 [tool.hatch.build.targets.wheel]
