@@ -1,19 +1,22 @@
-import io
-import matplotlib.pyplot as plt
-import pandas as pd
-import requests
-from shapely import wkt
+#!/usr/init/python3
+# -*- coding: utf-8 -*-
+''' Version: 2.1 '''
+''' Description: Find nearest DAHITI target to a ROI centroid and download water level time series '''
 
-# 1. Setup API and ROI
-API_KEY = "589AD7A19BAE1CBA8FCE33756EBD90BD124ECB2A2F4E638BFADD12C6C4DE84C4"
-
-import io
+import os
+import sys
 import json
-import matplotlib.pyplot as plt
-import pandas as pd
+import pprint
 import requests
 from shapely import wkt
 
+''' Download path were all water level time series will be stored '''
+download_path = 'downloads/'
+if not os.path.isdir(download_path):
+    os.mkdir(download_path)
+
+API_KEY = "589AD7A19BAE1CBA8FCE33756EBD90BD124ECB2A2F4E638BFADD12C6C4DE84C4"
+OUTPUT_FORMAT = 'ascii'
 BASE_URL = "https://dahiti.dgfi.tum.de/api/v2/"
 
 # 1. Setup ROI and find Centroid
@@ -21,62 +24,62 @@ roi_wkt = "POLYGON((-62.0 -4.0, -59.0 -4.0, -59.0 -2.0, -62.0 -2.0, -62.0 -4.0))
 polygon = wkt.loads(roi_wkt)
 centroid = polygon.centroid
 
-# 2. Get Nearest Target (uses form-encoded POST)
-target_url = f"{BASE_URL}get-nearest-target/"
-target_args = {
-    "api_key": API_KEY,
-    "longitude": centroid.x,
-    "latitude": centroid.y,
+# 2. List targets in the region
+url = BASE_URL + 'list-targets/'
+args = {
+    'api_key': API_KEY,
+    'basin': 'Amazon'
 }
 
-response = requests.post(target_url, data=target_args)
-response.raise_for_status()
-target_data = json.loads(response.text)
-dahiti_id = target_data.get("dahiti_id")
-print(f"Found DAHITI ID: {dahiti_id} {target_data.get('data')['target_name']}")
+response = requests.post(url, data=args)
+if response.status_code == 200:
+    targets = json.loads(response.text)['data']
+    print('Dataset(s) found:', len(targets))
 
+    if not targets:
+        print('No targets found in the specified basin.')
+        sys.exit(0)
 
+    # 3. Find the nearest target based on Euclidean distance to the centroid (lat/lon)
+    nearest_target = min(
+        targets,
+        key=lambda t: (t['latitude'] - centroid.y)**2 + (t['longitude'] - centroid.x)**2
+    )
+    
+    print('Nearest Target Selected:')
+    pprint.pprint(nearest_target)
 
-wl_url = f"{BASE_URL}download-water-level/"
-wl_args = {"api_key": API_KEY, "dahiti_id": dahiti_id}
+    # 4. Download water level time series for the nearest target
+    url = BASE_URL + 'download-water-level/'
+    args = {
+        'api_key': API_KEY,
+        'dahiti_id': nearest_target['dahiti_id'],
+        'format': OUTPUT_FORMAT
+    }
 
-wl_response = requests.post(wl_url, data=wl_args)
-wl_response.raise_for_status()
+    ext_map = {'ascii': 'txt', 'json': 'json', 'netcdf': 'nc', 'csv': 'csv'}
+    file_ext = ext_map.get(OUTPUT_FORMAT, 'txt')
+    path_output = os.path.abspath(f"{download_path}/{nearest_target['dahiti_id']}.{file_ext}")
 
-# Parse JSON data into DataFrame
-data_json = json.loads(wl_response.text)
-df_wl = pd.DataFrame(data_json)
-
-# Filter for data since 2024
-df_wl["date"] = pd.to_datetime(df_wl["date"])
-df_wl = df_wl[df_wl["date"] >= "2024-01-01"]
-
-# 4. Download Water Occurrence Mask (using JSON POST pattern)
-mask_url = f"{BASE_URL}download-water-occurrence-mask/"
-mask_args = {"api_key": API_KEY, "dahiti_id": dahiti_id}
-mask_response = requests.post(mask_url, json=mask_args)
-# mask_response.content contains the raster bytes if available
-
-# 5. Generate Plots
-fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-
-# Time Series Plot
-axes[0].plot(
-    df_wl["date"],
-    df_wl["height"],
-    marker="o",
-    linestyle="-",
-    color="royalblue",
-)
-axes[0].set_title(f"Water Level Time Series (ID: {dahiti_id})")
-axes[0].set_xlabel("Date")
-axes[0].set_ylabel("Water Level (m)")
-axes[0].grid(True)
-axes[0].tick_params(axis="x", rotation=45)
-
-# Spatial Plot Placeholder
-axes[1].set_title("Spatial ROI / Water Mask")
-axes[1].axis("off")
-
-plt.tight_layout()
-plt.show()
+    print(f"Downloading ... {nearest_target['dahiti_id']} -> {nearest_target['target_name']} ({path_output})")
+    
+    response_download = requests.post(url, json=args)
+    if response_download.status_code == 200:
+        mode = 'wb' if OUTPUT_FORMAT == 'netcdf' else 'w'
+        encoding = None if OUTPUT_FORMAT == 'netcdf' else 'utf-8'
+        
+        with open(path_output, mode, encoding=encoding) as f:
+            if OUTPUT_FORMAT == 'netcdf':
+                for chunk in response_download.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+            else:
+                f.write(response_download.text)
+        print('Download completed successfully.')
+    else:
+        print('Error: `download-water-level` request failed!')
+        pprint.pprint(json.loads(response_download.text))
+        sys.exit(0)
+else:
+    print('Error: `list-targets` request failed!')
+    pprint.pprint(json.loads(response.text))
