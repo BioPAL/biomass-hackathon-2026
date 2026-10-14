@@ -6,6 +6,9 @@ credentials_path: credentials.txt
 # Preset ROI list used by run_pipeline.py --roi
 roi_json_path: rois.json
 
+# Catalogue search output (shared by flooded_forest.search and find_stack_files.py)
+output_json_path: assets/catalogue/sta_level1c_by_roi.json
+
 # All generated/downloaded files (git-ignored)
 assets_dir: assets
 
@@ -22,4 +25,3 @@ max_items_per_roi: 1000
 max_files: 70
 min_coverage: 0.5
 workers: 6
-

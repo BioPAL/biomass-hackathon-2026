@@ -26,6 +26,8 @@ the file name is the most importat ID that identifies the data.
 
 ## region of interests
 
+you can find wetlands globally here --> https://www2.cifor.org/global-wetlands/
+
 precise coordinates defined in another file
 
 - Lac Télé Community Reserve (LTCR), a protected area in the Likouala swamp forest biome
