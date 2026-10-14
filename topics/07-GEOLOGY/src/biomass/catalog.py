@@ -46,7 +46,8 @@ class BiomassClient:
             max_items=query.max_items,
         )
         items = list(search.items())
-        print(f"{len(items)} products fetched | {search.matched()} match in total")
+        matched = search.matched()  # not every collection reports it
+        print(f"{len(items)} products fetched" + (f" | {matched} match in total" if matched is not None else ""))
         return items
 
 

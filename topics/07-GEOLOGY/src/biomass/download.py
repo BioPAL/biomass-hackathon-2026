@@ -7,20 +7,33 @@ from tqdm.auto import tqdm
 
 from . import config
 from .auth import TokenProvider
-from .exceptions import DownloadError
+from .exceptions import AuthError, DownloadError
+
+
+def _file_name(asset, key: str) -> str:
+    """File name for an asset: the end of its address, or of ``file:local_path`` when the
+    address does not end in a file name (Copernicus links end in ``$value``)."""
+    name = Path(asset.href.split("?")[0]).name
+    local_path = (getattr(asset, "extra_fields", None) or {}).get("file:local_path")
+    if local_path and "." not in name:
+        name = Path(local_path).name
+    return name or key
 
 
 class Downloader:
     """Downloads assets of STAC items into ``outdir/<item id>/``.
 
     Existing files are skipped; interrupted downloads (``*.part``) are resumed
-    with an HTTP Range request when the server supports it.
+    with an HTTP Range request when the server supports it. ``auth`` is whatever
+    gives the ``headers()`` the server asks for, or ``None`` for public files.
     """
 
     def __init__(self, auth: TokenProvider, outdir=config.DEFAULT_OUTPUT_DIR,
-                 retries: int = 3, chunk_size: int = 1 << 20, session=None, backoff: float = 3.0):
+                 retries: int = 3, chunk_size: int = 1 << 20, session=None, backoff: float = 3.0,
+                 item_folders: bool = True):
         self.auth = auth
         self.outdir = Path(outdir)
+        self.item_folders = item_folders  # False: files straight into outdir (shorter paths)
         self.retries = retries
         self.chunk_size = chunk_size
         self.backoff = backoff
@@ -34,8 +47,9 @@ class Downloader:
                     print(f"{item.id}: has no asset '{key}'")
                     continue
                 href = item.assets[key].href
-                name = Path(href.split("?")[0]).name or key
-                done.append(self.download_file(href, self.outdir / item.id / name))
+                name = _file_name(item.assets[key], key)
+                folder = self.outdir / item.id if self.item_folders else self.outdir
+                done.append(self.download_file(href, folder / name))
         print(f"\n{len(done)} files in {self.outdir.resolve()}")
         return done
 
@@ -52,14 +66,16 @@ class Downloader:
                 self._fetch(url, part, dest.name)
                 part.replace(dest)
                 return dest
-            except Exception as e:  # network errors, HTTP errors, token refresh failures
+            except AuthError:  # retrying wrong credentials could lock the account
+                raise
+            except Exception as e:  # network errors, HTTP errors
                 last_error = e
                 print(f"  attempt {attempt}/{self.retries} failed: {e}")
                 time.sleep(self.backoff * attempt)
         raise DownloadError(f"Could not download {url}") from last_error
 
     def _fetch(self, url: str, part: Path, label: str) -> None:
-        headers = self.auth.headers()
+        headers = self.auth.headers() if self.auth else {}
         done = part.stat().st_size if part.exists() else 0
         if done:
             headers["Range"] = f"bytes={done}-"

@@ -152,7 +152,7 @@ activemq-data/
 # Environments
 .env
 .envrc
-.venv
+.venv_biomass
 env/
 venv/
 ENV/
@@ -218,3 +218,17 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Data
+data/*
+
+# Token
+nasa_token.txt
+
+token.txt
+
+copernicus.txt
+
+
+
+

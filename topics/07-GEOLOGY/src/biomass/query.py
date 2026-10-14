@@ -16,6 +16,7 @@ class SearchQuery:
     aoi_file: Optional[str] = None              # geojson/shp/kml/gpkg; overrides bbox
     extra_filters: dict = field(default_factory=dict)  # e.g. {"sat:orbit_state": "DESCENDING"}
     max_items: Optional[int] = 10               # None = all (mind the size)
+    max_cloud_cover: Optional[float] = None     # percent, for optical products (Sentinel-2)
 
     def __post_init__(self):
         try:
@@ -42,6 +43,8 @@ class SearchQuery:
             parts.append(f"product:type='{self.product_type}'")
         for key, value in self.extra_filters.items():
             parts.append(f"{key}='{value}'" if isinstance(value, str) else f"{key}={str(value).lower()}")
+        if self.max_cloud_cover is not None:
+            parts.append(f"eo:cloud_cover<={self.max_cloud_cover}")
         return " AND ".join(parts) or None
 
     def resolved_bbox(self) -> Optional[list]:

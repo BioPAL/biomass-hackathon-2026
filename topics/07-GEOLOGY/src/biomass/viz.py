@@ -1,4 +1,5 @@
 """Maps and plots of search results and downloaded rasters."""
+import re
 from pathlib import Path
 
 from .query import SearchQuery
@@ -44,6 +45,9 @@ def _read_db(path, max_size):
         amp = src.read(out_shape=(src.count, h, w), masked=True,
                        resampling=Resampling.average).astype("float32").filled(np.nan)
         names = [src.tags(i + 1).get("POLARIMETRIC_INTERP", f"band {i + 1}") for i in range(src.count)]
+        in_name = re.search(r"-(hh|hv|vh|vv)-", Path(path).name.lower())  # Sentinel-1: one file per polarisation
+        if src.count == 1 and names == ["band 1"] and in_name:
+            names = [in_name.group(1).upper()]
         gcps = [GroundControlPoint(row=g.row * h / src.height, col=g.col * w / src.width,
                                    x=g.x, y=g.y, z=g.z or 0)
                 for g in src.get_gcps()[0]]
@@ -100,6 +104,8 @@ def raster_map(paths, band: str = "rgb", max_size: int = 1000, opacity: float = 
             print(f"{Path(path).name}: no GCPs, skipped")
             continue
         wanted = ["HH", "HV", "VV"] if band.lower() == "rgb" else [band.upper()]
+        if band.lower() == "rgb" and len(names) == 1:  # a single-polarisation file: nothing to compose
+            wanted = names
         if not set(wanted) <= set(names):
             print(f"{Path(path).name}: has {names}, not {wanted}; showing {names[0]}")
             wanted = [names[0]]
@@ -109,14 +115,29 @@ def raster_map(paths, band: str = "rgb", max_size: int = 1000, opacity: float = 
         dst = np.full((len(wanted), h, w), np.nan, dtype="float32")
         reproject(src, dst, gcps=gcps, src_crs="EPSG:4326", dst_transform=transform,
                   dst_crs="EPSG:4326", src_nodata=np.nan, dst_nodata=np.nan)
-        grey = [_stretch(b) for b in dst]
-        valid = np.isfinite(dst).all(axis=0)
-        rgba = np.dstack([np.nan_to_num(b) for b in (grey if len(grey) == 3 else grey * 3)] + [valid])
-        west, north = transform * (0, 0)
-        east, south = transform * (w, h)
-        folium.raster_layers.ImageOverlay(rgba, bounds=[[south, west], [north, east]], opacity=opacity,
-                                          mercator_project=True, name=Path(path).name).add_to(m)
-        bounds.append((south, west, north, east))
+        bounds.append(_add_overlay(m, dst, transform, Path(path).name, opacity))
+    return _finish_map(m, bounds)
+
+
+def _add_overlay(m, dst, transform, name, opacity):
+    """Lay a (1 or 3 bands, rows, cols) lon/lat array over the map; returns (south, west, north, east)."""
+    import folium
+    import numpy as np
+
+    grey = [_stretch(b) for b in dst]
+    valid = np.isfinite(dst).all(axis=0)
+    rgba = np.dstack([np.nan_to_num(b) for b in (grey if len(grey) == 3 else grey * 3)] + [valid])
+    west, north = transform * (0, 0)
+    east, south = transform * (dst.shape[2], dst.shape[1])
+    folium.raster_layers.ImageOverlay(rgba, bounds=[[south, west], [north, east]], opacity=opacity,
+                                      mercator_project=True, name=name).add_to(m)
+    return south, west, north, east
+
+
+def _finish_map(m, bounds):
+    """Zoom the map to its overlays and add the layer control (None if there are no overlays)."""
+    import folium
+
     if not bounds:
         print("Nothing to show")
         return None
