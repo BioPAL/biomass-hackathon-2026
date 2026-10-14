@@ -5,8 +5,8 @@ import pyvista as pv
 from tomo_canopy.visualisation.basic_plotter_app import BasicPlotterApp
 from tomo_canopy.types.data_interface import DataCube
 
-MODES = ("surface", "solid", "volume")
-LABELS = {"surface": "Surface", "solid": "Solid block", "volume": "Volume"}
+MODES = ("surface", "solid", "volume", "bubbles")
+LABELS = {"surface": "Surface", "solid": "Solid block", "volume": "Volume", "bubbles": "Bubbles"}
 
 
 DATA_LAYERS = ["TLS", "ALS", "P-BAND", "GEDI"]
@@ -205,6 +205,43 @@ class TomographicPlotter(BasicPlotterApp):
                 **common,
             )
             pl.add_mesh_clip_plane(solid, normal="y", **opts)
+
+        elif self.mode == "bubbles":
+            ds = self.data_layer.data
+            voxel_size = float(ds.attrs.get("voxel_size", 5.0))
+
+            counts = ds["point_count"]
+            occupied = counts.values > 0
+
+            # Centres of occupied voxels, as a flat point cloud
+            xc = np.broadcast_to(counts.x.values[None, None, :], counts.shape)[occupied]
+            yc = np.broadcast_to(counts.y.values[None, :, None], counts.shape)[occupied]
+            zc = np.broadcast_to(counts.z.values[:, None, None], counts.shape)[occupied]
+            centres = np.column_stack((xc, yc, zc))
+            values = counts.values[occupied].astype(np.float32)
+
+            cloud = pv.PolyData(centres)
+            cloud["point_count"] = values
+            # Scale factor per bubble: 0.5 → radius = half voxel edge, so
+            # neighbours touch but don't overlap; sqrt softens density blow-up
+            cloud["scale"] = 0.5 * voxel_size * np.sqrt(
+                values / values.max()
+            )
+
+            bubbles = cloud.glyph(
+                orient=False,
+                scale="scale",
+                factor=2.0,  # multiplies 'scale'; tune per dataset
+                geom=pv.Sphere(radius=1.0, theta_resolution=16, phi_resolution=12),
+            )
+
+            pl.add_mesh(
+                bubbles,
+                scalars="point_count",
+                cmap="viridis",
+                scalar_bar_args=bar,
+                **common,
+            )
 
         else:  # volume
             # Build the grid from the 1D coordinates

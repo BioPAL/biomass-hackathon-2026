@@ -39,4 +39,4 @@ tls_layer = DataLayer(
     geometry=GeometryType.VOLUME,
 )
 
-TomographicPlotter.from_data_layer(tls_layer, "volume").run()
+TomographicPlotter.from_data_layer(tls_layer, "bubbles").run()
