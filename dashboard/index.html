@@ -230,7 +230,7 @@
     <div id="err" class="err" hidden></div>
 
     <div class="kpis">
-      <div class="kpi"><div class="label">Tasks closed</div><div class="value" id="kpi-tasks">—</div><div class="hint">label task + closed</div></div>
+      <div class="kpi"><div class="label">Issues closed</div><div class="value" id="kpi-issues-closed">—</div><div class="hint">all closed issues</div></div>
       <div class="kpi"><div class="label">PRs merged</div><div class="value" id="kpi-prs">—</div><div class="hint">into main</div></div>
       <div class="kpi"><div class="label">Issues open</div><div class="value" id="kpi-open">—</div><div class="hint">all open issues</div></div>
       <div class="kpi"><div class="label">PRs open</div><div class="value" id="kpi-pr-open">—</div><div class="hint">including drafts</div></div>
@@ -243,7 +243,7 @@
           <table>
             <thead>
               <tr>
-                <th>Group</th><th>Tasks ✓</th><th>Tasks open</th><th>PRs merged</th><th>+ / − (merged PRs)</th><th>Activity</th>
+                <th>Group</th><th>Issues closed</th><th>Issues open</th><th>PRs merged</th><th>+ / − (merged PRs)</th><th>Activity</th>
               </tr>
             </thead>
             <tbody id="groups-body"></tbody>
@@ -290,22 +290,22 @@
         const data = await res.json();
         document.getElementById("repo").textContent = data.repo;
         document.getElementById("updated").textContent = fmtTime(data.generated_at);
-        document.getElementById("kpi-tasks").textContent = fmt(data.totals.tasks_closed);
+        document.getElementById("kpi-issues-closed").textContent = fmt(data.totals.issues_closed);
         document.getElementById("kpi-prs").textContent = fmt(data.totals.prs_merged);
         document.getElementById("kpi-open").textContent = fmt(data.totals.issues_open);
         document.getElementById("kpi-pr-open").textContent = fmt(data.totals.prs_open);
 
-        const maxScore = Math.max(1, ...data.groups.map((g) => g.tasks_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500));
+        const maxScore = Math.max(1, ...data.groups.map((g) => g.issues_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500));
         const tbody = document.getElementById("groups-body");
         tbody.replaceChildren();
-        data.groups.slice().sort((a, b) => (b.tasks_closed + b.prs_merged) - (a.tasks_closed + a.prs_merged)).forEach((g) => {
-          const score = g.tasks_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500;
+        data.groups.slice().sort((a, b) => (b.issues_closed + b.prs_merged) - (a.issues_closed + a.prs_merged)).forEach((g) => {
+          const score = g.issues_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500;
           const pct = Math.round((score / maxScore) * 100);
           const barInner = el("span", { style: { width: "0%" } });
           tbody.appendChild(el("tr", null, [
             el("td", { className: "mono", text: g.id }),
-            el("td", { text: fmt(g.tasks_closed) }),
-            el("td", { text: fmt(g.tasks_open) }),
+            el("td", { text: fmt(g.issues_closed) }),
+            el("td", { text: fmt(g.issues_open) }),
             el("td", { text: fmt(g.prs_merged) }),
             el("td", { className: "mono", text: "+" + fmt(g.pr_additions) + " / −" + fmt(g.pr_deletions) }),
             el("td", { style: { minWidth: "7rem" } }, [el("div", { className: "bar" }, [barInner])]),
