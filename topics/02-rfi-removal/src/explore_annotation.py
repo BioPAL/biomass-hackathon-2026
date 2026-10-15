@@ -1,7 +1,4 @@
 import xml.etree.ElementTree as ET
-<<<<<<< HEAD
-
-=======
 import threading, time, json
 from concurrent.futures import ThreadPoolExecutor
 from aiohttp import ClientResponseError
