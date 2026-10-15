@@ -1,25 +1,10 @@
-from rasterio.windows import Window
-from pystac_client import Client
-from folium import GeoJson
-import geopandas as gpd
-from io import BytesIO
-import rasterio as rio
-from tqdm import tqdm
-from PIL import Image
-import pandas as pd
 import numpy as np
-import requests
-import pathlib
-import fsspec
-import folium
-import fiona
-import os
-import json
-import time
+import pandas as pd
+import rasterio
+from numpy.typing import NDArray
 from scipy import signal
 from scipy.ndimage import median_filter
-from numpy.typing import NDArray
-import rasterio
+
 
 def pol_mean(df: pd.DataFrame, kind: str, suffix: str):
     cols = [c for c in df.columns if c.startswith(f"{kind}_") and c.endswith(f"_{suffix}")]
@@ -87,15 +72,6 @@ def range_spectrogram(
     P = np.fft.fftshift(acc / n, axes=0)                       # (freq, t), mean over lines
     return f, t, P
 
-def read_annot(
-    item_id, 
-    paths_by_id, 
-):
-    """Read the amplitude and phase of a product and return the SLC"""
-    p = paths_by_id[item_id]
-    with rasterio.open(p["enclosure_annot_xml"]) as annot:
-        return annot
-
 def read_item(
     item_id, 
     paths_by_id, 
@@ -103,5 +79,9 @@ def read_item(
 ):
     """Read the amplitude and phase of a product and return the SLC"""
     p = paths_by_id[item_id]
-    with rasterio.open(p["enclosure_i_abs_tiff"]) as a, rasterio.open(p["enclosure_i_phase_tiff"]) as ph:
-        return a.read(window=window) * np.exp(1j * ph.read(window=window))   # (pol, azimuth, range)
+    try:
+        with rasterio.open(p["enclosure_i_abs_tiff"]) as a, rasterio.open(p["enclosure_i_phase_tiff"]) as ph:
+            return a.read(window=window) * np.exp(1j * ph.read(window=window))   # (pol, azimuth, range)
+    except rasterio.errors.RasterioIOError as e:
+        print(f"{item_id}: file not found ({e})")
+        return None

@@ -1,38 +1,21 @@
-from shapely.geometry import Polygon, shape, mapping
-from rasterio.windows import Window
-import xml.etree.ElementTree as ET
-import matplotlib.pyplot as plt
-from pystac_client import Client
-from folium import GeoJson
-import geopandas as gpd
 from io import BytesIO
-import rasterio as rio
-from PIL import Image
-import pandas as pd
+
+import matplotlib.pyplot as plt
 import numpy as np
 import requests
-import pathlib
-import fsspec
-import folium
-import fiona
-import os
-import json
-from datetime import datetime, timedelta
-import time
-import yaml
-from pathlib import Path
-import branca.colormap as cm
-from processing import pol_mean, prescreen_pulses, range_power, range_spectrogram
+from PIL import Image
+
+from processing import prescreen_pulses, range_power, range_spectrogram
 
 POLS = ["HH", "HV", "VH", "VV"]   # assumed band order, check src.descriptions or the annotation XML
 
 
-def fetch_quicklook(item, path=None):
-    """Quicklook JPG as a PIL image: from a local file if `path` is given, else streamed with the token."""
+def fetch_quicklook(item, path=None, token=None):
+    """Quicklook JPG as a PIL image: from a local file if `path` is given, else streamed with `token`."""
     if path is not None:
         return Image.open(path)
     r = requests.get(item.assets["quicklook_jpg"].href,
-                     headers={"Authorization": f"Bearer {access_token}"}, timeout=60)
+                     headers={"Authorization": f"Bearer {token}"}, timeout=60)
     r.raise_for_status()
     return Image.open(BytesIO(r.content))
 
@@ -95,7 +78,7 @@ def plot_product(slc, title, quicklook=None, az_step=4, prescreen_thr=2.5, out_d
 
     fig.suptitle(title[:60], fontsize=9)
     if out_dir is not None:
-        fig.savefig(out_dir, dpi=150, bbox_inches="tight") 
+        fig.savefig(out_dir, dpi=150, bbox_inches="tight")
     plt.show()
 
 def _box(a, fy, fx):
@@ -103,8 +86,9 @@ def _box(a, fy, fx):
     h, w = (a.shape[0] // fy) * fy, (a.shape[1] // fx) * fx
     return a[:h, :w].reshape(h // fy, fy, w // fx, fx).mean(axis=(1, 3))
 
-def plot_result(slc, clean, mask, title="", roi=None, max_px=4000, pct=(1, 99), aspect="auto", out_dir: str=None):
-    """roi=(slice(r0, r1), slice(c0, c1)) zooms at full resolution; max_px = max displayed pixels per axis."""
+def plot_result(slc, clean, mask, title="", roi=None, max_px=4000, pct=(1, 99), aspect="auto", out_dir: str=None, spectrum=False):
+    """spectrum=True adds the 2D range spectrum (azimuth line vs range frequency) of source and filtered (inspect the mitigation).
+    roi=(slice(r0, r1), slice(c0, c1)) zooms at full resolution; max_px = max displayed pixels per axis."""
     if roi is not None:
         slc, clean, mask = slc[roi], clean[roi], mask[roi]
     fy, fx = (max(1, n // max_px) for n in slc.shape)           # decimation per axis, 1 = none
@@ -113,7 +97,11 @@ def plot_result(slc, clean, mask, title="", roi=None, max_px=4000, pct=(1, 99), 
     lo, hi = np.percentile(src, pct)
     rlo, rhi = np.percentile(rem, pct)
 
-    fig, ax = plt.subplots(2, 2, figsize=(14, 10), sharex=True, sharey=True, constrained_layout=True)
+    names = [["src", "flt"], ["rem", "msk"]] + ([["sp_src", "sp_flt"]] if spectrum else [])
+    fig, axd = plt.subplot_mosaic(names, figsize=(14, 10 + 4 * spectrum), constrained_layout=True)
+    ax = np.array([[axd[n] for n in r] for r in names[:2]])
+    for a in ax.ravel()[1:]:
+        a.sharex(ax[0, 0]); a.sharey(ax[0, 0])
     panels = [(src, "source [dB]", lo, hi, "gray"),
               (flt, "filtered [dB]", lo, hi, "gray"),
               (rem, "removed RFI [dB]", rlo, rhi, "magma"),
@@ -123,8 +111,16 @@ def plot_result(slc, clean, mask, title="", roi=None, max_px=4000, pct=(1, 99), 
                       extent=(0, slc.shape[1], slc.shape[0], 0))
         a.set_title(t)
         fig.colorbar(im, ax=a, shrink=0.8)
+    if spectrum:
+        f = np.fft.fftshift(np.fft.fftfreq(slc.shape[1]))
+        sp = [10 * np.log10(_box(range_power(v), fy, 1) + 1e-20) for v in (slc, clean)]
+        slo, shi = np.percentile(sp[0], [2, 98])
+        for n, d, t in zip(("sp_src", "sp_flt"), sp, ("source", "filtered")):
+            im = axd[n].imshow(d, aspect="auto", cmap="viridis", vmin=slo, vmax=shi,
+                               extent=[f[0], f[-1], slc.shape[0], 0])
+            axd[n].set(xlabel="normalized range frequency", ylabel="azimuth line", title=f"{t} range spectrum [dB]")
+            fig.colorbar(im, ax=axd[n], shrink=0.8)
     fig.suptitle(f"{title}  (decimation {fy}x{fx})")
     if out_dir is not None:
-        fig.savefig(out_dir, dpi=150, bbox_inches="tight") 
-        plt.show()
-    
+        fig.savefig(out_dir, dpi=150, bbox_inches="tight")
+    plt.show()
