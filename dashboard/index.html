@@ -186,9 +186,15 @@
       width: 0; transition: width 0.85s ease;
     }
 
-    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); }
+    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); align-items: baseline; }
     .person:last-child { border-bottom: 0; }
+    .person .name-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.45rem 0.55rem; }
     .person .name { font-family: var(--fm); font-size: 0.84rem; }
+    .person .group-tag {
+      font-family: var(--fm); font-size: 0.68rem; letter-spacing: 0.02em;
+      color: var(--cy); border: 1px solid rgba(0, 182, 240, 0.35);
+      padding: 0.12rem 0.4rem; border-radius: 2px; white-space: nowrap;
+    }
     .person .stats { color: var(--muted); font-size: 0.84rem; }
     .person .stats em { font-style: normal; color: var(--gr); font-family: var(--fm); }
 
@@ -322,11 +328,14 @@
             const stats = el("div", { className: "stats" });
             stats.appendChild(document.createTextNode(fmt(p.merged_prs) + " merged · "));
             stats.appendChild(el("em", { text: "+" + fmt(p.additions) + " / −" + fmt(p.deletions) }));
+            const nameRow = el("div", { className: "name-row" }, [
+              el("div", { className: "name", text: "#" + (i + 1) + " " + p.login }),
+            ]);
+            if (p.top_group) {
+              nameRow.appendChild(el("span", { className: "group-tag", text: p.top_group }));
+            }
             people.appendChild(el("div", { className: "person" }, [
-              el("div", null, [
-                el("div", { className: "name", text: "#" + (i + 1) + " " + p.login }),
-                stats,
-              ]),
+              el("div", null, [nameRow, stats]),
             ]));
           });
         }

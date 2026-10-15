@@ -125,7 +125,14 @@ def collect_prs():
     }
     merged_total = 0
     open_total = 0
-    contributors = defaultdict(lambda: {"merged_prs": 0, "additions": 0, "deletions": 0})
+    contributors = defaultdict(
+        lambda: {
+            "merged_prs": 0,
+            "additions": 0,
+            "deletions": 0,
+            "groups": defaultdict(int),  # group label -> merged PR count
+        }
+    )
 
     for pr in pulls:
         user = (pr.get("user") or {}).get("login") or "unknown"
@@ -142,11 +149,9 @@ def collect_prs():
                 add = dele = 0
             contributors[user]["additions"] += add
             contributors[user]["deletions"] += dele
-            for g in groups or []:
-                by_group[g]["merged"] += 1
-                by_group[g]["additions"] += add
-                by_group[g]["deletions"] += dele
-            if not groups:
+
+            hit = set(groups)
+            if not hit:
                 # attribute by path heuristics from files
                 try:
                     files = api_paginated(
@@ -154,25 +159,30 @@ def collect_prs():
                     )
                 except urllib.error.HTTPError:
                     files = []
-                hit = set()
                 for f in files:
                     fn = f.get("filename", "")
                     for g in GROUPS:
                         folders = FOLDER_ALIASES.get(g, [g])
                         if any(fn.startswith(f"topics/{folder}/") for folder in folders):
                             hit.add(g)
-                    if fn.startswith("resources/"):
-                        pass
-                for g in hit:
-                    by_group[g]["merged"] += 1
-                    by_group[g]["additions"] += add
-                    by_group[g]["deletions"] += dele
+
+            for g in hit:
+                by_group[g]["merged"] += 1
+                by_group[g]["additions"] += add
+                by_group[g]["deletions"] += dele
+                contributors[user]["groups"][g] += 1
         elif pr.get("state") == "open":
             open_total += 1
             for g in groups:
                 by_group[g]["open"] += 1
                 if pr.get("draft"):
                     by_group[g]["draft"] += 1
+
+    def top_group(groups_map: dict) -> str | None:
+        if not groups_map:
+            return None
+        # Most merged PRs in a group; tie-break by label name for stability
+        return max(groups_map.items(), key=lambda kv: (kv[1], kv[0]))[0]
 
     top = sorted(
         (
@@ -182,6 +192,7 @@ def collect_prs():
                 "additions": v["additions"],
                 "deletions": v["deletions"],
                 "net": v["additions"] - v["deletions"],
+                "top_group": top_group(v["groups"]),
             }
             for u, v in contributors.items()
             if v["merged_prs"] > 0
