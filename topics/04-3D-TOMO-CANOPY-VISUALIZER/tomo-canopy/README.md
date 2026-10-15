@@ -11,7 +11,7 @@
 ---
 
 **tomo-canopy** is a Python package for bringing terrestrial laser scanning
-(TLS), GEDI observations, and BIOMASS tomographic products into a shared,
+(TLS), LVIS and GEDI observations, and BIOMASS tomographic products into a shared,
 Xarray-based interface. It preserves each source's natural geometry while
 providing a path towards aligned 2D and 3D canopy visualisation.
 
@@ -23,16 +23,17 @@ The package is under active development as part of the
 | Capability | Description |
 |---|---|
 | **TLS provider** | Read ASCII or binary PLY point clouds and tree-segment TXT files, with memory mapping for large binary PLY data. |
+| **LVIS provider** | Read complete LVIS-C Level-2 TXT footprint records and normalize all 23 RH percentiles. |
 | **GEDI provider** | Query `gedidb` and return GEDI footprints, metrics, and waveforms as Xarray datasets. |
 | **Tomogram provider** | Inspect and lazily open BIOMASS TOM L1D and L2A product directories, including their STAC and annotation metadata. |
-| **Processing** | Validate, filter, sample, summarize, slice, and derive analysis quantities for TLS, GEDI, and tomograms. |
-| **Transforms** | Match vertical resolution with a Gaussian point-spread function and resample regular volumes onto a target grid. |
+| **Processing** | Validate, filter, sample, summarize, slice, and derive analysis quantities for TLS, LVIS, GEDI, and tomograms. |
+| **Transforms** | Reproject irregular observations, match vertical resolution, and resample regular volumes onto a target grid. |
 | **Shared data interface** | Combine point clouds, meshes, tree segments, rasters, waveforms, and regular volumes without requiring every modality to be present. |
 | **Xarray first** | Providers and processors return labelled `xarray.Dataset` objects with spatial metadata. |
 
 > [!NOTE]
-> ALS support, higher-level cube-generation helpers, and the final
-> visualisation API are currently scaffolds for upcoming development.
+> Higher-level cube-generation helpers and the final visualisation API are
+> currently scaffolds for upcoming development.
 
 ---
 
@@ -57,17 +58,21 @@ python -m pip install -e ".[examples]"
 # GEDI access
 python -m pip install -e ".[gedi]"
 
+# LVIS Level-2 TXT access
+python -m pip install -e ".[lvis]"
+
 # Lazy BIOMASS NetCDF access
 python -m pip install -e ".[tomogram]"
 
 # Full development environment
-python -m pip install -e ".[dev,examples,gedi,tomogram]"
+python -m pip install -e ".[dev,examples,gedi,lvis,tomogram]"
 ```
 
 | Dependency group | Main packages | Purpose |
 |---|---|---|
 | Core | NumPy, Xarray | Labelled scientific arrays and datasets |
 | `gedi` | gedidb, pyproj | GEDI queries and coordinate transforms |
+| `lvis` | pandas | LVIS L2 TXT footprint access and spatial filtering |
 | `tomogram` | Dask, netCDF4 | Lazy, chunked tomogram reading |
 | `examples` | JupyterLab, Matplotlib | Example notebooks and plots |
 | `dev` | pytest, Ruff | Testing and code quality |
@@ -114,6 +119,25 @@ gedi = GEDIProvider(
     end_time="2024-07-25",
 )
 ```
+
+### Open LVIS footprints
+
+```python
+from tomo_canopy.providers import LVISProvider
+
+lvis = LVISProvider().open(
+    "data/lvisc/raw/LVISC2_Gabon2023_0520_R2507_051090.TXT",
+    variables=["rh", "ground_elevation", "sensitivity"],
+    bounds=(11.6, -0.2, 11.8, 0.1),
+)
+
+rh98 = lvis.rh.sel(percentile=98)
+```
+
+LVIS Level-2 observations are represented as irregular footprints rather than
+ALS point-cloud returns. TXT products expose all 23 RH percentiles and the
+complete Level-2 record. Bounding-box selection scans the large ASCII file,
+so it is slower than an indexed geospatial query.
 
 ### Open a BIOMASS tomogram
 
@@ -168,8 +192,8 @@ independent vertical detail.
 
 `DataCube` is a geometry-aware collection rather than a single dense array.
 All layers share a CRS, but only raster and volume layers must align with the
-cube grid. Native TLS point clouds, meshes, GEDI shots, and waveforms keep
-their irregular coordinates.
+cube grid. Native TLS point clouds, meshes, LVIS footprints, GEDI shots, and
+waveforms keep their irregular coordinates.
 
 ```python
 import numpy as np
@@ -209,6 +233,7 @@ and document any setup required at the top of each notebook.
 |---|---|
 | [`tls_provider.ipynb`](examples/tls_provider.ipynb) | Reading PLY point clouds and tree-segment files |
 | [`tls_processor.ipynb`](examples/tls_processor.ipynb) | TLS validation, sampling, bounds, tree metrics, and plotting |
+| [`lvis_processor.ipynb`](examples/lvis_processor.ipynb) | LVIS filtering, RH metrics, canopy elevation, reprojection, and interface integration |
 | [`gedi_provider.ipynb`](examples/gedi_provider.ipynb) | Querying GEDI observations with `gedidb` |
 | [`gedi_processor.ipynb`](examples/gedi_processor.ipynb) | GEDI filtering, subsetting, and spatial preparation |
 | [`tomogram_provider.ipynb`](examples/tomogram_provider.ipynb) | Inspecting and opening BIOMASS TOM L1D/L2A products |
@@ -226,9 +251,9 @@ jupyter lab examples/
 ## Architecture
 
 ```text
-TLS files       GEDI service       BIOMASS TOM products
-    │                │                       │
-    └──────────── providers ─────────────────┘
+TLS files      LVIS L2 files      GEDI service      BIOMASS TOM products
+    │               │                  │                      │
+    └───────────────┴──────── providers ┴──────────────────────┘
                      │
               xarray.Dataset
                      │
@@ -257,7 +282,7 @@ tomo_canopy/
 ## Development
 
 ```bash
-python -m pip install -e ".[dev,examples,gedi,tomogram]"
+python -m pip install -e ".[dev,examples,gedi,lvis,tomogram]"
 python -m pytest
 python -m ruff check tomo_canopy tests
 ```

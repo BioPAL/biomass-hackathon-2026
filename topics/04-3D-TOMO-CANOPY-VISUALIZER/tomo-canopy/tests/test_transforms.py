@@ -6,7 +6,11 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from tomo_canopy.transforms import match_vertical_resolution, resample_to_grid
+from tomo_canopy.transforms import (
+    match_vertical_resolution,
+    reproject_points,
+    resample_to_grid,
+)
 from tomo_canopy.types import GridSpec
 
 
@@ -96,3 +100,13 @@ def test_resample_to_grid_rejects_reprojection_and_sar_data() -> None:
         resample_to_grid(dataset, other_crs)
     with pytest.raises(ValueError, match="must be geocoded"):
         resample_to_grid(dataset, same_crs)
+
+
+def test_reproject_points_requires_shared_coordinates() -> None:
+    dataset = xr.Dataset(
+        coords={"x": ("point", [1.0]), "y": ("other", [2.0])},
+        attrs={"crs": "EPSG:4326"},
+    )
+
+    with pytest.raises(ValueError, match="share one dimension"):
+        reproject_points(dataset, target_crs="EPSG:32632")

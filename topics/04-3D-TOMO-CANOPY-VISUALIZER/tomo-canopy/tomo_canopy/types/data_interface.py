@@ -17,7 +17,7 @@ class Modality(str, Enum):
     """Known observation modalities."""
 
     TLS = "tls"
-    ALS = "als"
+    LVIS = "lvis"
     GEDI = "gedi"
     TOMOGRAM = "tomogram"
     OTHER = "other"
@@ -29,6 +29,7 @@ class GeometryType(str, Enum):
     POINT_CLOUD = "point_cloud"
     TRIANGULAR_MESH = "triangular_mesh"
     TREE_SEGMENTS = "tree_segments"
+    FOOTPRINTS = "footprints"
     RASTER = "raster"
     VOLUME = "volume"
     WAVEFORM = "waveform"
@@ -139,7 +140,8 @@ class DataCube:
     Modalities are deliberately optional. A cube can contain TLS alone, any
     other subset of sources, or initially no layers at all. Raster and volume
     layers must align with ``grid``; point clouds, meshes, tree segments, and
-    waveforms retain their native geometry and only need to share its CRS.
+    footprints and waveforms retain their native geometry and only need to
+    share its CRS.
     """
 
     grid: GridSpec
@@ -181,7 +183,10 @@ class DataCube:
         elif geometry == GeometryType.VOLUME.value:
             _require_grid_axes(layer.data, ("x", "y", "z"))
             self.grid.validate_dataset(layer.data)
-        elif geometry == GeometryType.POINT_CLOUD.value:
+        elif geometry in {
+            GeometryType.POINT_CLOUD.value,
+            GeometryType.FOOTPRINTS.value,
+        }:
             _validate_point_geometry(layer.data)
         elif geometry == GeometryType.TRIANGULAR_MESH.value:
             _validate_mesh_geometry(layer.data)

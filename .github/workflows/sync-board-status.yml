@@ -19,6 +19,8 @@ on:
     types:
       - opened
       - reopened
+      - edited
+      - synchronize
       - converted_to_draft
       - ready_for_review
       - closed
@@ -240,7 +242,35 @@ jobs:
             if (event === 'pull_request_target' || event === 'pull_request') {
               const pr = context.payload.pull_request;
               const action = context.payload.action;
-              const issueNums = closesIssues(pr.body || '');
+
+              // Always re-fetch body: webhook payloads can be stale/empty on
+              // converted_to_draft / edited, and body edits must re-sync the board.
+              let body = pr.body || '';
+              let isDraft = !!pr.draft;
+              let merged = !!pr.merged;
+              try {
+                const fresh = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                });
+                body = fresh.data.body || body;
+                isDraft = fresh.data.draft;
+                merged = fresh.data.merged;
+              } catch (err) {
+                core.warning(`Could not re-fetch PR #${pr.number}: ${err.message}`);
+              }
+
+              // Ignore title-only edits (noise); still run when body changes.
+              if (action === 'edited') {
+                const changes = context.payload.changes || {};
+                if (!changes.body) {
+                  core.info('PR edit did not change body; skipping.');
+                  return;
+                }
+              }
+
+              const issueNums = closesIssues(body);
               if (issueNums.length === 0) {
                 core.info('No Closes #N in PR body; skipping.');
                 return;
@@ -248,17 +278,23 @@ jobs:
 
               let status = 'review';
               if (action === 'closed') {
-                status = pr.merged ? 'done' : 'todo';
+                status = merged ? 'done' : 'todo';
               } else if (
                 action === 'converted_to_draft' ||
-                (action === 'opened' && pr.draft) ||
-                (action === 'reopened' && pr.draft)
+                ((action === 'opened' ||
+                  action === 'reopened' ||
+                  action === 'edited' ||
+                  action === 'synchronize') &&
+                  isDraft)
               ) {
                 status = 'doing';
               } else if (
                 action === 'ready_for_review' ||
-                (action === 'opened' && !pr.draft) ||
-                (action === 'reopened' && !pr.draft)
+                ((action === 'opened' ||
+                  action === 'reopened' ||
+                  action === 'edited' ||
+                  action === 'synchronize') &&
+                  !isDraft)
               ) {
                 status = 'review';
               }

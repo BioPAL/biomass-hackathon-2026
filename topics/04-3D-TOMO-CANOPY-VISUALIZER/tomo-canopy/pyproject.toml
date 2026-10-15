@@ -35,8 +35,15 @@ examples = [
   "jupyterlab>=4",
   "matplotlib>=3.8",
 ]
+visualisation = [
+  "pyvista[jupyter]>=0.49",
+]
 gedi = [
   "gedidb",
+  "pyproj>=3.6",
+]
+lvis = [
+  "pandas>=2.2",
   "pyproj>=3.6",
 ]
 tomogram = [

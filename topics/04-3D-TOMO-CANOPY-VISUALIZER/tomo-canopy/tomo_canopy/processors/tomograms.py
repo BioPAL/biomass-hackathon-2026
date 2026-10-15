@@ -195,7 +195,9 @@ class TomogramProcessor:
         with np.errstate(divide="ignore", invalid="ignore"):
             values = 10.0 * np.log10(source / reference)
         if floor_db is not None:
-            values = values.clip(min=floor_db).fillna(floor_db)
+            # ``clip`` maps valid zero power (-inf dB) to the display floor,
+            # while deliberately preserving missing source cells as NaN.
+            values = values.clip(min=floor_db)
         output_name = name or f"{variable}_db"
         values.name = output_name
         values.attrs = {
