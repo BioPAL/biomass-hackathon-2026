@@ -33,12 +33,23 @@ GROUPS = [
     "11-B-FLOODED-FOREST",
 ]
 GROUP_SET = set(GROUPS)
+# Tag when most added lines sit outside topics/ (docs, CI, dashboard, …)
+REPO_TAG = "repo"
 
 # Folder under topics/ may match label, or legacy aliases
 FOLDER_ALIASES = {
     "02-RFI": ["02-RFI", "02-rfi-removal"],
     "06B-CARBON": ["06B-CARBON", "06-biomass-validation"],
 }
+
+
+def topic_group_for_path(filename: str) -> str | None:
+    """Return group id if path is under topics/<group>/, else None."""
+    for g in GROUPS:
+        folders = FOLDER_ALIASES.get(g, [g])
+        if any(filename.startswith(f"topics/{folder}/") for folder in folders):
+            return g
+    return None
 
 
 def api(path: str, params: dict | None = None):
@@ -131,6 +142,8 @@ def collect_prs():
             "additions": 0,
             "deletions": 0,
             "groups": defaultdict(int),  # group label -> merged PR count
+            "group_additions": defaultdict(int),  # lines added under topics/<group>/
+            "repo_additions": 0,  # lines outside topics/
         }
     )
 
@@ -150,21 +163,27 @@ def collect_prs():
             contributors[user]["additions"] += add
             contributors[user]["deletions"] += dele
 
+            try:
+                files = api_paginated(
+                    f"/repos/{OWNER}/{REPO}/pulls/{pr['number']}/files"
+                )
+            except urllib.error.HTTPError:
+                files = []
+
             hit = set(groups)
+            path_groups: set[str] = set()
+            for f in files:
+                fn = f.get("filename", "")
+                file_add = int(f.get("additions") or 0)
+                g = topic_group_for_path(fn)
+                if g:
+                    path_groups.add(g)
+                    contributors[user]["group_additions"][g] += file_add
+                else:
+                    contributors[user]["repo_additions"] += file_add
+
             if not hit:
-                # attribute by path heuristics from files
-                try:
-                    files = api_paginated(
-                        f"/repos/{OWNER}/{REPO}/pulls/{pr['number']}/files"
-                    )
-                except urllib.error.HTTPError:
-                    files = []
-                for f in files:
-                    fn = f.get("filename", "")
-                    for g in GROUPS:
-                        folders = FOLDER_ALIASES.get(g, [g])
-                        if any(fn.startswith(f"topics/{folder}/") for folder in folders):
-                            hit.add(g)
+                hit = path_groups
 
             for g in hit:
                 by_group[g]["merged"] += 1
@@ -178,11 +197,17 @@ def collect_prs():
                 if pr.get("draft"):
                     by_group[g]["draft"] += 1
 
-    def top_group(groups_map: dict) -> str | None:
-        if not groups_map:
-            return None
-        # Most merged PRs in a group; tie-break by label name for stability
-        return max(groups_map.items(), key=lambda kv: (kv[1], kv[0]))[0]
+    def top_group(v: dict) -> str:
+        """Prefer the topic with most added lines; if most lines are outside topics/, use repo."""
+        topic_add = sum(v["group_additions"].values())
+        repo_add = v["repo_additions"]
+        if repo_add > topic_add:
+            return REPO_TAG
+        if v["group_additions"]:
+            return max(v["group_additions"].items(), key=lambda kv: (kv[1], kv[0]))[0]
+        if v["groups"]:
+            return max(v["groups"].items(), key=lambda kv: (kv[1], kv[0]))[0]
+        return REPO_TAG
 
     top = sorted(
         (
@@ -192,7 +217,7 @@ def collect_prs():
                 "additions": v["additions"],
                 "deletions": v["deletions"],
                 "net": v["additions"] - v["deletions"],
-                "top_group": top_group(v["groups"]),
+                "top_group": top_group(v),
             }
             for u, v in contributors.items()
             if v["merged_prs"] > 0

@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-15T12:02:38.934924+00:00",
+  "generated_at": "2026-10-15T12:40:37.310153+00:00",
   "repo": "BioPAL/biomass-hackathon-2026",
   "totals": {
     "issues_open": 28,
-    "issues_closed": 25,
-    "tasks_closed": 25,
-    "prs_merged": 43,
-    "prs_open": 4,
+    "issues_closed": 26,
+    "tasks_closed": 26,
+    "prs_merged": 45,
+    "prs_open": 6,
     "ungrouped_issues_open": 0,
     "ungrouped_issues_closed": 0,
     "resources_git_additions": 224,
@@ -20,14 +20,14 @@
       "issues_closed": 3,
       "tasks_open": 2,
       "tasks_closed": 3,
-      "prs_merged": 5,
+      "prs_merged": 6,
       "prs_open": 1,
       "prs_draft": 1,
-      "pr_additions": 10670,
-      "pr_deletions": 441,
-      "git_additions": 9887,
-      "git_deletions": 226,
-      "git_commits": 6
+      "pr_additions": 11491,
+      "pr_deletions": 527,
+      "git_additions": 9890,
+      "git_deletions": 312,
+      "git_commits": 7
     },
     {
       "id": "03-QGIS",
@@ -92,9 +92,9 @@
     {
       "id": "06B-CARBON",
       "issues_open": 2,
-      "issues_closed": 8,
+      "issues_closed": 9,
       "tasks_open": 2,
-      "tasks_closed": 8,
+      "tasks_closed": 9,
       "prs_merged": 4,
       "prs_open": 0,
       "prs_draft": 0,
@@ -198,52 +198,59 @@
   "top_contributors": [
     {
       "login": "yreyricord",
-      "merged_prs": 23,
-      "additions": 2137,
-      "deletions": 683,
-      "net": 1454
+      "merged_prs": 25,
+      "additions": 3164,
+      "deletions": 839,
+      "net": 2325,
+      "top_group": "repo"
     },
     {
       "login": "simonbesnard1",
       "merged_prs": 11,
       "additions": 18414,
       "deletions": 481,
-      "net": 17933
+      "net": 17933,
+      "top_group": "04-3D-TOMO-CANOPY-VISUALIZER"
     },
     {
       "login": "yreyricord-ext",
       "merged_prs": 3,
       "additions": 4,
       "deletions": 2,
-      "net": 2
+      "net": 2,
+      "top_group": "03-QGIS"
     },
     {
       "login": "andreu-melis",
       "merged_prs": 2,
       "additions": 9996,
       "deletions": 220,
-      "net": 9776
+      "net": 9776,
+      "top_group": "02-RFI"
     },
     {
       "login": "cristianoManuelLopes",
       "merged_prs": 2,
       "additions": 2,
       "deletions": 2,
-      "net": 0
+      "net": 0,
+      "top_group": "repo"
     },
     {
       "login": "alex-valero",
       "merged_prs": 1,
       "additions": 16969,
       "deletions": 0,
-      "net": 16969
+      "net": 16969,
+      "top_group": "07-GEOLOGY"
     },
     {
       "login": "leaenguehard",
       "merged_prs": 1,
       "additions": 900,
       "deletions": 0,
-      "net": 900
+      "net": 900,
+      "top_group": "06B-CARBON"
     }
   ]
 }
