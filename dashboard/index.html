@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BIOMASS Hackathon Live Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07110e;
+      --bg-2: #0d1c16;
+      --panel: rgba(14, 36, 28, 0.72);
+      --ink: #e8f5ea;
+      --muted: #8aa896;
+      --line: rgba(125, 255, 179, 0.18);
+      --signal: #7dffb3;
+      --warn: #f0c35a;
+      --hot: #ff7a59;
+      --radar: #3ecf8e;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      color: var(--ink);
+      font-family: "Source Serif 4", Georgia, serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(62, 207, 142, 0.16), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(240, 195, 90, 0.08), transparent 50%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M0 80H160M80 0V160' stroke='%237dffb3' stroke-width='0.5' fill='none'/%3E%3Ccircle cx='80' cy='80' r='40' stroke='%237dffb3' stroke-width='0.4' fill='none'/%3E%3Ccircle cx='80' cy='80' r='70' stroke='%237dffb3' stroke-width='0.3' fill='none'/%3E%3C/svg%3E");
+      animation: sweep 18s linear infinite;
+    }
+    @keyframes sweep { from { transform: rotate(0deg) scale(1.2); } to { transform: rotate(360deg) scale(1.2); } }
+    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    .wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+    header { display: grid; gap: 0.75rem; margin-bottom: 2rem; animation: rise 0.7s ease both; }
+    .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--signal); }
+    h1 { margin: 0; font-family: "Bebas Neue", sans-serif; font-weight: 400; font-size: clamp(2.8rem, 8vw, 5.2rem); line-height: 0.92; letter-spacing: 0.02em; }
+    h1 span { color: var(--signal); }
+    .sub { max-width: 42rem; color: var(--muted); font-size: 1.05rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--muted); }
+    .meta strong { color: var(--ink); font-weight: 500; }
+    .pulse { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .pulse i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 0 rgba(125, 255, 179, 0.7); animation: ping 1.8s ease infinite; }
+    @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(125, 255, 179, 0.55); } 70% { box-shadow: 0 0 0 10px rgba(125, 255, 179, 0); } 100% { box-shadow: 0 0 0 0 rgba(125, 255, 179, 0); } }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.85rem; margin-bottom: 1.5rem; }
+    @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .kpi { background: var(--panel); border: 1px solid var(--line); backdrop-filter: blur(8px); padding: 1.1rem 1rem 1rem; animation: rise 0.7s ease both; }
+    .kpi:nth-child(1) { animation-delay: 0.05s; } .kpi:nth-child(2) { animation-delay: 0.1s; } .kpi:nth-child(3) { animation-delay: 0.15s; } .kpi:nth-child(4) { animation-delay: 0.2s; }
+    .kpi .label { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .kpi .value { margin-top: 0.35rem; font-family: "Bebas Neue", sans-serif; font-size: 3rem; line-height: 1; color: var(--signal); }
+    .kpi .hint { margin-top: 0.35rem; color: var(--muted); font-size: 0.9rem; }
+    .grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1rem; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+    section.panel { background: var(--panel); border: 1px solid var(--line); padding: 1.1rem; animation: rise 0.75s ease both; animation-delay: 0.25s; }
+    section.panel h2 { margin: 0 0 1rem; font-family: "Bebas Neue", sans-serif; font-size: 1.7rem; letter-spacing: 0.04em; font-weight: 400; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    th, td { text-align: left; padding: 0.55rem 0.4rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    th { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+    td.mono, .mono { font-family: "IBM Plex Mono", monospace; font-size: 0.82rem; }
+    tr:hover td { background: rgba(125, 255, 179, 0.04); }
+    .bar { height: 0.35rem; background: rgba(125, 255, 179, 0.12); overflow: hidden; margin-top: 0.35rem; }
+    .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--radar), var(--signal)); width: 0; transition: width 0.9s ease; }
+    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid var(--line); }
+    .person:last-child { border-bottom: 0; }
+    .person .name { font-family: "IBM Plex Mono", monospace; font-size: 0.88rem; }
+    .person .stats { color: var(--muted); font-size: 0.88rem; }
+    .person .stats em { font-style: normal; color: var(--warn); font-family: "IBM Plex Mono", monospace; }
+    footer { margin-top: 1.5rem; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--muted); animation: rise 0.8s ease both; animation-delay: 0.35s; }
+    footer a { color: var(--signal); }
+    .err { border: 1px solid var(--hot); color: var(--hot); padding: 1rem; font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">ESA · BioPAL · ESOC 2026</div>
+      <h1>BIOMASS Hackathon<br /><span>Live contribution board</span></h1>
+      <p class="sub">Issues closed, PRs merged, and code churn by group — refreshed when an issue is closed or a PR is merged.</p>
+      <div class="meta">
+        <span class="pulse"><i></i> Auto-refresh on close / merge</span>
+        <span>Repo <strong id="repo">…</strong></span>
+        <span>Updated <strong id="updated">…</strong></span>
+      </div>
+    </header>
+    <div id="err" class="err" hidden></div>
+    <div class="kpis">
+      <div class="kpi"><div class="label">Tasks closed</div><div class="value" id="kpi-tasks">—</div><div class="hint">label task + closed</div></div>
+      <div class="kpi"><div class="label">PRs merged</div><div class="value" id="kpi-prs">—</div><div class="hint">into main</div></div>
+      <div class="kpi"><div class="label">Issues open</div><div class="value" id="kpi-open">—</div><div class="hint">all open issues</div></div>
+      <div class="kpi"><div class="label">PRs open</div><div class="value" id="kpi-pr-open">—</div><div class="hint">including drafts</div></div>
+    </div>
+    <div class="grid">
+      <section class="panel">
+        <h2>By group</h2>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Group</th><th>Tasks ✓</th><th>Tasks open</th><th>PRs merged</th><th>+ / − (merged PRs)</th><th>Activity</th>
+              </tr>
+            </thead>
+            <tbody id="groups-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="panel">
+        <h2>Top contributors</h2>
+        <div id="people"></div>
+      </section>
+    </div>
+    <footer>
+      Source: GitHub API · Actions ·
+      <a href="https://github.com/BioPAL/biomass-hackathon-2026">BioPAL/biomass-hackathon-2026</a>
+      · <a href="https://github.com/orgs/BioPAL/projects/6">Project board</a>
+    </footer>
+  </div>
+  <script>
+    function fmt(n) { return new Intl.NumberFormat("en-GB").format(n ?? 0); }
+    function fmtTime(iso) {
+      if (!iso) return "—";
+      return new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+    }
+    function el(tag, props, kids) {
+      const node = document.createElement(tag);
+      if (props) {
+        Object.entries(props).forEach(([k, v]) => {
+          if (k === "className") node.className = v;
+          else if (k === "text") node.textContent = v;
+          else if (k === "style" && v && typeof v === "object") Object.assign(node.style, v);
+          else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v);
+          else if (v != null) node.setAttribute(k, v);
+        });
+      }
+      (kids || []).forEach((c) => node.appendChild(typeof c === "string" ? document.createTextNode(c) : c));
+      return node;
+    }
+    async function load() {
+      const err = document.getElementById("err");
+      try {
+        const res = await fetch("./metrics.json?ts=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("metrics.json missing — run workflow Hackathon dashboard once.");
+        const data = await res.json();
+        document.getElementById("repo").textContent = data.repo;
+        document.getElementById("updated").textContent = fmtTime(data.generated_at);
+        document.getElementById("kpi-tasks").textContent = fmt(data.totals.tasks_closed);
+        document.getElementById("kpi-prs").textContent = fmt(data.totals.prs_merged);
+        document.getElementById("kpi-open").textContent = fmt(data.totals.issues_open);
+        document.getElementById("kpi-pr-open").textContent = fmt(data.totals.prs_open);
+
+        const maxScore = Math.max(1, ...data.groups.map((g) => g.tasks_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500));
+        const tbody = document.getElementById("groups-body");
+        tbody.replaceChildren();
+        data.groups.slice().sort((a, b) => (b.tasks_closed + b.prs_merged) - (a.tasks_closed + a.prs_merged)).forEach((g) => {
+          const score = g.tasks_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500;
+          const pct = Math.round((score / maxScore) * 100);
+          const barInner = el("span", { style: { width: "0%" } });
+          const tr = el("tr", null, [
+            el("td", { className: "mono", text: g.id }),
+            el("td", { text: fmt(g.tasks_closed) }),
+            el("td", { text: fmt(g.tasks_open) }),
+            el("td", { text: fmt(g.prs_merged) }),
+            el("td", { className: "mono", text: "+" + fmt(g.pr_additions) + " / −" + fmt(g.pr_deletions) }),
+            el("td", { style: { minWidth: "7rem" } }, [el("div", { className: "bar" }, [barInner])]),
+          ]);
+          tbody.appendChild(tr);
+          requestAnimationFrame(() => { barInner.style.width = pct + "%"; });
+        });
+
+        const people = document.getElementById("people");
+        people.replaceChildren();
+        if (!data.top_contributors.length) {
+          people.appendChild(el("p", { className: "sub", text: "No merged PRs yet." }));
+        } else {
+          data.top_contributors.forEach((p, i) => {
+            const stats = el("div", { className: "stats" });
+            stats.appendChild(document.createTextNode(fmt(p.merged_prs) + " merged · "));
+            stats.appendChild(el("em", { text: "+" + fmt(p.additions) + " / −" + fmt(p.deletions) }));
+            people.appendChild(el("div", { className: "person" }, [
+              el("div", null, [
+                el("div", { className: "name", text: "#" + (i + 1) + " " + p.login }),
+                stats,
+              ]),
+            ]));
+          });
+        }
+        err.hidden = true;
+      } catch (e) {
+        err.hidden = false;
+        err.textContent = String(e.message || e);
+      }
+    }
+    load();
+    setInterval(load, 60000);
+  </script>
+</body>
+</html>
