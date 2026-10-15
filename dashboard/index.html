@@ -354,6 +354,7 @@
     <div class="grid">
       <section class="panel">
         <h2>By group</h2>
+        <p class="sub" style="margin: -0.35rem 0 0.85rem; font-size: 0.78rem;">Ranked by merged PRs. Gold star = #1 on that ranking.</p>
         <div style="overflow-x:auto">
           <table>
             <thead>
@@ -851,10 +852,10 @@
         const maxScore = Math.max(1, ...data.groups.map(groupScore));
         const tbody = document.getElementById("groups-body");
         tbody.replaceChildren();
-        // Rank: closed issues, then merged PRs, then open issues (break ties like the shared scaffold PR)
+        // Rank: merged PRs first, then closed issues, then open issues
         data.groups.slice().sort((a, b) =>
-          (b.issues_closed - a.issues_closed) ||
           (b.prs_merged - a.prs_merged) ||
+          (b.issues_closed - a.issues_closed) ||
           (b.issues_open - a.issues_open) ||
           a.id.localeCompare(b.id)
         ).forEach((g, rank) => {
