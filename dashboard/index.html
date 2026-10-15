@@ -6,83 +6,186 @@
   <title>BIOMASS Hackathon Live Board</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
+    /* Aligned with kickoff deck tokens (docs/presentations/.../tokens.css) */
     :root {
-      --bg: #07110e;
-      --bg-2: #0d1c16;
-      --panel: rgba(14, 36, 28, 0.72);
-      --ink: #e8f5ea;
-      --muted: #8aa896;
-      --line: rgba(125, 255, 179, 0.18);
-      --signal: #7dffb3;
-      --warn: #f0c35a;
-      --hot: #ff7a59;
-      --radar: #3ecf8e;
+      --bg: #0f1923;
+      --bg-2: #152433;
+      --panel: rgba(21, 36, 51, 0.82);
+      --ink: #ffffff;
+      --muted: #9bb0c0;
+      --line: rgba(0, 182, 240, 0.22);
+      --tl: #007a94;
+      --tl2: #347891;
+      --cy: #00b6f0;
+      --gr: #97c00b;
+      --pk: #ff7e79;
+      --vm: #5234c9;
+      --mn: #a3d8b0;
+      --signal: var(--cy);
+      --warn: var(--gr);
+      --hot: var(--pk);
+      --fs: "Inter", "Helvetica Neue", sans-serif;
+      --fm: "JetBrains Mono", "IBM Plex Mono", monospace;
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
     body {
       color: var(--ink);
-      font-family: "Source Serif 4", Georgia, serif;
+      font-family: var(--fs);
       background:
-        radial-gradient(1200px 600px at 10% -10%, rgba(62, 207, 142, 0.16), transparent 55%),
-        radial-gradient(900px 500px at 90% 0%, rgba(240, 195, 90, 0.08), transparent 50%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
-      overflow-x: hidden;
+        radial-gradient(1000px 520px at 8% -8%, rgba(0, 182, 240, 0.16), transparent 55%),
+        radial-gradient(800px 480px at 92% 0%, rgba(151, 192, 11, 0.1), transparent 50%),
+        linear-gradient(165deg, var(--bg) 0%, var(--bg-2) 55%, #0c141c 100%);
     }
     body::before {
       content: "";
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: 0.07;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cpath d='M0 80H160M80 0V160' stroke='%237dffb3' stroke-width='0.5' fill='none'/%3E%3Ccircle cx='80' cy='80' r='40' stroke='%237dffb3' stroke-width='0.4' fill='none'/%3E%3Ccircle cx='80' cy='80' r='70' stroke='%237dffb3' stroke-width='0.3' fill='none'/%3E%3C/svg%3E");
-      animation: sweep 18s linear infinite;
+      opacity: 0.045;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cpath d='M0 60H120M60 0V120' stroke='%2300b6f0' stroke-width='0.6' fill='none'/%3E%3C/svg%3E");
     }
-    @keyframes sweep { from { transform: rotate(0deg) scale(1.2); } to { transform: rotate(360deg) scale(1.2); } }
-    @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-    .wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
-    header { display: grid; gap: 0.75rem; margin-bottom: 2rem; animation: rise 0.7s ease both; }
-    .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--signal); }
-    h1 { margin: 0; font-family: "Bebas Neue", sans-serif; font-weight: 400; font-size: clamp(2.8rem, 8vw, 5.2rem); line-height: 0.92; letter-spacing: 0.02em; }
-    h1 span { color: var(--signal); }
-    .sub { max-width: 42rem; color: var(--muted); font-size: 1.05rem; }
-    .meta { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; color: var(--muted); }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 1.5rem 1.25rem 2.5rem; }
+
+    .brand-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+      animation: rise 0.55s ease both;
+    }
+    .brand-left, .brand-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .brand-left img.esa { height: 42px; width: auto; display: block; }
+    .brand-left img.biomass { height: 40px; width: auto; display: block; }
+    .brand-right img.biopal { height: 36px; width: auto; display: block; }
+    .brand-right img.acri { height: 28px; width: auto; display: block; opacity: 0.92; }
+    .brand-sep {
+      width: 1px; height: 28px; background: var(--line);
+    }
+
+    header { display: grid; gap: 0.65rem; margin-bottom: 1.5rem; animation: rise 0.65s ease both; }
+    .eyebrow {
+      font-family: var(--fm); font-size: 0.72rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--cy);
+    }
+    h1 {
+      margin: 0; font-weight: 700; font-size: clamp(1.9rem, 4.5vw, 2.75rem);
+      line-height: 1.1; letter-spacing: -0.02em;
+    }
+    h1 span { color: var(--cy); }
+    .sub { max-width: 40rem; color: var(--muted); font-size: 0.98rem; line-height: 1.45; margin: 0; }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 0.65rem 1.1rem;
+      font-family: var(--fm); font-size: 0.74rem; color: var(--muted);
+    }
     .meta strong { color: var(--ink); font-weight: 500; }
-    .pulse { display: inline-flex; align-items: center; gap: 0.45rem; }
-    .pulse i { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 0 rgba(125, 255, 179, 0.7); animation: ping 1.8s ease infinite; }
-    @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(125, 255, 179, 0.55); } 70% { box-shadow: 0 0 0 10px rgba(125, 255, 179, 0); } 100% { box-shadow: 0 0 0 0 rgba(125, 255, 179, 0); } }
-    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.85rem; margin-bottom: 1.5rem; }
+    .pulse { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .pulse i {
+      width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--gr);
+      box-shadow: 0 0 0 0 rgba(151, 192, 11, 0.55); animation: ping 1.8s ease infinite;
+    }
+    @keyframes ping {
+      0% { box-shadow: 0 0 0 0 rgba(151, 192, 11, 0.5); }
+      70% { box-shadow: 0 0 0 9px rgba(151, 192, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(151, 192, 11, 0); }
+    }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
     @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    .kpi { background: var(--panel); border: 1px solid var(--line); backdrop-filter: blur(8px); padding: 1.1rem 1rem 1rem; animation: rise 0.7s ease both; }
-    .kpi:nth-child(1) { animation-delay: 0.05s; } .kpi:nth-child(2) { animation-delay: 0.1s; } .kpi:nth-child(3) { animation-delay: 0.15s; } .kpi:nth-child(4) { animation-delay: 0.2s; }
-    .kpi .label { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
-    .kpi .value { margin-top: 0.35rem; font-family: "Bebas Neue", sans-serif; font-size: 3rem; line-height: 1; color: var(--signal); }
-    .kpi .hint { margin-top: 0.35rem; color: var(--muted); font-size: 0.9rem; }
-    .grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1rem; }
+    .kpi {
+      background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--cy);
+      padding: 1rem 0.95rem 0.9rem; animation: rise 0.7s ease both;
+    }
+    .kpi:nth-child(2) { border-top-color: var(--gr); }
+    .kpi:nth-child(3) { border-top-color: var(--tl); }
+    .kpi:nth-child(4) { border-top-color: var(--pk); }
+    .kpi:nth-child(1) { animation-delay: 0.04s; } .kpi:nth-child(2) { animation-delay: 0.08s; }
+    .kpi:nth-child(3) { animation-delay: 0.12s; } .kpi:nth-child(4) { animation-delay: 0.16s; }
+    .kpi .label {
+      font-family: var(--fm); font-size: 0.68rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .kpi .value {
+      margin-top: 0.3rem; font-weight: 700; font-size: 2.4rem; line-height: 1; color: var(--ink);
+    }
+    .kpi:nth-child(1) .value { color: var(--cy); }
+    .kpi:nth-child(2) .value { color: var(--gr); }
+    .kpi:nth-child(3) .value { color: var(--tl2); }
+    .kpi:nth-child(4) .value { color: var(--pk); }
+    .kpi .hint { margin-top: 0.3rem; color: var(--muted); font-size: 0.85rem; }
+
+    .grid { display: grid; grid-template-columns: 1.65fr 1fr; gap: 0.9rem; }
     @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
-    section.panel { background: var(--panel); border: 1px solid var(--line); padding: 1.1rem; animation: rise 0.75s ease both; animation-delay: 0.25s; }
-    section.panel h2 { margin: 0 0 1rem; font-family: "Bebas Neue", sans-serif; font-size: 1.7rem; letter-spacing: 0.04em; font-weight: 400; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-    th, td { text-align: left; padding: 0.55rem 0.4rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
-    th { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
-    td.mono, .mono { font-family: "IBM Plex Mono", monospace; font-size: 0.82rem; }
-    tr:hover td { background: rgba(125, 255, 179, 0.04); }
-    .bar { height: 0.35rem; background: rgba(125, 255, 179, 0.12); overflow: hidden; margin-top: 0.35rem; }
-    .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--radar), var(--signal)); width: 0; transition: width 0.9s ease; }
-    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.65rem 0; border-bottom: 1px solid var(--line); }
+    section.panel {
+      background: var(--panel); border: 1px solid var(--line); padding: 1rem 1.05rem 1.05rem;
+      animation: rise 0.75s ease both; animation-delay: 0.2s;
+    }
+    section.panel h2 {
+      margin: 0 0 0.85rem; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em;
+      color: var(--ink); display: flex; align-items: center; gap: 0.5rem;
+    }
+    section.panel h2::before {
+      content: ""; width: 0.55rem; height: 0.55rem; background: var(--cy); border-radius: 1px;
+    }
+    section.panel.contributors h2::before { background: var(--gr); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 0.5rem 0.35rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    th {
+      font-family: var(--fm); font-size: 0.65rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted); font-weight: 500;
+    }
+    td.mono, .mono { font-family: var(--fm); font-size: 0.78rem; }
+    tr:hover td { background: rgba(0, 182, 240, 0.05); }
+    .bar { height: 0.32rem; background: rgba(0, 122, 148, 0.25); overflow: hidden; margin-top: 0.3rem; border-radius: 1px; }
+    .bar > span {
+      display: block; height: 100%;
+      background: linear-gradient(90deg, var(--tl), var(--cy));
+      width: 0; transition: width 0.85s ease;
+    }
+
+    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); }
     .person:last-child { border-bottom: 0; }
-    .person .name { font-family: "IBM Plex Mono", monospace; font-size: 0.88rem; }
-    .person .stats { color: var(--muted); font-size: 0.88rem; }
-    .person .stats em { font-style: normal; color: var(--warn); font-family: "IBM Plex Mono", monospace; }
-    footer { margin-top: 1.5rem; font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--muted); animation: rise 0.8s ease both; animation-delay: 0.35s; }
-    footer a { color: var(--signal); }
-    .err { border: 1px solid var(--hot); color: var(--hot); padding: 1rem; font-family: "IBM Plex Mono", monospace; font-size: 0.85rem; }
+    .person .name { font-family: var(--fm); font-size: 0.84rem; }
+    .person .stats { color: var(--muted); font-size: 0.84rem; }
+    .person .stats em { font-style: normal; color: var(--gr); font-family: var(--fm); }
+
+    footer {
+      margin-top: 1.35rem; font-family: var(--fm); font-size: 0.7rem; color: var(--muted);
+      animation: rise 0.8s ease both; animation-delay: 0.28s;
+    }
+    footer a { color: var(--cy); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .err { border: 1px solid var(--pk); color: var(--pk); padding: 0.9rem; font-family: var(--fm); font-size: 0.82rem; }
   </style>
 </head>
 <body>
   <div class="wrap">
+    <div class="brand-bar">
+      <div class="brand-left">
+        <img class="esa" src="assets/logos/esa-dark.png" alt="ESA" />
+        <span class="brand-sep" aria-hidden="true"></span>
+        <img class="biomass" src="assets/logos/biomass-disc.png" alt="BIOMASS" />
+      </div>
+      <div class="brand-right">
+        <img class="biopal" src="assets/logos/biopal-text-right.png" alt="BioPAL" />
+        <span class="brand-sep" aria-hidden="true"></span>
+        <img class="acri" src="assets/logos/acri-st.png" alt="ACRI-ST" />
+      </div>
+    </div>
+
     <header>
       <div class="eyebrow">ESA · BioPAL · ESOC 2026</div>
       <h1>BIOMASS Hackathon<br /><span>Live contribution board</span></h1>
@@ -93,13 +196,16 @@
         <span>Updated <strong id="updated">…</strong></span>
       </div>
     </header>
+
     <div id="err" class="err" hidden></div>
+
     <div class="kpis">
       <div class="kpi"><div class="label">Tasks closed</div><div class="value" id="kpi-tasks">—</div><div class="hint">label task + closed</div></div>
       <div class="kpi"><div class="label">PRs merged</div><div class="value" id="kpi-prs">—</div><div class="hint">into main</div></div>
       <div class="kpi"><div class="label">Issues open</div><div class="value" id="kpi-open">—</div><div class="hint">all open issues</div></div>
       <div class="kpi"><div class="label">PRs open</div><div class="value" id="kpi-pr-open">—</div><div class="hint">including drafts</div></div>
     </div>
+
     <div class="grid">
       <section class="panel">
         <h2>By group</h2>
@@ -114,15 +220,17 @@
           </table>
         </div>
       </section>
-      <section class="panel">
+      <section class="panel contributors">
         <h2>Top contributors</h2>
         <div id="people"></div>
       </section>
     </div>
+
     <footer>
-      Source: GitHub API · Actions ·
-      <a href="https://github.com/BioPAL/biomass-hackathon-2026">BioPAL/biomass-hackathon-2026</a>
-      · <a href="https://github.com/orgs/BioPAL/projects/6">Project board</a>
+      Source: GitHub API · Actions · visuals aligned with the hackathon kickoff deck ·
+      <a href="https://github.com/BioPAL/biomass-hackathon-2026">repo</a>
+      · <a href="https://github.com/orgs/BioPAL/projects/6">project board</a>
+      · live: <a href="https://biopal.github.io/biomass-hackathon-2026/">Pages</a>
     </footer>
   </div>
   <script>
@@ -138,7 +246,6 @@
           if (k === "className") node.className = v;
           else if (k === "text") node.textContent = v;
           else if (k === "style" && v && typeof v === "object") Object.assign(node.style, v);
-          else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v);
           else if (v != null) node.setAttribute(k, v);
         });
       }
@@ -165,15 +272,14 @@
           const score = g.tasks_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500;
           const pct = Math.round((score / maxScore) * 100);
           const barInner = el("span", { style: { width: "0%" } });
-          const tr = el("tr", null, [
+          tbody.appendChild(el("tr", null, [
             el("td", { className: "mono", text: g.id }),
             el("td", { text: fmt(g.tasks_closed) }),
             el("td", { text: fmt(g.tasks_open) }),
             el("td", { text: fmt(g.prs_merged) }),
             el("td", { className: "mono", text: "+" + fmt(g.pr_additions) + " / −" + fmt(g.pr_deletions) }),
             el("td", { style: { minWidth: "7rem" } }, [el("div", { className: "bar" }, [barInner])]),
-          ]);
-          tbody.appendChild(tr);
+          ]));
           requestAnimationFrame(() => { barInner.style.width = pct + "%"; });
         });
 
