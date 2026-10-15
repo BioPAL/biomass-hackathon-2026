@@ -79,6 +79,17 @@ def test_power_and_decibel_derivations_are_composable(
     assert result.attrs["processing_quantity"] == "power_db"
 
 
+def test_decibel_floor_preserves_missing_cells(l2a_tomogram: xr.Dataset) -> None:
+    power = TomogramProcessor().to_power(l2a_tomogram)
+    power["tomographic_power"][0, 0, 0, 0] = np.nan
+    power["tomographic_power"][0, 0, 0, 1] = 0.0
+
+    result = TomogramProcessor().to_db(power, floor_db=-30.0)
+
+    assert np.isnan(result.tomographic_power_db[0, 0, 0, 0])
+    assert float(result.tomographic_power_db[0, 0, 0, 1]) == -30.0
+
+
 def test_select_subset_and_slices(l2a_tomogram: xr.Dataset) -> None:
     processor = TomogramProcessor()
 
