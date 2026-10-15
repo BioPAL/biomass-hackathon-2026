@@ -68,10 +68,10 @@ def _block_filter(slc, lblk, lpd, gamma, ns_max, ns_mul, axis, q_out, min_size, 
             if min(X.shape) <= min_size:                                   # too small for svds / edge sliver
                 continue
             th = get_eig_th(np.var(X), *X.shape, gamma=gamma, **kw)
-            if svds(X, k=1, maxiter=20)[1][0] ** 2 <= th:
+            u, s, vh = svds(X, k=ns_max)                                   # singular values ascending
+            if s[-1] ** 2 <= th:                                           # lambda1 detector: no RFI in this block
                 continue
-            u, s, vh = svds(X, k=ns_max)
-            q = int(np.sum(s ** 2 > th) * ns_mul)
+            q = min(ns_max, int(np.sum(s ** 2 > th) * ns_mul))            # >= 1 since s[-1]^2 > th
             rem = np.stack(np.split((u[:, -q:] * s[-q:]) @ vh[-q:], n, axis=axis))   # (n, h, w)
             hy, hx = min(lblk[0], R - y), min(lblk[1], C - x)
             out[:, y:y + hy, x:x + hx] -= rem[:, y - y0:y - y0 + hy, x - x0:x - x0 + hx]
