@@ -18,6 +18,10 @@ Steps (everything lands in outputs/, see config.yaml)
 9. PolSAR of the kept scenes (PolSARpro T3, Pauli, HSI, H/A/alpha_averaged) on the same averaging
    window/grid + per-scene figures, chronological stack comparison, mechanism time series
                                             -> outputs/<roi>/polsar/<stack>/
+10. DAHITI water level of the target nearest to the ROI (every point since water_level_since in
+    config.yaml, extracted scene dates as faint lines)
+                                             -> outputs/<roi>/extraction/figures/water_level.png
+                                             -> outputs/<roi>/water_level/
 
 Examples
 --------
@@ -59,6 +63,8 @@ def parse_args(argv=None):
     parser.add_argument("--skip-review", action="store_true",
                         help="no manual scene review: reuse the saved selection (all scenes the first time)")
     parser.add_argument("--skip-polsar", action="store_true", help="skip the PolSAR decompositions and their figures")
+    parser.add_argument("--skip-water-level", action="store_true",
+                        help="skip the DAHITI water level of the target nearest to the ROI")
     parser.add_argument("--skip-plots", action="store_true", help="compute only, no figures")
     parser.add_argument("--force", action="store_true", help="recompute coherence / PolSAR even if up to date")
     # spatial averaging (coherence + PolSAR)
@@ -175,6 +181,14 @@ def main(argv=None):
         run_polsar(cfg, paths, window, force=args.force)
         if not args.skip_plots:
             plot_polsar_outputs(paths, window, show=show)
+
+    # 10. DAHITI water level of the target nearest to the ROI (context for the stacks:
+    #     every point since water_level_since in config.yaml, scene dates as faint lines)
+    if not args.skip_water_level:
+        from tools.water_level_roi import run_water_level
+
+        print("Water level (DAHITI):")
+        run_water_level(cfg, roi, paths, args.start, args.end or str(date.today()), show=show)
 
 
 if __name__ == "__main__":

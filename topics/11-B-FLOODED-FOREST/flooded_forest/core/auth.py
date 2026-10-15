@@ -1,5 +1,6 @@
-"""MAAP credentials and access token."""
+"""MAAP credentials and access token, and the DAHITI API key."""
 
+import os
 import threading
 import time
 from pathlib import Path
@@ -11,17 +12,23 @@ DEFAULT_CLIENT_ID = "offline-token"
 DEFAULT_CLIENT_SECRET = "p1eL7uonXs6MDxtGbgKdPVRAmnGxHpVE"
 
 
+def read_keyvalue(path):
+    """KEY=value pairs of a credentials file; blank lines and #comments ignored."""
+    values = {}
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        if "=" in line and not line.lstrip().startswith("#"):
+            key, value = line.split("=", 1)
+            values[key.strip()] = value.strip()
+    return values
+
+
 def load_credentials(path):
     """Accept a raw offline-token file or a KEY=value credentials file.
 
     Returns (offline_token, client_id, client_secret).
     """
     text = Path(path).read_text(encoding="utf-8").strip()
-    values = {}
-    for line in text.splitlines():
-        if "=" in line and not line.lstrip().startswith("#"):
-            key, value = line.split("=", 1)
-            values[key.strip()] = value.strip()
+    values = read_keyvalue(path)
 
     offline = values.get("OFFLINE_TOKEN") or text.replace("\n", "")
     if not offline:
@@ -31,6 +38,26 @@ def load_credentials(path):
         values.get("CLIENT_ID", DEFAULT_CLIENT_ID),
         values.get("CLIENT_SECRET", DEFAULT_CLIENT_SECRET),
     )
+
+
+def dahiti_api_key(credentials_path=None):
+    """DAHITI API key: DAHITI_API_KEY=... in the credentials file, or the environment.
+
+    Get a key after registering on https://dahiti.dgfi.tum.de/. Never commit it: the
+    credentials file is git-ignored (see config.yaml credentials_path).
+    """
+    if credentials_path and Path(credentials_path).exists():
+        key = read_keyvalue(credentials_path).get("DAHITI_API_KEY")
+        if key:
+            return key
+    key = os.environ.get("DAHITI_API_KEY")
+    if not key:
+        raise ValueError(
+            f"No DAHITI_API_KEY in {credentials_path or 'the credentials file'} or in the "
+            "environment: add the line DAHITI_API_KEY=... to the credentials file "
+            "(dahiti.dgfi.tum.de registration) or export DAHITI_API_KEY"
+        )
+    return key
 
 
 class Token:

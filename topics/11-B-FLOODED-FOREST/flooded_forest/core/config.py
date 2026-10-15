@@ -17,6 +17,7 @@ class RoiPaths:
         self.quicklooks = self.root / "quicklooks"    # catalogue/ and one folder per stack
         self.coherence = self.root / "coherence"      # one folder per stack
         self.polsar = self.root / "polsar"            # one folder per stack
+        self.water_level = self.root / "water_level"  # DAHITI series + info of the nearest target
         self.figures = self.extraction / "figures"    # ROI-level figures (time series)
 
     def stack_dirs(self):
@@ -62,6 +63,10 @@ class Config:
 
         # spatial averaging shared by coherence and PolSAR
         self.averaging_window = float(raw.get("averaging_window", raw.get("coherence_window", 250)))
+
+        # DAHITI water level (pipeline step 10, tools/water_level_roi.py)
+        # str() also handles the date object that YAML makes of an unquoted 2024-01-01
+        self.water_level_since = str(raw.get("water_level_since", "2024-01-01"))
 
         # PolSAR
         self.swath_incidence_deg = {

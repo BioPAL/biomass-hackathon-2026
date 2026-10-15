@@ -9,6 +9,7 @@ One entry point: [`run_pipeline.py`](run_pipeline.py). For a ROI, it does the fo
 3. Computes the MBMP coherence and lets you remove scenes per stack in a manual review.
 4. Computes the PolSARpro decompositions (T3, Pauli, HSI, H/A/alpha_averaged) of the kept scenes with the same averaging window.
 5. Saves the figures.
+6. Plots the DAHITI water level of the target nearest to the ROI: every point since `water_level_since` (config.yaml), with the dates of the extracted scenes as faint vertical lines.
 
 Everything generated goes into `outputs/` (git-ignored).
 
@@ -33,6 +34,7 @@ BPS is optional at runtime. When it is importable, the MBMP coherence is cross-c
    - the phase corrections (`apply_skp`, `apply_flat`)
    - the averaging window (`averaging_window`, in metres)
    - the PolSAR incidence angle of each swath (`swath_incidence_deg`)
+   - the start date of the water-level figure (`water_level_since`)
 
    Paths are relative to this folder.
 2. **`credentials.txt`** (git-ignored, next to `config.yaml` by default) — either a raw MAAP offline token, or:
@@ -40,8 +42,9 @@ BPS is optional at runtime. When it is importable, the MBMP coherence is cross-c
    OFFLINE_TOKEN=eyJ...
    CLIENT_ID=offline-token
    CLIENT_SECRET=...
+   DAHITI_API_KEY=...
    ```
-   Get the offline token from your ESA MAAP account (see the MAAP documentation). The catalogue search runs without the token, because the MAAP STAC API rejects authenticated search requests. The token is only used to download assets (quicklooks, LUTs, COG tiles).
+   Get the offline token from your ESA MAAP account (see the MAAP documentation). The catalogue search runs without the token, because the MAAP STAC API rejects authenticated search requests. The token is only used to download assets (quicklooks, LUTs, COG tiles). The `DAHITI_API_KEY` line is the key of a [DAHITI](https://dahiti.dgfi.tum.de/) account, used by the water-level step (a `DAHITI_API_KEY` environment variable works too).
 
 ## Run
 
@@ -81,6 +84,7 @@ python run_pipeline.py --help         # all flags
 | 7. Scene review | Per stack, the mean \|γ\| MBMP matrix and the HH, HV, VV pair grids open in windows. You type the scenes to keep in the terminal. | `plotting/coherence.py`, `core/scenes.py` | `<roi>/extraction/<stack>/scene_selection.json` |
 | 8. Stack figures | HH intensity of every kept scene, HH/HV time series. | `plotting/stacks.py` | `<roi>/extraction/…/figures/` |
 | 9. PolSAR | For every **kept** scene: PolSARpro `S_to_T3`, with T3 averaged on the **same window and grid** as the coherence, then `pauli_rgb` and `h_a_alpha` (eigenvalues, alpha_1..3, entropy, anisotropy, alpha_averaged). Figures per scene, a chronological Pauli/HSI comparison per stack and the dominant-mechanism time series. | `processing/polsar.py`, `plotting/polsar.py` | `<roi>/polsar/<stack>/` |
+| 10. Water level | DAHITI target nearest to the ROI with data in the period (`--start`/`--end`); figure with every point since `water_level_since` and the extracted scene dates as faint vertical lines. Skipped with a warning when DAHITI fails or has no data. | `tools/water_level_roi.py` | `<roi>/extraction/figures/water_level.png`, `<roi>/water_level/` |
 
 How the steps behave:
 
@@ -112,7 +116,7 @@ outputs/
 └── <roi>/
     ├── extraction/
     │   ├── stack_selection_map.html, extraction_summary.json, common_area.geojson, extraction.log
-    │   ├── figures/timeseries.png                 mean HH/HV in the common area per date
+    │   ├── figures/                               timeseries.png (mean HH/HV), water_level.png (DAHITI)
     │   └── <stack>/
     │       ├── BIO_S1_STA__...tif                 complex64 HH HV VH VV, SKP + flattening applied (GCPs)
     │       ├── overlap_mask.tif, latlon.tif       common-area mask, lat/lon of every pixel
@@ -126,13 +130,16 @@ outputs/
     │   ├── coherence_w<L>m.npz, .json             MBMP + single-pol coherence, valid fraction, lat/lon
     │   ├── coherence_scenes.md                    window, scenes kept / removed, 3-day |γ| hint table
     │   └── figures/                               mean |γ| MBMP matrix, |γ| pair grids (all scenes), temporal RGB (kept)
-    └── polsar/<stack>/
-        ├── polsar_w<L>m.npz, .json                T3, Pauli RGB, lambdas, alphas, H, A, alpha_averaged, span (kept scenes)
-        ├── mechanism_counts.json                  cells per dominant mechanism per kept scene
-        └── figures/
-            ├── <date>_{pauli,hsi,alphas,h_a_alpha,h_alpha}.png
-            ├── stack_pauli_hsi.png                kept scenes in chronological order: Pauli RGB (top), HSI (bottom)
-            └── mechanism_timeseries.png           surface / volume / double bounce cells vs temporal baseline
+    ├── polsar/<stack>/
+    │   ├── polsar_w<L>m.npz, .json                T3, Pauli RGB, lambdas, alphas, H, A, alpha_averaged, span (kept scenes)
+    │   ├── mechanism_counts.json                  cells per dominant mechanism per kept scene
+    │   └── figures/
+    │       ├── <date>_{pauli,hsi,alphas,h_a_alpha,h_alpha}.png
+    │       ├── stack_pauli_hsi.png                kept scenes in chronological order: Pauli RGB (top), HSI (bottom)
+    │       └── mechanism_timeseries.png           surface / volume / double bounce cells vs temporal baseline
+    └── water_level/
+        ├── water_level_<id>.json                  raw DAHITI download of the nearest target (json format)
+        └── water_level.json                       roi, period, target, distances, source metadata
 ```
 
 All figures are in radar geometry (rows = azimuth, columns = slant range, drawn with the true ground aspect); nothing is ground-projected.
@@ -161,7 +168,8 @@ All figures are in radar geometry (rows = azimuth, columns = slant range, drawn 
 ```bash
 python tools/refine_roi.py                  # refine ROIs to the best asc/desc C01 frame intersection
 python tools/kml_files_visualisation.py     # major-cycle KML footprints on a globe (pass your KML paths)
-python tools/water_level_dahiti.py --dahiti-id 15307   # DAHITI water levels (needs DAHITI_API_KEY env var)
+python tools/water_level_roi.py --roi bolobo --start 2026-05-01   # DAHITI water level of the nearest target (also pipeline step 10)
+python tools/water_level_dahiti.py --dahiti-id 15307             # DAHITI series of one target id
 ```
 
-Their figures and downloads go to `outputs/tools/` and `outputs/validation/`.
+Their figures and downloads go to `outputs/tools/` and `outputs/validation/`, except the water-level figure of a ROI, which goes to `outputs/<roi>/extraction/figures/` (with the data in `outputs/<roi>/water_level/`). Both DAHITI scripts read the key from the credentials file (`DAHITI_API_KEY=...`) or the `DAHITI_API_KEY` environment variable.

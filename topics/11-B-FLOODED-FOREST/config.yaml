@@ -38,3 +38,7 @@ swath_incidence_deg:
   S1: 25.4
   S2: 29.1
   S3: 32.2
+
+# DAHITI water level (pipeline step 10): the figure plots every point of the target
+# nearest to the ROI since this date, with the extracted scene dates as faint lines
+water_level_since: 2024-01-01

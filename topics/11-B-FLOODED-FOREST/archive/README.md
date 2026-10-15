@@ -14,4 +14,5 @@ Code that the pipeline (`run_pipeline.py` + `flooded_forest/`) no longer uses, k
 | `flooded_forest/qgis.py` | QGIS `*_dB.tif` rasters with GCPs | removed (ground projection) |
 | `flooded_forest/extract.py` | subprocess wrapper of the extractor | removed |
 | `NISAR_extractor.py` | NISAR GCOV Pauli reader | — |
+| `sams_dev/water_level.py` | nearest-DAHITI-target water level of a ROI (prototype, `assets/` layout, hardcoded key) | `tools/water_level_roi.py`, run as pipeline step 10, key in `credentials.txt` |
 | `sams_dev/read_water_level.py` | water-level development script | — |
