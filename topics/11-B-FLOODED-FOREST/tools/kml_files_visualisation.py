@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import plotly.graph_objects as go
 
-from flooded_forest import config as ffconfig
+from flooded_forest.core import config as ffconfig
 
 # Default: KML files downloaded from https://explorer.maap.eo.esa.int/ (or pass paths)
 DEFAULT_KML_FILES = [
@@ -49,7 +49,7 @@ def extract_footprints(kml_path):
 
 def main(kml_files=None, output_name="simplified_major_cycles_globe.html"):
     cfg = ffconfig.load_config()
-    figures_dir = cfg.assets_dir / "figures"
+    figures_dir = cfg.outputs_dir / "tools"
     figures_dir.mkdir(parents=True, exist_ok=True)
     out_path = figures_dir / output_name
 

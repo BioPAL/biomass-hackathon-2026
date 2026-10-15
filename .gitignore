@@ -227,6 +227,10 @@ __marimo__/
 topics/11-B-FLOODED-FOREST/pauli_tif/
 topics/11-B-FLOODED-FOREST/figures/
 
+# Local PolSAR downloads and processing outputs
+topics/11-B-FLOODED-FOREST/polsar_raw/
+topics/11-B-FLOODED-FOREST/polsar_out/
+
 # MAAP / local secrets (never commit)
 credentials.txt
 **/credentials.txt

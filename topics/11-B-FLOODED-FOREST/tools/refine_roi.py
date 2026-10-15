@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Refine ROIs to the intersection of the best ascending/descending C01 frames.
 
-Reads assets/catalogue/sta_level1c_by_roi.json (written by the pipeline search),
+Reads outputs/catalogue/sta_level1c_by_roi.json (written by the pipeline search),
 downloads the KML footprint of every product, plots them per ROI (colour by
 orbit direction), picks the ascending/descending pair with the largest overlap
 and stores the intersection as 'roi_refined' (WKT) in the JSON.
-Figures go to assets/figures/.
+Figures go to outputs/tools/.
 """
 
 import json
@@ -21,7 +21,7 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from shapely.geometry import box
 
-from flooded_forest import auth, config as ffconfig
+from flooded_forest.core import auth, config as ffconfig
 
 CATALOGUE_PATH = "sta_level1c_by_roi.json"
 
@@ -34,7 +34,7 @@ def main():
 
     data = json.loads(catalogue_path.read_text(encoding="utf-8"))
     token = auth.load_token(cfg)
-    figures_dir = cfg.assets_dir / "figures"
+    figures_dir = cfg.outputs_dir / "tools"
     figures_dir.mkdir(parents=True, exist_ok=True)
 
     for roi in data.get("rois", []):
