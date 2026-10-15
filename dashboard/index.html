@@ -186,9 +186,21 @@
       width: 0; transition: width 0.85s ease;
     }
 
-    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); }
+    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); align-items: baseline; }
     .person:last-child { border-bottom: 0; }
+    .person .name-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.45rem 0.55rem; }
     .person .name { font-family: var(--fm); font-size: 0.84rem; }
+    .person .group-tag {
+      font-family: var(--fm); font-size: 0.72rem; letter-spacing: 0.02em;
+      color: var(--ink); background: rgba(0, 182, 240, 0.18);
+      border: 1px solid rgba(0, 182, 240, 0.55);
+      padding: 0.14rem 0.45rem; border-radius: 2px; white-space: nowrap;
+    }
+    .person .group-tag.is-repo {
+      color: var(--ink); background: rgba(151, 192, 11, 0.22);
+      border-color: rgba(151, 192, 11, 0.55);
+    }
+    .person .group-tag.is-empty { color: var(--muted); background: transparent; border-color: var(--line); }
     .person .stats { color: var(--muted); font-size: 0.84rem; }
     .person .stats em { font-style: normal; color: var(--gr); font-family: var(--fm); }
 
@@ -219,7 +231,7 @@
     <header>
       <div class="eyebrow">ESA · BioPAL · ESOC 2026</div>
       <h1>BIOMASS Hackathon<br /><span>Live contribution board</span></h1>
-      <p class="sub">Issues closed, PRs merged, and code churn by group — refreshed when an issue is closed or a PR is merged.</p>
+      <p class="sub">Issues closed, PRs merged, and code churn by group. Refreshed when an issue is closed or a PR is merged.</p>
       <div class="meta">
         <span class="pulse"><i></i> Auto-refresh on close / merge</span>
         <span>Repo <strong id="repo">…</strong></span>
@@ -286,7 +298,7 @@
       const err = document.getElementById("err");
       try {
         const res = await fetch("./metrics.json?ts=" + Date.now(), { cache: "no-store" });
-        if (!res.ok) throw new Error("metrics.json missing — run workflow Hackathon dashboard once.");
+        if (!res.ok) throw new Error("metrics.json missing: run workflow Hackathon dashboard once.");
         const data = await res.json();
         document.getElementById("repo").textContent = data.repo;
         document.getElementById("updated").textContent = fmtTime(data.generated_at);
@@ -322,11 +334,22 @@
             const stats = el("div", { className: "stats" });
             stats.appendChild(document.createTextNode(fmt(p.merged_prs) + " merged · "));
             stats.appendChild(el("em", { text: "+" + fmt(p.additions) + " / −" + fmt(p.deletions) }));
+            const nameRow = el("div", { className: "name-row" }, [
+              el("div", { className: "name", text: "#" + (i + 1) + " " + p.login }),
+            ]);
+            const tag = p.top_group || "repo";
+            const tagClass = tag === "repo"
+              ? "group-tag is-repo"
+              : (p.top_group ? "group-tag" : "group-tag is-empty");
+            nameRow.appendChild(el("span", {
+              className: tagClass,
+              text: tag === "repo" ? "repo" : tag,
+              title: tag === "repo"
+                ? "Most added lines outside topics/ (docs, CI, dashboard, …)"
+                : ("Most contributed topic: " + tag),
+            }));
             people.appendChild(el("div", { className: "person" }, [
-              el("div", null, [
-                el("div", { className: "name", text: "#" + (i + 1) + " " + p.login }),
-                stats,
-              ]),
+              el("div", null, [nameRow, stats]),
             ]));
           });
         }
