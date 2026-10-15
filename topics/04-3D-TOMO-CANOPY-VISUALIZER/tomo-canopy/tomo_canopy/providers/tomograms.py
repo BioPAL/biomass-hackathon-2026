@@ -134,6 +134,7 @@ class TomogramProvider:
         ``load=True``. Passing chunks requires the optional Dask dependency.
         """
         product = self.inspect(source)
+        effective_chunks = _safe_chunks(product, chunks)
         if expected_level is not None:
             expected = _normalise_level(expected_level)
             if product.product_level != expected:
@@ -148,7 +149,7 @@ class TomogramProvider:
         if selected_bounds is not None and product.product_level != "L2A":
             raise ValueError("Geographic bounds are supported only for L2A")
 
-        dataset = _open_netcdf(product.measurement, chunks=chunks)
+        dataset = _open_netcdf(product.measurement, chunks=effective_chunks)
         if "tomographicCubes" not in dataset:
             dataset.close()
             raise ValueError("Measurement has no 'tomographicCubes' variable")
@@ -158,11 +159,15 @@ class TomogramProvider:
         dataset = dataset[["tomographicCubes"]]
 
         if product.product_level == "L2A":
-            result = self._normalise_l2a(dataset, product)
+            result = self._standardise_l2a_schema(dataset, product)
         else:
-            result = self._normalise_l1d(dataset, product, chunks=chunks)
+            result = self._normalise_l1d(
+                dataset, product, chunks=effective_chunks
+            )
 
-        result = result.sel(polarization=list(selected_polarizations))
+        # Apply inexpensive contiguous spatial slices before polarization.
+        # Selecting several labels uses fancy indexing; with the netCDF4
+        # backend, doing that first can materialize the full spatial cube.
         if selected_height is not None:
             result = result.sel(z=slice(*selected_height))
         if selected_bounds is not None:
@@ -170,16 +175,19 @@ class TomogramProvider:
             result = result.sel(
                 x=slice(minimum_x, maximum_x), y=slice(minimum_y, maximum_y)
             )
+        result = result.sel(polarization=list(selected_polarizations))
 
         if include_auxiliary and product.lut is not None:
-            auxiliary = self._open_auxiliary(product, chunks=chunks)
+            auxiliary = self._open_auxiliary(product, chunks=effective_chunks)
             result = xr.merge([result, auxiliary], compat="no_conflicts")
 
         result.attrs.update(_product_attributes(product))
+        if chunks is None and effective_chunks == "auto":
+            result.attrs["automatic_chunking"] = True
         return result.load() if load else result
 
     @staticmethod
-    def _normalise_l2a(
+    def _standardise_l2a_schema(
         dataset: xr.Dataset, product: TomogramProduct
     ) -> xr.Dataset:
         xml_root = ET.parse(product.annotation).getroot()
@@ -385,6 +393,30 @@ def _open_netcdf(
         mask_and_scale=True,
         cache=False,
     )
+
+
+def _safe_chunks(
+    product: TomogramProduct,
+    chunks: str | Mapping[str, int] | None,
+) -> str | Mapping[str, int] | None:
+    """Automatically protect large cubes from eager netCDF fancy indexing."""
+    if chunks is not None:
+        return chunks
+    # Prototype TOM measurements are float32. Use a conservative threshold:
+    # downstream operations and multiple polarizations can require several
+    # times the raw array size.
+    estimated_bytes = int(np.prod(product.shape, dtype=np.int64)) * 4
+    if estimated_bytes < 256 * 1024**2:
+        return None
+    try:
+        import_module("dask.array")
+    except ImportError as error:
+        raise ImportError(
+            "This TOM product is too large for safe unchunked access. Install "
+            "the tomogram extra (`pip install -e '.[tomogram]'`) or pass an "
+            "explicit Dask chunk mapping."
+        ) from error
+    return "auto"
 
 
 def _normalise_level(value: Any) -> str:
