@@ -268,6 +268,11 @@ def collect_prs():
                 by_group[g]["deletions"] += gd
                 if scaffold_multi and g not in groups:
                     continue
+                # Path-only touches with no scored LOC (renames, empty README
+                # moves, CSV-only after filter) must not inflate merged-PR rank.
+                # Labeled group PRs still count even at +0 (intentional empty PR).
+                if g not in groups and ga == 0 and gd == 0:
+                    continue
                 by_group[g]["merged"] += 1
                 contributors[user]["groups"][g] += 1
 
