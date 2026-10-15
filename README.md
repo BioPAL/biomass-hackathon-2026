@@ -137,16 +137,18 @@ Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md
 
 Public board: [Hackaton 2026 Board](https://github.com/orgs/BioPAL/projects/6)
 
-Task issues appear on that board. You do **not** need to drag cards — Status updates from GitHub events:
+The board shows **Task issues**, not pull requests. Example: [PR #93](https://github.com/BioPAL/biomass-hackathon-2026/pull/93) moves **issue #68** on the board (via `Closes #68` in the PR description) — you will not see card “#93”.
+
+You do **not** need to drag cards — Status updates from GitHub events:
 
 | Event | Status |
 | --- | --- |
 | Task issue opened | **Todo** (or Backlog) |
-| **Draft** PR opened with `Closes #N` | **Doing** (or Started) |
+| **Draft** PR opened/updated with `Closes #N` | **Doing** (or Started) |
 | PR marked **Ready for review** (or opened non-draft) | **In review** |
 | PR merged / issue closed | **Done** |
 
-Open the draft PR as soon as you start an issue so the board shows you are working on it.
+Put `Closes #<issue-number>` in the PR description **when you open it** (or edit the description later — that also re-syncs). Open the draft PR as soon as you start so the board shows **Doing**.
 
 ## Data and resources
 
