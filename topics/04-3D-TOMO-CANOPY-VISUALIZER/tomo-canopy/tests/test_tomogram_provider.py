@@ -140,15 +140,15 @@ def test_open_l2a_normalizes_and_subsets_geographic_volume(tmp_path: Path) -> No
         root,
         polarization="HV",
         height_range=(0.0, 2.0),
-        bounds=(-0.5, 5.0, 0.5, 5.5),
+        bounds=(5.0, -0.5, 5.5, 0.5),
     )
 
     assert dataset.tomographic_cube.dims == ("polarization", "z", "y", "x")
-    assert dataset.sizes == {"polarization": 1, "z": 2, "y": 2, "x": 3}
-    np.testing.assert_array_equal(dataset.x, [-0.5, 0.0, 0.5])
-    np.testing.assert_array_equal(dataset.y, [5.0, 5.5])
+    assert dataset.sizes == {"polarization": 1, "z": 2, "y": 3, "x": 2}
+    np.testing.assert_array_equal(dataset.x, [5.0, 5.5])
+    np.testing.assert_array_equal(dataset.y, [-0.5, 0.0, 0.5])
     assert dataset.attrs["coordinate_space"] == "geographic"
-    assert "swapped" in dataset.attrs["coordinate_normalization"]
+    assert "latitude-first" in dataset.attrs["coordinate_normalization"]
     dataset.close()
 
 
