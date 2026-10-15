@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 import threading, time, json
 from concurrent.futures import ThreadPoolExecutor
 from aiohttp import ClientResponseError
->>>>>>> origin/main
 import fsspec
 
 # XML tag (namespace stripped) -> short key used in the output dict
