@@ -5,8 +5,8 @@ import pyvista as pv
 
 from tomo_canopy.visualisation.basic_plotter_app import BasicPlotterApp
 
-MODES = ("scatter", "volume", "bubbles")
-LABELS = {"scatter": "Scatter", "volume": "Volume", "bubbles": "Bubbles"}
+MODES = ("raw_representation", "voxel_as_cubes", "voxel_as_bubbles")
+LABELS = {"raw_representation": "Raw Data", "voxel_as_cubes": "Voxel (Cubes)", "voxel_as_bubbles": "Voxel (Bubbles)"}
 
 
 DATA_LAYERS = ["TLS", "GEDI"]
@@ -21,9 +21,9 @@ class DataGetter:
 class TomographicPlotter(BasicPlotterApp):
     MAIN = "tomographic_plotter"
 
-    def __init__(self, data_getter_dict: dict[str, DataGetter], mode="bubbles"):
+    def __init__(self, data_getter_dict: dict[str, DataGetter], mode="voxel_as_bubbles"):
         self.mode = mode
-        self.modality = "TLS"
+        self.modality = "TOMO"
         self.voxel_res = 10.0
         self.data_getter_dict = data_getter_dict
         super().__init__()
@@ -31,7 +31,7 @@ class TomographicPlotter(BasicPlotterApp):
     def build_ui(self):
         for _, mode in enumerate(MODES):
             self.add_checkbox(
-                mode, mode, self._make_mode_callback(mode), value=(mode == self.mode)
+                mode, LABELS[mode.lower()], self._make_mode_callback(mode), value=(mode == self.mode)
             )
         self.increase_btn_y()
         self.increase_btn_y()
@@ -89,7 +89,7 @@ class TomographicPlotter(BasicPlotterApp):
 
         cmap = "viridis"
 
-        if self.mode == "scatter":
+        if self.mode == "raw_representation":
             data = self.data_getter_dict[self.modality].get_points_fn()
             x, y, z = (
                 data["x"],
@@ -126,7 +126,7 @@ class TomographicPlotter(BasicPlotterApp):
                 render_points_as_spheres=True,
                 **common,
             )
-        elif self.mode == "bubbles":
+        elif self.mode == "voxel_as_bubbles":
             ds = self.data_getter_dict[self.modality].get_vol_data_fn(self.voxel_res)
             voxel_size = float(ds.attrs.get("voxel_size", 5.0))
 
@@ -160,7 +160,7 @@ class TomographicPlotter(BasicPlotterApp):
                 scalar_bar_args={"title": "points per voxel"},
                 **common,
             )
-        elif self.mode == "volume":
+        elif self.mode == "voxel_as_cubes":
             ds = self.data_getter_dict[self.modality].get_vol_data_fn(self.voxel_res)
 
             x = ds["x"].values - ds["x"].values[0]
@@ -219,7 +219,7 @@ class TomographicPlotter(BasicPlotterApp):
             )
 
         pl.add_text(
-            f"Terrain: {LABELS[self.mode].lower()}",
+            f"Terrain: {LABELS[self.mode.lower()]}",
             position="upper_left",
             font_size=10,
             name="mode_title",
