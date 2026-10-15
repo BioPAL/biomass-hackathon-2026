@@ -9,8 +9,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 OWNER = os.environ.get("GITHUB_REPOSITORY_OWNER", "BioPAL")
 REPO = os.environ.get("GITHUB_REPOSITORY", "BioPAL/biomass-hackathon-2026").split("/")[-1]
@@ -35,6 +36,45 @@ GROUPS = [
 GROUP_SET = set(GROUPS)
 # Tag when most added lines sit outside topics/ (docs, CI, dashboard, …)
 REPO_TAG = "repo"
+# Chosen team names (display); metrics keys stay as GROUPS / labels
+GROUP_NAMES = {
+    "02-RFI": "The Cleaning Guy",
+    "03-QGIS": "SARcastic",
+    "04-3D-TOMO-CANOPY-VISUALIZER": "Eye in the Sub",
+    "05_BIOMASS_AND_GEDI": "The Canopy Matchmakers",
+    "06A-CARBON": "Abovegrounders",
+    "06B-CARBON": "Pikachu Group",
+    "07-GEOLOGY": "Arrakis",
+    "08-ICE-QUEEN": "Ice Queens",
+    "09-BIODIVERSITY": "The Green Queens & Servant",
+    "10-TOMO-SAR-FOREST-HEIGHT": "TomoSAR group",
+    "11-A-SOIL-MOISTURE": "Soil moisture",
+    "11-B-FLOODED-FOREST": "Flooded forests",
+}
+# Live board charts only cover the on-site hackathon window (hourly, local ESOC time)
+CHART_START = date(2026, 10, 13)
+CHART_END = date(2026, 10, 16)
+CHART_TZ = ZoneInfo("Europe/Berlin")
+
+
+def hour_key(iso: str) -> str | None:
+    """Bucket an API timestamp into local YYYY-MM-DDTHH within the chart window."""
+    if not iso:
+        return None
+    dt = datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(CHART_TZ)
+    if dt.date() < CHART_START or dt.date() > CHART_END:
+        return None
+    return dt.strftime("%Y-%m-%dT%H")
+
+
+def chart_hours() -> list[str]:
+    hours: list[str] = []
+    cur = datetime(CHART_START.year, CHART_START.month, CHART_START.day, tzinfo=CHART_TZ)
+    end = datetime(CHART_END.year, CHART_END.month, CHART_END.day, 23, tzinfo=CHART_TZ)
+    while cur <= end:
+        hours.append(cur.strftime("%Y-%m-%dT%H"))
+        cur += timedelta(hours=1)
+    return hours
 
 # Folder under topics/ may match label, or legacy aliases
 FOLDER_ALIASES = {
@@ -146,6 +186,7 @@ def collect_prs():
             "repo_additions": 0,  # lines outside topics/
         }
     )
+    merged_events: list[dict] = []
 
     for pr in pulls:
         user = (pr.get("user") or {}).get("login") or "unknown"
@@ -172,12 +213,14 @@ def collect_prs():
 
             hit = set(groups)
             path_groups: set[str] = set()
+            by_group_adds: dict[str, int] = defaultdict(int)
             for f in files:
                 fn = f.get("filename", "")
                 file_add = int(f.get("additions") or 0)
                 g = topic_group_for_path(fn)
                 if g:
                     path_groups.add(g)
+                    by_group_adds[g] += file_add
                     contributors[user]["group_additions"][g] += file_add
                 else:
                     contributors[user]["repo_additions"] += file_add
@@ -190,6 +233,16 @@ def collect_prs():
                 by_group[g]["additions"] += add
                 by_group[g]["deletions"] += dele
                 contributors[user]["groups"][g] += 1
+
+            merged_events.append(
+                {
+                    "at": pr["merged_at"],
+                    "login": user,
+                    "additions": add,
+                    "groups": sorted(hit),
+                    "by_group": dict(by_group_adds),
+                }
+            )
         elif pr.get("state") == "open":
             open_total += 1
             for g in groups:
@@ -225,7 +278,76 @@ def collect_prs():
         key=lambda x: (x["merged_prs"], x["additions"]),
         reverse=True,
     )[:15]
-    return by_group, merged_total, open_total, top
+    return by_group, merged_total, open_total, top, merged_events
+
+
+def build_charts(issues: list, merged_events: list[dict]) -> dict:
+    """Hourly group + contributor cumulative lines for 13–16 Oct (Europe/Berlin)."""
+    hours = chart_hours()
+    hour_set = set(hours)
+
+    by_user_hour: dict[str, dict[str, int]] = defaultdict(lambda: {h: 0 for h in hours})
+    by_group_hour: dict[str, dict[str, int]] = {
+        g: {h: 0 for h in hours} for g in GROUPS
+    }
+
+    for e in merged_events:
+        h = hour_key(e.get("at") or "")
+        if not h or h not in hour_set:
+            continue
+        add = int(e.get("additions") or 0)
+        login = e.get("login") or "unknown"
+        by_user_hour[login][h] += add
+        file_by_group = e.get("by_group") or {}
+        if file_by_group:
+            for g, ga in file_by_group.items():
+                if g in by_group_hour:
+                    by_group_hour[g][h] += int(ga or 0)
+        else:
+            # Fallback: split PR additions across labeled/path groups
+            gs = [g for g in (e.get("groups") or []) if g in by_group_hour]
+            if gs:
+                share = add // len(gs)
+                for g in gs:
+                    by_group_hour[g][h] += share
+
+    def cumulative(hourly: dict[str, int]) -> list[int]:
+        total = 0
+        out = []
+        for h in hours:
+            total += hourly[h]
+            out.append(total)
+        return out
+
+    finals = {u: sum(by_user_hour[u].values()) for u in by_user_hour}
+    race_logins = [
+        u for u, _ in sorted(finals.items(), key=lambda kv: (-kv[1], kv[0]))[:6]
+        if finals[u] > 0
+    ]
+    race_series = {u: cumulative(by_user_hour[u]) for u in race_logins}
+
+    group_finals = {g: sum(by_group_hour[g].values()) for g in GROUPS}
+    group_ids = [
+        g for g, _ in sorted(group_finals.items(), key=lambda kv: (-kv[1], kv[0]))
+        if group_finals[g] > 0
+    ]
+    groups_series = {g: cumulative(by_group_hour[g]) for g in group_ids}
+    groups_names = {g: GROUP_NAMES.get(g, g) for g in group_ids}
+
+    return {
+        "resolution": "hour",
+        "timezone": "Europe/Berlin",
+        "hours": hours,
+        "groups": {
+            "ids": group_ids,
+            "names": groups_names,
+            "series": groups_series,
+        },
+        "race": {
+            "logins": race_logins,
+            "series": race_series,
+        },
+    }
 
 
 def loc_by_group_from_git():
@@ -276,8 +398,9 @@ def loc_by_group_from_git():
 
 def main():
     issues, issues_by_group, ungrouped = collect_issues()
-    prs_by_group, merged_total, open_prs, top_contributors = collect_prs()
+    prs_by_group, merged_total, open_prs, top_contributors, merged_events = collect_prs()
     loc_git, loc_resources = loc_by_group_from_git()
+    charts = build_charts(issues, merged_events)
 
     groups_out = []
     for g in GROUPS:
@@ -287,6 +410,7 @@ def main():
         groups_out.append(
             {
                 "id": g,
+                "name": GROUP_NAMES.get(g, g),
                 "issues_open": ig["open"],
                 "issues_closed": ig["closed"],
                 "tasks_open": ig["open_task"],
@@ -321,9 +445,13 @@ def main():
         },
         "groups": groups_out,
         "top_contributors": top_contributors,
+        "charts": charts,
     }
     OUT.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    print(f"Wrote {OUT} ({len(groups_out)} groups, {merged_total} merged PRs)")
+    print(
+        f"Wrote {OUT} ({len(groups_out)} groups, {merged_total} merged PRs, "
+        f"{len(charts['hours'])} chart hours)"
+    )
 
 
 if __name__ == "__main__":

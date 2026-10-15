@@ -201,30 +201,37 @@
       border-color: rgba(151, 192, 11, 0.55);
     }
     .person .group-tag.is-empty { color: var(--muted); background: transparent; border-color: var(--line); }
-    .person .lines-star {
+    .lines-star {
       display: inline-flex; align-items: center; justify-content: center;
       width: 1.15rem; height: 1.15rem; flex-shrink: 0;
-      transform-origin: 50% 55%;
+      transform-origin: 50% 50%;
       filter: drop-shadow(0 0 0.35rem rgba(255, 214, 0, 0.75));
-      animation: star-spin 1.1s linear infinite, star-flash 0.55s steps(2) infinite, star-bob 0.7s ease-in-out infinite;
+      animation: star-spin 1.15s linear infinite, star-flash 0.7s ease-in-out infinite, star-bob 0.7s ease-in-out infinite;
     }
-    .person .lines-star svg { width: 100%; height: 100%; display: block; }
+    .lines-star svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .race-labels .lines-star { width: 0.95rem; height: 0.95rem; }
+    .svg-lines-star {
+      transform-box: fill-box;
+      transform-origin: center;
+      filter: drop-shadow(0 0 2px rgba(255, 214, 0, 0.85));
+      animation: star-spin 1.15s linear infinite, star-flash 0.7s ease-in-out infinite;
+    }
     @keyframes star-spin {
-      from { transform: rotateY(0deg) scale(1); }
-      50% { transform: rotateY(180deg) scale(1.12); }
-      to { transform: rotateY(360deg) scale(1); }
+      from { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      to { transform: rotate(360deg) scale(1); }
     }
     @keyframes star-flash {
-      0% { filter: drop-shadow(0 0 0.35rem rgba(255, 214, 0, 0.9)) hue-rotate(0deg); }
-      50% { filter: drop-shadow(0 0 0.55rem rgba(255, 90, 200, 0.95)) hue-rotate(90deg); }
-      100% { filter: drop-shadow(0 0 0.35rem rgba(80, 200, 255, 0.9)) hue-rotate(180deg); }
+      0%, 100% { filter: drop-shadow(0 0 0.35rem rgba(255, 214, 0, 0.95)); }
+      33% { filter: drop-shadow(0 0 0.5rem rgba(255, 126, 121, 0.9)); }
+      66% { filter: drop-shadow(0 0 0.5rem rgba(0, 182, 240, 0.9)); }
     }
     @keyframes star-bob {
       0%, 100% { translate: 0 0; }
       50% { translate: 0 -0.12rem; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .person .lines-star { animation: none; filter: drop-shadow(0 0 0.25rem rgba(255, 214, 0, 0.6)); }
+      .lines-star, .svg-lines-star { animation: none; filter: drop-shadow(0 0 0.25rem rgba(255, 214, 0, 0.6)); }
     }
     .person .stats { color: var(--muted); font-size: 0.84rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
     .person .stats em { font-style: normal; color: var(--gr); font-family: var(--fm); }
@@ -242,6 +249,71 @@
     footer a { color: var(--cy); text-decoration: none; }
     footer a:hover { text-decoration: underline; }
     .err { border: 1px solid var(--pk); color: var(--pk); padding: 0.9rem; font-family: var(--fm); font-size: 0.82rem; }
+
+    .charts-pick {
+      margin: 1.35rem 0 0.75rem;
+      font-family: var(--fm); font-size: 0.72rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--cy);
+    }
+    .chart-panel { margin-bottom: 1rem; }
+    .chart-panel .option-tag {
+      display: inline-block; font-family: var(--fm); font-size: 0.68rem;
+      color: var(--pk); border: 1px solid rgba(255, 126, 121, 0.45);
+      padding: 0.1rem 0.4rem; margin-right: 0.45rem; vertical-align: middle;
+    }
+    .chart-panel h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem; }
+    .chart-legend {
+      display: flex; flex-wrap: wrap; gap: 0.75rem 1.1rem;
+      margin: 0.35rem 0 0.75rem; font-family: var(--fm); font-size: 0.72rem; color: var(--muted);
+    }
+    .chart-legend i {
+      display: inline-block; width: 0.75rem; height: 0.22rem; margin-right: 0.35rem;
+      vertical-align: middle; border-radius: 1px;
+    }
+    .chart-svg-wrap { width: 100%; overflow-x: auto; }
+    .chart-svg-wrap svg { width: 100%; height: auto; display: block; min-width: 560px; }
+    .race-labels {
+      display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem;
+      margin-top: 0.55rem; font-family: var(--fm); font-size: 0.72rem;
+    }
+    .race-labels span { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted); }
+    .race-labels i { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; }
+    .countdown {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.55rem 1rem;
+      margin: 0 0 1rem; padding: 0.75rem 0.9rem;
+      border: 1px solid rgba(255, 126, 121, 0.35);
+      background: rgba(255, 126, 121, 0.08);
+      font-family: var(--fm);
+    }
+    .countdown .cd-label {
+      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pk);
+    }
+    .countdown .cd-clock {
+      font-size: clamp(1.15rem, 2.5vw, 1.55rem); font-weight: 600; color: var(--ink);
+      letter-spacing: 0.04em;
+    }
+    .countdown .cd-hint { font-size: 0.72rem; color: var(--muted); }
+    .countdown.is-done .cd-clock { color: var(--gr); }
+    .podium {
+      font-family: var(--fm); font-size: 0.62rem; font-weight: 700;
+      width: 1.05rem; height: 1.05rem; border-radius: 2px;
+      display: inline-flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .podium.is-1 { background: #ffd200; color: #0f1923; box-shadow: 0 0 0.45rem rgba(255, 210, 0, 0.45); }
+    .podium.is-2 { background: #c5d0d8; color: #0f1923; }
+    .podium.is-3 { background: #c47a45; color: #0f1923; }
+    .race-draw {
+      stroke-dasharray: var(--path-len);
+      stroke-dashoffset: var(--path-len);
+      animation: race-launch 0.8s ease-out forwards;
+    }
+    @keyframes race-launch {
+      to { stroke-dashoffset: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .race-draw { animation: none; stroke-dashoffset: 0; }
+    }
   </style>
 </head>
 <body>
@@ -300,6 +372,27 @@
       </section>
     </div>
 
+    <div class="charts-pick">Hackathon window · 13–16 Oct · hourly (Europe/Berlin)</div>
+    <div class="countdown" id="finish-countdown" aria-live="polite">
+      <span class="cd-label">Countdown</span>
+      <span class="cd-clock" id="countdown-clock">--:--:--</span>
+      <span class="cd-hint">End of hackathon · 16 Oct 12:00 · Europe/Berlin</span>
+    </div>
+
+    <section class="panel chart-panel">
+      <h2>Groups cumulative work</h2>
+      <p class="sub" style="margin: -0.25rem 0 0.35rem; font-size: 0.78rem;">Hourly cumulative lines added under each topic (13–16 Oct).</p>
+      <div class="chart-svg-wrap" id="chart-groups"></div>
+      <div class="race-labels" id="chart-groups-legend"></div>
+    </section>
+
+    <section class="panel chart-panel">
+      <h2>Contributor lines race</h2>
+      <p class="sub" style="margin: -0.25rem 0 0.35rem; font-size: 0.78rem;">Hourly cumulative lines for the top writers (13–16 Oct).</p>
+      <div class="chart-svg-wrap" id="chart-race"></div>
+      <div class="race-labels" id="chart-race-legend"></div>
+    </section>
+
     <footer>
       Source: GitHub API · Actions · visuals aligned with the hackathon kickoff deck ·
       <a href="https://github.com/BioPAL/biomass-hackathon-2026">repo</a>
@@ -326,6 +419,420 @@
       (kids || []).forEach((c) => node.appendChild(typeof c === "string" ? document.createTextNode(c) : c));
       return node;
     }
+    const RACE_COLORS = ["#00b6f0", "#97c00b", "#ff7e79", "#a3d8b0", "#5234c9", "#ffd200"];
+    const GROUP_COLORS = ["#00b6f0", "#97c00b", "#ff7e79", "#a3d8b0", "#5234c9", "#ffd200", "#347891", "#ff9f43", "#c8f542", "#7ec8e3", "#e8a0bf", "#9bb0c0"];
+    const STAR_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#ffd200" stroke="#fff3a0" stroke-width="0.6" d="M12 2.2l2.7 6.2 6.7.6-5.1 4.4 1.5 6.5L12 16.8 6.2 20l1.5-6.5L2.6 9l6.7-.6L12 2.2z"/></svg>';
+
+    function makeLinesStar(title) {
+      const star = el("span", {
+        className: "lines-star",
+        role: "img",
+        "aria-label": "Most lines added",
+        title: title || "Most lines added",
+      });
+      star.innerHTML = STAR_SVG;
+      return star;
+    }
+
+    function svgEl(name, attrs) {
+      const n = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.entries(attrs || {}).forEach(([k, v]) => n.setAttribute(k, v));
+      return n;
+    }
+
+    function appendSvgStar(parent, cx, cy, size) {
+      const outer = svgEl("g", { transform: `translate(${cx},${cy})` });
+      const inner = svgEl("g", { class: "svg-lines-star" });
+      const s = size / 24;
+      const path = svgEl("path", {
+        d: "M12 2.2l2.7 6.2 6.7.6-5.1 4.4 1.5 6.5L12 16.8 6.2 20l1.5-6.5L2.6 9l6.7-.6L12 2.2z",
+        fill: "#ffd200",
+        stroke: "#fff8c8",
+        "stroke-width": "0.8",
+        transform: `translate(${-12 * s},${-12 * s}) scale(${s})`,
+      });
+      const tip = svgEl("title");
+      tip.textContent = "Most lines added";
+      inner.appendChild(tip);
+      inner.appendChild(path);
+      outer.appendChild(inner);
+      parent.appendChild(outer);
+      return outer;
+    }
+
+    function appendRocket(parent, x, y, color, withFlame) {
+      const g = svgEl("g", { transform: `translate(${x},${y})` });
+      if (withFlame) {
+        g.appendChild(svgEl("path", {
+          d: "M-10,-2.2 L-16,0 L-10,2.2 Z",
+          fill: "#ff7e79",
+          opacity: "0.95",
+        }));
+        g.appendChild(svgEl("path", {
+          d: "M-9,-1.2 L-13.5,0 L-9,1.2 Z",
+          fill: "#ffd200",
+          opacity: "0.95",
+        }));
+      }
+      g.appendChild(svgEl("path", {
+        d: "M-7,-3.2 L3,-3.2 L7,0 L3,3.2 L-7,3.2 Z",
+        fill: color,
+        stroke: "rgba(255,255,255,0.35)",
+        "stroke-width": "0.5",
+      }));
+      g.appendChild(svgEl("path", {
+        d: "M3,-3.2 L8,0 L3,3.2 Z",
+        fill: "#ffffff",
+        opacity: "0.9",
+      }));
+      parent.appendChild(g);
+      return g;
+    }
+
+    // Finish line: 16 Oct 2026 12:00 Europe/Berlin (CEST = UTC+2)
+    const FINISH_AT = new Date("2026-10-16T12:00:00+02:00");
+    const FINISH_HOUR = "2026-10-16T12";
+
+    function chartHours(charts) {
+      return charts.hours || charts.days || [];
+    }
+
+    function hourIndex(hours, key) {
+      const exact = hours.indexOf(key);
+      if (exact >= 0) return exact;
+      if (!hours.length) return 0;
+      if (key < hours[0]) return 0;
+      if (key > hours[hours.length - 1]) return hours.length - 1;
+      for (let i = 0; i < hours.length - 1; i++) {
+        if (hours[i] <= key && key < hours[i + 1]) return i;
+      }
+      return hours.length - 1;
+    }
+
+    function berlinHourKey(d) {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Berlin",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        hourCycle: "h23",
+      }).formatToParts(d || new Date());
+      const get = (t) => parts.find((p) => p.type === t).value;
+      return get("year") + "-" + get("month") + "-" + get("day") + "T" + get("hour");
+    }
+
+    function nowHourIndex(hours) {
+      return hourIndex(hours, berlinHourKey());
+    }
+
+    function hourLabel(h) {
+      const [datePart, hr] = h.split("T");
+      const day = Number(datePart.split("-")[2]);
+      const hour = Number(hr);
+      if (hour === 0) return day + " Oct";
+      if (hour % 6 === 0) return String(hour).padStart(2, "0") + "h";
+      return "";
+    }
+
+    function formatCountdown(ms) {
+      if (ms <= 0) return "00:00:00";
+      const total = Math.floor(ms / 1000);
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      const pad2 = (n) => String(n).padStart(2, "0");
+      return pad2(h) + ":" + pad2(m) + ":" + pad2(s);
+    }
+
+    function tickCountdown() {
+      const box = document.getElementById("finish-countdown");
+      const clock = document.getElementById("countdown-clock");
+      if (!box || !clock) return;
+      const left = FINISH_AT.getTime() - Date.now();
+      if (left <= 0) {
+        clock.textContent = "FINISHED";
+        box.classList.add("is-done");
+        return;
+      }
+      box.classList.remove("is-done");
+      clock.textContent = formatCountdown(left);
+    }
+
+    function smoothPath(points) {
+      if (!points.length) return "";
+      if (points.length === 1) return `M${points[0][0]},${points[0][1]}`;
+      let d = `M${points[0][0]},${points[0][1]}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const [x0, y0] = points[i];
+        const [x1, y1] = points[i + 1];
+        const cx = (x0 + x1) / 2;
+        d += ` C${cx},${y0} ${cx},${y1} ${x1},${y1}`;
+      }
+      return d;
+    }
+
+    const launchedHosts = new WeakSet();
+    function launchPath(path) {
+      try {
+        const len = path.getTotalLength();
+        path.style.setProperty("--path-len", String(len));
+        path.classList.add("race-draw");
+      } catch (_) { /* empty */ }
+    }
+
+    function podiumBadge(place) {
+      return el("span", { className: "podium is-" + place, text: String(place), title: "Podium #" + place });
+    }
+
+    function fillRaceLegend(legend, items, colors) {
+      legend.replaceChildren();
+      items.forEach((item, idx) => {
+        const kids = [
+          el("i", { style: { background: colors[idx % colors.length] } }),
+        ];
+        if (idx < 3) kids.push(podiumBadge(idx + 1));
+        if (item.star) kids.push(makeLinesStar(item.starTitle || "Most lines added"));
+        kids.push(document.createTextNode(item.label + " (+" + fmt(item.last) + ")"));
+        legend.appendChild(el("span", null, kids));
+      });
+    }
+
+    function renderLineChart(host, hours, seriesList, opts) {
+      host.replaceChildren();
+      if (!hours.length) {
+        host.appendChild(el("p", { className: "sub", text: "No chart data yet." }));
+        return;
+      }
+      const maxY = Math.max(1, ...seriesList.flatMap((s) => s.vals));
+      const W = opts.width || 860;
+      const H = opts.height || 240;
+      const pad = opts.pad || { t: 18, r: opts.right || 16, b: 40, l: 44 };
+      const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+      const svg = svgEl("svg", {
+        viewBox: `0 0 ${W} ${H}`,
+        role: "img",
+        "aria-label": opts.label || "chart",
+        overflow: "visible",
+        style: "overflow: visible;",
+      });
+
+      const defs = svgEl("defs");
+      const flame = svgEl("linearGradient", { id: "flame-trail-" + (opts.id || "x"), x1: "0%", y1: "0%", x2: "100%", y2: "0%" });
+      [
+        ["0%", "#ff7e79", "0"],
+        ["35%", "#ff9f43", "0.85"],
+        ["70%", "#ffd200", "0.95"],
+        ["100%", "#ffffff", "0.35"],
+      ].forEach(([offset, color, opacity]) => {
+        flame.appendChild(svgEl("stop", { offset, "stop-color": color, "stop-opacity": opacity }));
+      });
+      defs.appendChild(flame);
+      const glowId = "leader-glow-" + (opts.id || "x");
+      const glow = svgEl("filter", { id: glowId, x: "-20%", y: "-40%", width: "140%", height: "180%" });
+      glow.appendChild(svgEl("feGaussianBlur", { stdDeviation: "2.2", result: "blur" }));
+      const merge = svgEl("feMerge");
+      merge.appendChild(svgEl("feMergeNode", { in: "blur" }));
+      merge.appendChild(svgEl("feMergeNode", { in: "SourceGraphic" }));
+      glow.appendChild(merge);
+      defs.appendChild(glow);
+      svg.appendChild(defs);
+
+      svg.appendChild(svgEl("line", { x1: pad.l, y1: pad.t, x2: pad.l, y2: pad.t + ih, stroke: "rgba(0,182,240,0.25)", "stroke-width": "1" }));
+      svg.appendChild(svgEl("line", { x1: pad.l, y1: pad.t + ih, x2: pad.l + iw, y2: pad.t + ih, stroke: "rgba(0,182,240,0.25)", "stroke-width": "1" }));
+      [0, 0.5, 1].forEach((t) => {
+        const y = pad.t + ih * (1 - t);
+        const label = svgEl("text", { x: pad.l - 6, y: y + 3, fill: "#9bb0c0", "font-size": "9", "text-anchor": "end", "font-family": "JetBrains Mono, monospace" });
+        label.textContent = String(Math.round(maxY * t));
+        svg.appendChild(label);
+      });
+
+      const n = Math.max(1, hours.length - 1);
+      const xAt = (i) => pad.l + (iw * i) / n;
+      const yAt = (v) => pad.t + ih * (1 - v / maxY);
+      const nowIdx = nowHourIndex(hours);
+      const finishIdx = hourIndex(hours, FINISH_HOUR);
+
+      hours.forEach((h, i) => {
+        if (!h.endsWith("T00")) return;
+        svg.appendChild(svgEl("line", {
+          x1: xAt(i), y1: pad.t, x2: xAt(i), y2: pad.t + ih,
+          stroke: "rgba(0,182,240,0.12)", "stroke-width": "1", "stroke-dasharray": "3 4",
+        }));
+      });
+
+      // End of hackathon marker: 16 Oct 12:00 Berlin (curves stop at "now", not here)
+      const finishX = xAt(finishIdx);
+      svg.appendChild(svgEl("line", {
+        x1: finishX, y1: pad.t - 6, x2: finishX, y2: pad.t + ih,
+        stroke: "#ff7e79", "stroke-width": "1.8", "stroke-dasharray": "5 4", opacity: "0.95",
+      }));
+      const finishLbl = svgEl("text", {
+        x: finishX + 5, y: pad.t + 9, fill: "#ff7e79", "font-size": "9",
+        "font-family": "JetBrains Mono, monospace",
+      });
+      finishLbl.textContent = "End of hackathon";
+      svg.appendChild(finishLbl);
+
+      // Subtle "now" tick so it's clear rockets stop at current hour
+      if (nowIdx < finishIdx) {
+        const nowX = xAt(nowIdx);
+        svg.appendChild(svgEl("line", {
+          x1: nowX, y1: pad.t, x2: nowX, y2: pad.t + ih,
+          stroke: "rgba(255,255,255,0.22)", "stroke-width": "1", "stroke-dasharray": "2 3",
+        }));
+      }
+
+      const drawables = [];
+      const ordered = seriesList.slice().sort((a, b) => Number(!!a.star) - Number(!!b.star));
+      ordered.forEach((s) => {
+        // Always stop curves at the current hour — never draw into the future
+        const endIdx = Math.max(0, Math.min(nowIdx, (s.vals.length || 1) - 1));
+        const pts = [];
+        for (let i = 0; i <= endIdx; i++) {
+          pts.push([xAt(i), yAt(s.vals[i] ?? 0)]);
+        }
+        if (pts.length < 1) pts.push([xAt(0), yAt(0)]);
+        if (pts.length < 2) pts.push(pts[0]);
+        const d = smoothPath(pts);
+        const flameUrl = "url(#flame-trail-" + (opts.id || "x") + ")";
+        const glowUrl = "url(#" + glowId + ")";
+
+        if (s.star) {
+          const trailWide = svgEl("path", {
+            d, fill: "none", stroke: flameUrl, "stroke-width": "9",
+            "stroke-linejoin": "round", "stroke-linecap": "round", opacity: "0.45",
+            filter: glowUrl,
+          });
+          const trailCore = svgEl("path", {
+            d, fill: "none", stroke: "#ffd200", "stroke-width": "4",
+            "stroke-linejoin": "round", "stroke-linecap": "round", opacity: "0.55",
+          });
+          svg.appendChild(trailWide);
+          svg.appendChild(trailCore);
+          drawables.push(trailWide, trailCore);
+        }
+
+        const main = svgEl("path", {
+          d, fill: "none", stroke: s.color,
+          "stroke-width": s.star ? "2.8" : "2.1",
+          "stroke-linejoin": "round", "stroke-linecap": "round",
+        });
+        svg.appendChild(main);
+        drawables.push(main);
+
+        const tip = pts[pts.length - 1];
+        appendRocket(svg, tip[0], tip[1], s.color, !!(s.flame || s.star));
+        if (s.star) appendSvgStar(svg, tip[0] + 14, tip[1] - 10, 13);
+
+        if (s.endLabel) {
+          const t = svgEl("text", {
+            x: tip[0] + (s.star ? 24 : 12), y: tip[1] + 3, fill: s.color, "font-size": "10",
+            "font-family": "JetBrains Mono, monospace",
+          });
+          t.textContent = s.endLabel;
+          svg.appendChild(t);
+        }
+      });
+
+      hours.forEach((h, i) => {
+        const lab = hourLabel(h);
+        if (!lab) return;
+        const t = svgEl("text", {
+          x: xAt(i), y: H - 12, fill: "#9bb0c0", "font-size": "9",
+          "text-anchor": "middle", "font-family": "JetBrains Mono, monospace",
+        });
+        t.textContent = lab;
+        svg.appendChild(t);
+      });
+
+      host.appendChild(svg);
+      if (!launchedHosts.has(host)) {
+        requestAnimationFrame(() => {
+          drawables.forEach(launchPath);
+          launchedHosts.add(host);
+        });
+      }
+      return { maxY, seriesList };
+    }
+
+    function renderGroups(charts, groupsMeta) {
+      const host = document.getElementById("chart-groups");
+      const legend = document.getElementById("chart-groups-legend");
+      if (!charts.groups || !charts.groups.ids || !charts.groups.ids.length) {
+        host.replaceChildren(el("p", { className: "sub", text: "No group chart data yet." }));
+        legend.replaceChildren();
+        return;
+      }
+      const hours = chartHours(charts);
+      const ids = charts.groups.ids;
+      const names = charts.groups.names || {};
+      const series = charts.groups.series;
+      const topId = ids[0];
+      const closedById = Object.fromEntries(
+        (groupsMeta || []).map((g) => [g.id, (g.issues_closed || 0) > 0])
+      );
+      const seriesList = ids.map((id, idx) => ({
+        vals: series[id] || [],
+        color: GROUP_COLORS[idx % GROUP_COLORS.length],
+        endLabel: names[id] || id,
+        star: id === topId,
+        // Flames on rockets for groups that already closed at least one issue
+        flame: !!closedById[id],
+      }));
+      renderLineChart(host, hours, seriesList, {
+        id: "groups", label: "Groups cumulative work", height: 300, width: 980, right: 170,
+      });
+      fillRaceLegend(legend, ids.map((id) => ({
+        label: names[id] || id,
+        last: (series[id] || []).slice(-1)[0] || 0,
+        star: id === topId,
+        starTitle: "Most lines under topics/",
+      })), GROUP_COLORS);
+    }
+
+    function renderRace(charts) {
+      const host = document.getElementById("chart-race");
+      const legend = document.getElementById("chart-race-legend");
+      if (!charts.race || !charts.race.logins.length) {
+        host.replaceChildren(el("p", { className: "sub", text: "No race data yet." }));
+        legend.replaceChildren();
+        return;
+      }
+      const hours = chartHours(charts);
+      const logins = charts.race.logins;
+      const series = charts.race.series;
+      const topLinesLogin = logins[0];
+      const seriesList = logins.map((u, idx) => ({
+        vals: series[u] || [],
+        color: RACE_COLORS[idx % RACE_COLORS.length],
+        endLabel: u,
+        star: u === topLinesLogin,
+      }));
+      renderLineChart(host, hours, seriesList, {
+        id: "race", label: "Contributor lines race", height: 280, width: 960, right: 150,
+      });
+      fillRaceLegend(legend, logins.map((u) => ({
+        label: u,
+        last: (series[u] || []).slice(-1)[0] || 0,
+        star: u === topLinesLogin,
+        starTitle: "Most lines added",
+      })), RACE_COLORS);
+    }
+
+    function renderCharts(data) {
+      const charts = data.charts;
+      if (!charts) {
+        ["chart-groups", "chart-race"].forEach((id) => {
+          const h = document.getElementById(id);
+          if (h) h.replaceChildren(el("p", { className: "sub", text: "Regenerate metrics.json to load charts." }));
+        });
+        return;
+      }
+      renderGroups(charts, data.groups);
+      renderRace(charts);
+    }
+
     async function load() {
       const err = document.getElementById("err");
       try {
@@ -339,15 +846,35 @@
         document.getElementById("kpi-open").textContent = fmt(data.totals.issues_open);
         document.getElementById("kpi-pr-open").textContent = fmt(data.totals.prs_open);
 
-        const maxScore = Math.max(1, ...data.groups.map((g) => g.issues_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500));
+        const groupScore = (g) =>
+          g.issues_closed * 3 + g.issues_open * 1 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500;
+        const maxScore = Math.max(1, ...data.groups.map(groupScore));
         const tbody = document.getElementById("groups-body");
         tbody.replaceChildren();
-        data.groups.slice().sort((a, b) => (b.issues_closed + b.prs_merged) - (a.issues_closed + a.prs_merged)).forEach((g) => {
-          const score = g.issues_closed * 3 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500;
+        // Rank: closed issues, then merged PRs, then open issues (break ties like the shared scaffold PR)
+        data.groups.slice().sort((a, b) =>
+          (b.issues_closed - a.issues_closed) ||
+          (b.prs_merged - a.prs_merged) ||
+          (b.issues_open - a.issues_open) ||
+          a.id.localeCompare(b.id)
+        ).forEach((g, rank) => {
+          const score = groupScore(g);
           const pct = Math.round((score / maxScore) * 100);
           const barInner = el("span", { style: { width: "0%" } });
+          const nameRow = el("div", {
+            style: { display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" },
+          }, [
+            el("div", { text: g.name || g.id }),
+          ]);
+          if (rank === 0) {
+            nameRow.appendChild(makeLinesStar("Top group in the board ranking"));
+          }
+          const groupCell = el("td", null, [
+            nameRow,
+            el("div", { className: "mono", text: g.id, style: { color: "var(--muted)", fontSize: "0.68rem", marginTop: "0.15rem" } }),
+          ]);
           tbody.appendChild(el("tr", null, [
-            el("td", { className: "mono", text: g.id }),
+            groupCell,
             el("td", { text: fmt(g.issues_closed) }),
             el("td", { text: fmt(g.issues_open) }),
             el("td", { text: fmt(g.prs_merged) }),
@@ -366,6 +893,7 @@
             .slice()
             .sort((a, b) => (b.additions - a.additions) || (b.net - a.net) || a.login.localeCompare(b.login))
             .find((p) => (p.additions || 0) > 0)?.login;
+          const groupNames = Object.fromEntries((data.groups || []).map((g) => [g.id, g.name || g.id]));
 
           data.top_contributors.forEach((p, i) => {
             const isTopLines = p.login === topLinesLogin;
@@ -377,13 +905,7 @@
                 className: "lines-hot",
                 title: "Most lines added in merged PRs (+" + fmt(p.additions) + ")",
               });
-              const star = el("span", {
-                className: "lines-star",
-                role: "img",
-                "aria-label": "Most lines added",
-              });
-              star.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#ffd200" stroke="#fff3a0" stroke-width="0.6" d="M12 2.2l2.7 6.2 6.7.6-5.1 4.4 1.5 6.5L12 16.8 6.2 20l1.5-6.5L2.6 9l6.7-.6L12 2.2z"/></svg>';
-              hot.appendChild(star);
+              hot.appendChild(makeLinesStar("Most lines added in merged PRs (+" + fmt(p.additions) + ")"));
               hot.appendChild(document.createTextNode(linesText));
               stats.appendChild(hot);
             } else {
@@ -396,9 +918,10 @@
             const tagClass = tag === "repo"
               ? "group-tag is-repo"
               : (p.top_group ? "group-tag" : "group-tag is-empty");
+            const tagText = tag === "repo" ? "repo" : (groupNames[tag] || tag);
             nameRow.appendChild(el("span", {
               className: tagClass,
-              text: tag === "repo" ? "repo" : tag,
+              text: tagText,
               title: tag === "repo"
                 ? "Most added lines outside topics/ (docs, CI, dashboard, …)"
                 : ("Most contributed topic: " + tag),
@@ -408,6 +931,8 @@
             ]));
           });
         }
+
+        renderCharts(data);
         err.hidden = true;
       } catch (e) {
         err.hidden = false;
@@ -416,6 +941,8 @@
     }
     load();
     setInterval(load, 60000);
+    tickCountdown();
+    setInterval(tickCountdown, 1000);
   </script>
 </body>
 </html>
