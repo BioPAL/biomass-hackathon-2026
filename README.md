@@ -133,6 +133,14 @@ Work from a **fork** (one fork per person; you do not push directly to `main`):
 
 Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Live contribution dashboard
+
+HTML board (GitHub Pages), refreshed on **issue close** and **PR merge**:
+
+- After merge of this feature: enable **Settings → Pages → Source: GitHub Actions**, then run workflow **Hackathon dashboard** once (`workflow_dispatch`).
+- URL will be: `https://biopal.github.io/biomass-hackathon-2026/` (or the Pages URL shown in the workflow).
+- Source: [`dashboard/`](dashboard/) (`index.html` + `collect_metrics.py`).
+
 ## Project board (Kanban)
 
 Public board: [Hackaton 2026 Board](https://github.com/orgs/BioPAL/projects/6)
