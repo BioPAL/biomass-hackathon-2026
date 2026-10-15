@@ -2,7 +2,7 @@ blank_issues_enabled: false
 contact_links:
   - name: Ask in Discussions
     url: https://github.com/BioPAL/biomass-hackathon-2026/discussions
-    about: General questions, ideas, show and tell. Not a specific bug or task.
+    about: Questions, help with Git, ideas, show and tell.
   - name: Open issues list
     url: https://github.com/BioPAL/biomass-hackathon-2026/issues
     about: Search existing issues before creating a duplicate.

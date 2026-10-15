@@ -1,5 +1,5 @@
 name: "Task · my group"
-description: Work that lives in your group folder (≤ 2 hours). One issue per task.
+description: Work that lives in your group folder. One issue per task (S/M/L up to 3 hours).
 title: "[Task] "
 labels: ["task"]
 body:
@@ -8,20 +8,19 @@ body:
       value: |
         **Where:** your group folder under `topics/`.
 
-        After you submit:
-        1. Add your **group label** (same as below)
-        2. **Assign yourself**
-        3. Search existing issues first to avoid duplicates
+        Your **group label** is applied automatically from the Group field below.
+        Search existing issues first to avoid duplicates.
+        You do not need to assign yourself to work on the issue (open a PR with `Closes #N`).
   - type: dropdown
     id: group
     attributes:
       label: Group
-      description: Also apply this as a GitHub label on the issue after creation.
+      description: A GitHub Action applies this as a colored label on the issue.
       options:
         - "02-RFI"
         - "03-QGIS"
         - "04-3D-TOMO-CANOPY-VISUALIZER"
-        - "05-BIOMASS&GEDI"
+        - "05_BIOMASS_AND_GEDI"
         - "06A-CARBON"
         - "06B-CARBON"
         - "07-GEOLOGY"
@@ -44,11 +43,11 @@ body:
     id: size
     attributes:
       label: Size
-      description: Must be ≤ 2 hours for one person. Split if larger.
+      description: Pick S, M, or L. If the work needs more than 3 hours, split it into several issues.
       options:
         - "S (≤ 1 hour)"
         - "M (≤ 2 hours)"
-        - "L (split me - too big)"
+        - "L (≤ 3 hours)"
     validations:
       required: true
   - type: dropdown

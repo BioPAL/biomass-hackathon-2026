@@ -1,6 +1,6 @@
-# BIOMASS validation
+# Carbon map validation (group 06A)
 
-**Challenge #6, The Truth-Engine: global carbon map cross-validation dashboard**
+**Group `06A-CARBON` — Challenge #6, The Truth-Engine: global carbon map cross-validation dashboard**
 
 ## Goal
 
