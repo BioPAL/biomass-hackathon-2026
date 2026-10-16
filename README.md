@@ -1,9 +1,6 @@
 <div align="center">
 
-[![Live contribution dashboard](dashboard/readme-banner.svg)](https://biopal.github.io/biomass-hackathon-2026/)
-
-**[Open the live board →](https://biopal.github.io/biomass-hackathon-2026/)**  
-issues closed · PRs merged · group races · refreshed when issues close or PRs merge
+[![Live contribution dashboard](dashboard/readme-banner-v2.png)](https://biopal.github.io/biomass-hackathon-2026/)
 
 </div>
 
