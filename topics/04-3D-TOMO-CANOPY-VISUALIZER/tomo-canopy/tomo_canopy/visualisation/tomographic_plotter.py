@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from tomo_canopy.types import Modality, DataLayer
 import numpy as np
 import pyvista as pv
+import matplotlib as mpl
+
 
 from tomo_canopy.visualisation.basic_plotter_app import BasicPlotterApp
 
@@ -184,18 +186,31 @@ class TomographicPlotter(BasicPlotterApp):
             # Keep only occupied voxels
             voxels = grid.threshold(0.5, scalars="occupancy")
             xmin, xmax, ymin, ymax, zmin, zmax = voxels.bounds
+
+            counts = voxels.cell_data["point_count"].astype(float)
+
+            # Normalise; the 99th percentile stops a few dense voxels from squashing everything else
+            vmin, vmax = counts.min(), np.percentile(counts, 99)
+            norm = np.clip((counts - vmin) / (vmax - vmin), 0, 1)
+
+            gamma = 0.5  # <1 lifts faint voxels, >1 suppresses them
+            alpha_min, alpha_max = 0.15, 0.95
+
+            rgba = mpl.colormaps[cmap](norm)  # cmap given as a name, e.g. "viridis"
+            rgba[:, 3] = alpha_min + (alpha_max - alpha_min) * norm**gamma
+            voxels.cell_data["rgba"] = (rgba * 255).astype(np.uint8)
+
             pl.add_mesh_clip_plane(
                 voxels,
-                scalars="point_count",
-                cmap=cmap,
-                opacity=1,  # transparency
+                scalars="rgba",
+                rgba=True,  # use the array as-is, including alpha
                 normal="z",
-                origin=(voxels.center[0], voxels.center[1], zmax),  # start at the top
-                invert=False,  # keep everything below the plane
+                origin=(voxels.center[0], voxels.center[1], zmax),
+                invert=False,
                 show_edges=False,
-                scalar_bar_args={"title": "points per voxel"},
                 **common,
             )
+            pl.enable_depth_peeling(10)
         else:  # volume
             ds = self.data_getter_dict[self.modality].get_vol_data_fn(self.voxel_res)
             grid = pv.RectilinearGrid(ds["x"].values, ds["y"].values, ds["z"].values)
