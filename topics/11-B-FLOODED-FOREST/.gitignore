@@ -3,6 +3,7 @@ outputs/
 assets/
 pauli_tif/
 figures/
+georg_dev/osm_cache/
 
 # GeoTIFF rasters — large, regenerable (run_pipeline.py / data_view.ipynb)
 *.tif
