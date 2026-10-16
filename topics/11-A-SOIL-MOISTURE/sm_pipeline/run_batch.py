@@ -1,10 +1,10 @@
 """Run the pipeline for a list of stacks without interaction and aggregate the results.
 
-    python run_batch.py batch_stacks.csv                 # runs every row, then aggregates
+    python run_batch.py my_stacks.csv                    # runs every row, then aggregates
     python run_batch.py --aggregate-only                 # only rebuild all_metrics.csv / all_tiles_summary.csv from existing runs
-    nohup python run_batch.py batch_stacks.csv > batch.log 2>&1 &        # keeps running when the browser tab closes
+    nohup python run_batch.py my_stacks.csv > batch.log 2>&1 &        # keeps running when the browser tab closes
 
-batch_stacks.csv columns: stack (required), lat, lon, name (optional), extra (optional extra CLI args, e.g. "--half-m 500 --only-point").
+Stack list (CSV) columns: stack (required), lat, lon, name (optional), extra (optional extra CLI args, e.g. "--half-m 500 --only-point").
 Rows whose run folder already contains metrics.csv are skipped unless --force.
 Outputs in ~/data/runs/: batch_log.csv (one row per stack: status, duration, tier, points),
 all_metrics.csv (concatenated metrics.csv with stack column), all_tiles_summary.csv (one row per stack x point with the key numbers).
@@ -12,7 +12,14 @@ all_metrics.csv (concatenated metrics.csv with stack column), all_tiles_summary.
 import argparse, glob, json, os, pathlib, subprocess, sys, time
 import numpy as np, pandas as pd
 
+RAIN_ORDER = ("ismn_rain_between_mm", "era5_land_rain_between_mm", "era5_rain_between_mm", "ecmwf_ifs_rain_between_mm")   # as plots.RAIN_KEYS
+
 HERE = pathlib.Path(__file__).resolve().parent
+
+
+def _mean(v):
+    x = np.array([np.nan if e is None else e for e in (v or [])], float)
+    return float(np.nanmean(x)) if np.isfinite(x).any() else np.nan
 
 
 def run_one(row, out_root, force):
@@ -30,10 +37,19 @@ def run_one(row, out_root, force):
                 tier=tier.get("tier"), points=";".join(tier.get("points", [])), stations=";".join(tier.get("stations", [])))
 
 
+def _read_or_none(f):
+    """CSV as DataFrame, None if missing, empty or broken."""
+    try: return pd.read_csv(f) if pathlib.Path(f).exists() else None
+    except (pd.errors.EmptyDataError, pd.errors.ParserError): return None
+
+
 def aggregate(out_root):
     mets = []
     for f in glob.glob(str(out_root / "*" / "metrics.csv")):
-        m = pd.read_csv(f); m.insert(0, "stack", pathlib.Path(f).parent.name); mets.append(m)
+        try: m = pd.read_csv(f)
+        except (pd.errors.EmptyDataError, pd.errors.ParserError) as ex:
+            print(f"[aggregate] skipping {f}: {type(ex).__name__} (empty or broken file; re-run or replot that stack)"); continue
+        m.insert(0, "stack", pathlib.Path(f).parent.name); mets.append(m)
     M = pd.concat(mets, ignore_index=True) if mets else pd.DataFrame()
     M.to_csv(out_root / "all_metrics.csv", index=False)
     rows = []
@@ -43,32 +59,39 @@ def aggregate(out_root):
         for r in refs:
             st = r["station"]; pd_ = d / st
             info = json.load(open(pd_ / "sar_info.json")) if (pd_ / "sar_info.json").exists() else {}
-            raw = pd.read_csv(pd_ / "backscatter_raw.csv") if (pd_ / "backscatter_raw.csv").exists() else None
+            raw = _read_or_none(pd_ / "backscatter_raw.csv")
             mm = M[(M["stack"] == d.name) & (M["station"] == st)] if len(M) and "reference" in M else pd.DataFrame()
             def pick(obs, ref_pref):
+                if not len(mm) or "observable" not in mm: return None, None          # reference-only run (no SAR metrics)
                 for ref in ref_pref:
                     q = mm[(mm.observable == obs) & (mm.reference == ref)]
                     if len(q): return q.iloc[0], ref
                 return None, None
             ismn_refs = sorted([x for x in mm.reference.dropna().unique() if str(x).startswith("ISMN")], key=lambda x: float(x.split()[1].rstrip("m"))) if len(mm) else []
-            pref = ismn_refs + ["ecmwf_ifs 0-7 cm", "era5_land 0-7 cm"]
+            pref = ismn_refs + ["era5_land 0-7 cm", "era5 0-7 cm", "ecmwf_ifs 0-7 cm"]   # same order as the figures (plots.REF_MODELS)
             s_hh, ref_used = pick("sigma0 HH", pref); s_vv, _ = pick("sigma0 VV", pref); cc, _ = pick("closure phase HH", pref)
             skipped = next((l.split("SAR skipped -> ")[1] for l in log.splitlines() if f"[4] {st}: SAR skipped" in l), "")
+            if not skipped and len(mm) and "metric" in mm:
+                sk = mm[mm["metric"] == "skipped"]
+                if len(sk): skipped = str(sk["note"].iloc[0])
             lc = r.get("aux_landcover_pct") or {}
-            rows.append(dict(stack=d.name, station=st, network=r.get("network"), tier=tier.get("tier"), has_ismn=r.get("has_ismn"),
+            rows.append(dict(stack=d.name, station=st, network=r.get("network"), lat=r.get("lat"), lon=r.get("lon"), tier=tier.get("tier"), has_ismn=r.get("has_ismn"),
                              first=raw["acq_datetime_utc"].iloc[0][:10] if raw is not None else "", last=raw["acq_datetime_utc"].iloc[-1][:10] if raw is not None else "",
                              n_acq=len(raw) if raw is not None else 0, height_m=info.get("height_m"), incidence_deg=info.get("incidence_deg"),
                              dem_slope_deg=r.get("aux_slope_mean_deg"), lut_slope_az_deg=info.get("lut_slope_az_deg"), lut_slope_rg_deg=info.get("lut_slope_rg_deg"),
                              grassland_pct=lc.get("grassland"), tree_pct=lc.get("tree"), bare_pct=lc.get("bare"), valid_pct=info.get("valid_pct"),
+                             clay_pct=(r.get("aux_soil") or {}).get("clay_pct_0_5cm"), sand_pct=(r.get("aux_soil") or {}).get("sand_pct_0_5cm"),
+                             soc_g_kg=(r.get("aux_soil") or {}).get("soc_g_kg_0_5cm"),
+                             ndvi_mean=_mean(r.get("s2_ndvi_nearest")), ndmi_mean=_mean(r.get("s2_ndmi_nearest")),
                              tmin_C=r.get("ecmwf_ifs_tmin_window_C"), snow_max_m=r.get("ecmwf_ifs_snow_depth_max_window_m"),
-                             rain_total_mm=float(np.nansum([v for v in (r.get("ismn_rain_between_mm") or r.get("ecmwf_ifs_rain_between_mm") or []) if v is not None])),
+                             rain_total_mm=float(np.nansum([v for v in next((r[k] for k in RAIN_ORDER if r.get(k) and np.isfinite(np.array(r[k], float)).any()), []) if v is not None])),
                              ref_used=ref_used, ref_range=s_hh.ref_range if s_hh is not None else np.nan,
                              dsigma0_HH_dB=s_hh.obs_range if s_hh is not None else np.nan, dsigma0_VV_dB=s_vv.obs_range if s_vv is not None else np.nan,
                              slope_HH=s_hh.value if s_hh is not None else np.nan, slope_VV=s_vv.value if s_vv is not None else np.nan,
                              r_HH=s_hh.r if s_hh is not None else np.nan, r_VV=s_vv.r if s_vv is not None else np.nan,
                              r_diff_HH=s_hh.r_diff if s_hh is not None else np.nan, r_diff_VV=s_vv.r_diff if s_vv is not None else np.nan,
                              closure_r_HH=cc.r if cc is not None else np.nan, closure_note=cc.note if cc is not None else "",
-                             mean_coh_HH=float(np.nanmean(info["pipeline_coh_to_primary_HH"])) if info.get("pipeline_coh_to_primary_HH") else np.nan,
+                             mean_coh_HH=info.get("mean_coh_3day_HH", np.nan), r_diff_p_HH=s_hh.r_diff_p if s_hh is not None and "r_diff_p" in s_hh else np.nan,
                              flattening=info.get("flattening", ""), denoising=info.get("denoising", ""), skipped=skipped))
     S = pd.DataFrame(rows).sort_values(["tier", "stack", "station"]) if rows else pd.DataFrame()
     S.to_csv(out_root / "all_tiles_summary.csv", index=False)

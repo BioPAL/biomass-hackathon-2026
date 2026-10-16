@@ -1,5 +1,5 @@
 """Step 5: reference data at the overpass times: ERA5-Land hourly (Open-Meteo), ISMN station files, SMOS later."""
-import json, urllib.request, io
+import json, urllib.request
 import pandas as pd, numpy as np
 OMH = ("https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&start_date={s}&end_date={e}"
        "&hourly=precipitation,temperature_2m,dew_point_2m,snow_depth,soil_temperature_0_to_7cm,soil_moisture_0_to_7cm,soil_moisture_7_to_28cm,"
@@ -31,7 +31,7 @@ def all_model_sources(lat, lon, start, end):
     for m in MODELS:
         try: out[m] = model_hourly(lat, lon, start, end, m)
         except Exception as e:
-            hint = " (Open-Meteo quota of this IP exhausted for today, e.g. by screen_all_tiles.py; resets 00:00 UTC; the run continues without models)" if "429" in str(e) else ""
+            hint = " (Open-Meteo quota of this IP used up for today; resets 00:00 UTC; the run continues without models)" if "429" in str(e) else ""
             print("model", m, "failed:", str(e)[:60] + hint)
     return out
 

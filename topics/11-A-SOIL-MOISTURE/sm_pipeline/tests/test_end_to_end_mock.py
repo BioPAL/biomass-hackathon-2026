@@ -8,7 +8,7 @@ the data carry exp(-j phi_flat)). A synthetic ISMN export with the same sequence
 
 Checks: the run completes and writes every output; flattening is chosen automatically and raises the coherence;
 the recovered HH/VV sensitivities match the simulated ones; the closure-phase forward check correlates (r > 0.6);
-a run with an empty ISMN folder falls back to tier 2/3.
+a run with an empty ISMN folder falls back to tier 3 (model reference only).
     python tests/test_end_to_end_mock.py        (2-4 min)
 """
 import sys, pathlib, json, re, tempfile
@@ -102,9 +102,11 @@ def write_ismn(folder, times):
 def main():
     global KZ, DATES, PRIM
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="smpipe_test_")); ismn_dir = tmp / "ISMN" / "temporal"; ismn_dir.mkdir(parents=True)
-    geo = ROOT / "ismn_locations.geojson"
+    geo = tmp / "ismn_locations.geojson"                 # the simulated station as the only ISMN location
+    geo.write_text(json.dumps({"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [LON, LAT]},
+                   "properties": {"station": NAME, "network": "ROMPS", "start": "2025-01-01", "end": "2026-12-31"}}]}))
     args = run_stack.parser().parse_args(["--stack", STACK, "--lat", str(LAT), "--lon", str(LON), "--name", NAME, "--only-point", "--ismn", str(geo),
-                                          "--ismn-dir", str(tmp / "ISMN"), "--out", str(tmp / "runs"), "--half-m", "300"])
+                                          "--ismn-dir", str(tmp / "ISMN"), "--out", str(tmp / "runs"), "--half-m", "300", "--no-s2"])
     tab, times = run_stack.products(args)
     DATES = [re.search(r"_(\d{8}T\d{6})_", pid).group(1) for pid in tab["pid"]]; PRIM = int(np.argmax(tab["primary"].astype(bool).values))
     KZ = 0.04 * (np.arange(len(tab)) - PRIM)          # rad/m, 0 at the primary
@@ -132,12 +134,12 @@ def main():
     cc = M[M.observable == "closure phase HH"].iloc[0]
     assert cc.r > 0.6, f"closure forward check r = {cc.r:.2f}"
     print(f"PASS run 1: tier 1, flattening '{flat}', sensitivity HH {res['HH']:.1f} (sim 20), VV {res['VV']:.1f} (sim 25), closure check HH r = {cc.r:.2f}")
-    # run 2: same stack without a station file -> tier 2 or 3, reference only
+    # run 2: same stack without a station file -> tier 3, reference only
     empty = tmp / "ISMN_empty"; empty.mkdir()
     a2 = run_stack.parser().parse_args(["--stack", STACK, "--lat", str(LAT), "--lon", str(LON), "--name", NAME, "--only-point", "--ismn", str(geo),
-                                        "--ismn-dir", str(empty), "--out", str(tmp / "runs2"), "--no-sar"])
+                                        "--ismn-dir", str(empty), "--out", str(tmp / "runs2"), "--no-sar", "--no-s2"])
     run_stack.main(a2); t2 = json.load(open(tmp / "runs2" / STACK / "tier.json"))
-    assert t2["tier"] in (2, 3), t2
+    assert t2["tier"] == 3, t2
     print(f"PASS run 2: no station file -> tier {t2['tier']}")
     print("outputs kept in", tmp)
 

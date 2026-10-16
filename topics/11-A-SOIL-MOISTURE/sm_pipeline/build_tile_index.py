@@ -4,7 +4,7 @@ Takes ~15 min on the first run (87 pages of 2000 items from the public MAAP cata
 Outputs: l1c_items_index.parquet, l1c_stack_index.csv, biomass_l1c_tiles_map.html, biomass_l1c_tiles_overview.png
 """
 import argparse, json, time, pathlib, sys
-import pandas as pd, numpy as np
+import pandas as pd
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from sm_pipeline import catalog, plots, auxiliary
 
@@ -12,7 +12,7 @@ def fetch_items(limit=2000):
     rows, start, fails = [], 1, 0
     while True:
         try: jj = catalog._get(f"{catalog.STAC.format(col='BiomassLevel1c')}?limit={limit}&startRecord={start}")
-        except Exception as e:
+        except Exception:
             fails += 1; time.sleep(5)
             if fails > 10: raise
             continue

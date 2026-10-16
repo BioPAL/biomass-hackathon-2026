@@ -81,6 +81,34 @@ def pauli_and_covariance(slc_t, nr=12, nc=2, names=("HH", "HV", "VH", "VV")):
     return C
 
 
+PP_METHODS = (("pp_freeman", "freeman", {}, ("odd", "double", "volume")),
+              ("pp_yamaguchi4_y4r", "yamaguchi4", {"mode": "y4r"}, ("odd", "double", "volume", "helix")),
+              ("pp_vanzyl", "vanzyl", {}, ("odd", "double", "volume")))
+
+
+def pypolsarpro_decompositions(slc_t, names, nr, nc):
+    """Window-mean powers of three PyPolSARpro decompositions for one date (satim-co/PolSARpro, Apache-2.0; ESA-funded
+    re-implementation of PolSARpro): Freeman-Durden, Yamaguchi 4-component with orientation compensation (y4r) and van Zyl
+    1992, each on a boxcar of nr x nc pixels (= the analysis looks). Returns {key: [odd, double, volume(, helix)]} or None
+    if PyPolSARpro is not installed (optional dependency) or the product is not quad-pol."""
+    try:
+        import xarray as xr
+        from polsarpro import decompositions as D
+    except ImportError:
+        return None
+    idx = {n: i for i, n in enumerate(names)}
+    if not all(p in idx for p in ("HH", "HV", "VH", "VV")): return None
+    S = xr.Dataset({p.lower(): (("y", "x"), np.asarray(slc_t[idx[p]], np.complex64)) for p in ("HH", "HV", "VH", "VV")},
+                   attrs=dict(poltype="S", description="Scattering matrix")).chunk()      # PyPolSARpro expects dask arrays
+    out = {}
+    for key, fn, kw, comps in PP_METHODS:
+        o = getattr(D, fn)(S, boxcar_size=[int(nr), int(nc)], **kw).compute()
+        out[key] = [float(np.nanmean(o[c].values)) for c in comps]
+    o = D.h_a_alpha(S, boxcar_size=[int(nr), int(nc)], flags=("entropy", "anisotropy", "alpha")).compute()
+    out["pp_h_a_alpha"] = [float(np.nanmean(o[c].values)) for c in ("entropy", "anisotropy", "alpha")]
+    return out
+
+
 def h_alpha(C):
     """Cloude-Pottier entropy H and mean alpha [deg] from C3 [3, 3, R, C] (via T3 = U C3 U^H); NaN cells stay NaN."""
     s = 1 / np.sqrt(2); U = np.array([[s, 0, s], [s, 0, -s], [0, 1.0, 0]], dtype=complex)
@@ -91,31 +119,3 @@ def h_alpha(C):
     H = -(p * np.log(p) / np.log(3)).sum(-1); alpha = (p * np.degrees(np.arccos(np.clip(np.abs(v[..., 0, :]), 0, 1)))).sum(-1)
     H[bad] = np.nan; alpha[bad] = np.nan
     return H, alpha
-
-
-def freeman_durden(C):
-    """Freeman-Durden 3-component powers (surface, double-bounce, volume) from C3 -> [3, R, C] (Freeman & Durden 1998)."""
-    c11, c13, c22, c33 = C[0, 0].real, C[0, 2], C[1, 1].real, C[2, 2].real
-    fv = 1.5 * c22
-    # non-negative power constraint (van Zyl et al. 2011, doi:10.1109/TGRS.2011.2128325): the volume term may not exceed what the
-    # co-polar channels can provide, otherwise the remainder matrix has negative eigenvalues and Ps/Pd turn negative
-    with np.errstate(invalid="ignore", divide="ignore"):
-        fv = np.minimum(fv, np.minimum(c11, c33) * 0.999)
-    Pv = 8 / 3 * fv
-    a11, a13, a33 = c11 - fv, c13 - fv / 3, c33 - fv
-    Ps = np.zeros_like(c11); Pd = np.zeros_like(c11)
-    pos = a13.real >= 0
-    with np.errstate(invalid="ignore", divide="ignore"):
-        # surface dominant (alpha = -1)
-        den = a11 + a33 + 2 * a13.real; fs = (a11 * a33 - np.abs(a13) ** 2) / np.where(den != 0, den, np.nan)
-        fd = a33 - fs; beta = (a13 + fd) / np.where(fs != 0, fs, np.nan)
-        Ps1, Pd1 = fs * (1 + np.abs(beta) ** 2), fd * 2.0
-        # double-bounce dominant (beta = 1)
-        den2 = a11 + a33 - 2 * a13.real; fd2 = (a11 * a33 - np.abs(a13) ** 2) / np.where(den2 != 0, den2, np.nan)
-        fs2 = a33 - fd2; alpha = (a13 - fs2) / np.where(fd2 != 0, fd2, np.nan)
-        Ps2, Pd2 = fs2 * 2.0, fd2 * (1 + np.abs(alpha) ** 2)
-    Ps = np.where(pos, np.real(Ps1), np.real(Ps2)); Pd = np.where(pos, np.real(Pd1), np.real(Pd2))
-    # by construction Ps + Pd = a11 + a33 (the co-polar power left after the volume term); enforce it so that an ill-conditioned
-    # cell (fs -> 0, |beta| -> inf) cannot produce a negative or exploding component: Ps in [0, a11 + a33], Pd = remainder
-    rem = np.clip(a11 + a33, 0, None); Ps = np.clip(np.nan_to_num(Ps, nan=0.0), 0, rem); Pd = rem - Ps
-    return np.stack([Ps, Pd, Pv])

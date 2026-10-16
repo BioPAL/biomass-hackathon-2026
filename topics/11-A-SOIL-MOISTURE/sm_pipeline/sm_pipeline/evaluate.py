@@ -30,6 +30,12 @@ def diff_corr(x, y):
     return pearson(np.diff(np.asarray(x, float)), np.diff(np.asarray(y, float)))
 
 
+def diff_corr_p(x, y):
+    """Two-sided p-value of diff_corr (t-test on n-1 differences). With 7 acquisitions (6 differences) |r| >= 0.81 is needed for p < 0.05."""
+    dx, dy = _ok(np.diff(np.asarray(x, float)), np.diff(np.asarray(y, float)))
+    return float(stats.pearsonr(dx, dy).pvalue) if len(dx) >= 3 and np.ptp(dx) > 0 and np.ptp(dy) > 0 else float("nan")
+
+
 def pair_regression(G_abs, times, sm):
     """|coherence| of all pairs i<j regressed on temporal baseline [days] and |dSM| -> coefficients, standard errors, R2."""
     t = pd.to_datetime(list(times), utc=True); sm = np.asarray(sm, float); T = len(t)
