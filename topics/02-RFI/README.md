@@ -18,7 +18,7 @@ P-band operates in a crowded radio spectrum. Investigate novel techniques to det
 
 ## Status
 
-Not started. Waiting on example data.
+Implementing the data loading and the plotting of the products with RFI
 
 ## Contact
 
