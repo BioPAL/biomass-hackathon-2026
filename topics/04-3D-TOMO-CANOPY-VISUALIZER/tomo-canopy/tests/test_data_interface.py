@@ -259,6 +259,18 @@ def test_to_xarray_preserves_native_layer_with_prefixed_coordinates(
     assert dataset["tls_occupancy__occupancy"].dims == ("z", "y", "x")
 
 
+def test_get_layer_enforces_optional_contract(grid: GridSpec) -> None:
+    cube = DataCube(grid=grid, layers={"tls_occupancy": make_tls_layer(grid)})
+
+    assert cube.get_layer("tls_occupancy", modality=Modality.TLS).name == (
+        "tls_occupancy"
+    )
+    with pytest.raises(ValueError, match="expected 'tomogram'"):
+        cube.get_layer("tls_occupancy", modality=Modality.TOMOGRAM)
+    with pytest.raises(KeyError, match="available layers: tls_occupancy"):
+        cube.get_layer("missing")
+
+
 def test_grid_axes_must_be_increasing() -> None:
     with pytest.raises(ValueError, match="strictly increasing"):
         GridSpec(

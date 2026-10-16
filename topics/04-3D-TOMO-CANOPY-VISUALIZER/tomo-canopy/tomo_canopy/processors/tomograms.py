@@ -289,6 +289,147 @@ class TomogramProcessor:
         }
         return result
 
+    def integrate_vertical_bands(
+        self,
+        dataset: xr.Dataset,
+        *,
+        variable: str = "tomographic_power",
+        band_size: float = 20.0,
+        name: str = "vertical_contribution",
+    ) -> xr.Dataset:
+        """Integrate power into height bands and normalize within each column.
+
+        Integration is performed on the supplied power variable before any
+        display smoothing. The resulting contribution sums to one along
+        ``height_band`` for every column with positive finite power.
+        """
+        self.validate(dataset)
+        source = _variable(dataset, variable)
+        if "z" not in source.dims:
+            raise ValueError(f"Variable {variable!r} has no 'z' dimension")
+        if np.issubdtype(source.dtype, np.complexfloating):
+            raise ValueError("Vertical bands require power, not complex amplitude")
+        if not np.isfinite(band_size) or band_size <= 0:
+            raise ValueError("band_size must be a positive finite value")
+
+        z = np.asarray(dataset.z.data, dtype=float)
+        start = np.floor(z.min() / band_size) * band_size - band_size / 2
+        stop = np.ceil(z.max() / band_size) * band_size + 1.5 * band_size
+        edges = np.arange(start, stop, band_size, dtype=float)
+        centers = (edges[:-1] + edges[1:]) / 2
+        bands = source.groupby_bins(
+            "z", edges, labels=centers, right=False, include_lowest=True
+        ).sum(dim="z", skipna=True)
+        bands = bands.rename({"z_bins": "height_band"}).assign_coords(
+            height_band=centers
+        )
+        total = bands.sum("height_band", skipna=True)
+        contribution = bands / total.where(total > 0)
+        contribution.name = name
+        contribution.attrs = {
+            "long_name": "normalized vertical scattering contribution",
+            "quantity": "fraction_of_column_power",
+            "units": "1",
+            "derived_from": variable,
+            "vertical_band_size": float(band_size),
+            "normalization": "sum over height_band equals one",
+        }
+        total_name = f"{variable}_column_total"
+        total = total.rename(total_name)
+        total.attrs = {
+            "long_name": "vertically integrated tomographic power",
+            "derived_from": variable,
+        }
+        result = dataset.assign({name: contribution, total_name: total})
+        result.attrs = {
+            **dataset.attrs,
+            "vertical_structure_band_size": float(band_size),
+        }
+        return result
+
+    def add_vertical_metrics(
+        self,
+        dataset: xr.Dataset,
+        *,
+        contribution: str = "vertical_contribution",
+        upper_height: float = 30.0,
+    ) -> xr.Dataset:
+        """Derive column metrics from normalized height-band contributions."""
+        values = _variable(dataset, contribution)
+        if "height_band" not in values.dims:
+            raise ValueError(
+                f"Variable {contribution!r} has no 'height_band' dimension"
+            )
+        if not np.isfinite(upper_height):
+            raise ValueError("upper_height must be finite")
+        height = dataset.height_band
+        cdf = values.fillna(0).cumsum("height_band")
+
+        def quantile_height(quantile: float) -> xr.DataArray:
+            return height.where(cdf >= quantile).min("height_band", skipna=True)
+
+        centroid = (values * height).sum("height_band", skipna=True)
+        # ``idxmax`` returns the height coordinate directly and remains lazy.
+        # Using a Dask-backed ``argmax`` result as an ``isel`` indexer is not
+        # supported by Xarray's vectorized indexing.
+        dominant_height = values.idxmax("height_band", skipna=True)
+        dominant_contribution = values.max("height_band", skipna=True)
+        entropy_terms = xr.where(values > 0, values * np.log(values), 0.0)
+        entropy = -entropy_terms.sum("height_band", skipna=True) / np.log(
+            values.sizes["height_band"]
+        )
+        valid = values.notnull().any("height_band")
+        metrics = {
+            "scattering_height_50": quantile_height(0.50).where(valid),
+            "scattering_height_90": quantile_height(0.90).where(valid),
+            "scattering_centroid": centroid.where(valid),
+            "dominant_scattering_height": dominant_height.where(valid),
+            "dominant_contribution": dominant_contribution.where(valid),
+            "vertical_entropy": entropy.where(valid),
+            "upper_contribution": values.where(height >= upper_height, 0).sum(
+                "height_band", skipna=True
+            ).where(valid),
+        }
+        for name, metric in metrics.items():
+            metric.attrs["derived_from"] = contribution
+        metrics["scattering_height_50"].attrs.update(units="m", quantile=0.5)
+        metrics["scattering_height_90"].attrs.update(units="m", quantile=0.9)
+        metrics["scattering_centroid"].attrs.update(units="m")
+        metrics["dominant_scattering_height"].attrs.update(units="m")
+        metrics["dominant_contribution"].attrs.update(units="1")
+        metrics["vertical_entropy"].attrs.update(units="1")
+        metrics["upper_contribution"].attrs.update(
+            units="1", lower_height=float(upper_height)
+        )
+        result = dataset.assign(metrics)
+        result.attrs = {**dataset.attrs, "upper_contribution_height": upper_height}
+        return result
+
+    def prepare_vertical_structure(
+        self,
+        dataset: xr.Dataset,
+        *,
+        polarization: str | Iterable[str] | None = None,
+        band_size: float = 20.0,
+        upper_height: float = 30.0,
+    ) -> xr.Dataset:
+        """Create the explicit TOM variables consumed by visualisation tools."""
+        selected = (
+            dataset
+            if polarization is None
+            else self.select_polarization(dataset, polarization)
+        )
+        powered = self.to_power(selected)
+        banded = self.integrate_vertical_bands(powered, band_size=band_size)
+        result = self.add_vertical_metrics(
+            banded, upper_height=upper_height
+        )
+        result.attrs = {
+            **result.attrs,
+            "processing_recipe": "tomogram_vertical_structure",
+        }
+        return result
+
     def to_data_layer(
         self,
         dataset: xr.Dataset,

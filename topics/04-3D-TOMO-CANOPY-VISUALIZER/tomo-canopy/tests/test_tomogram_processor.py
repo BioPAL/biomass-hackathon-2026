@@ -128,3 +128,59 @@ def test_to_data_layer_returns_tomogram_volume(l2a_tomogram: xr.Dataset) -> None
     assert layer.modality == Modality.TOMOGRAM.value
     assert layer.geometry == GeometryType.VOLUME.value
     assert layer.crs == "EPSG:4979"
+
+
+def test_prepare_vertical_structure_produces_normalized_bands_and_metrics(
+    l2a_tomogram: xr.Dataset,
+) -> None:
+    result = TomogramProcessor().prepare_vertical_structure(
+        l2a_tomogram, polarization="HV", band_size=10.0, upper_height=0.0
+    )
+
+    assert result.sizes["polarization"] == 1
+    assert result.vertical_contribution.dims == (
+        "polarization",
+        "height_band",
+        "y",
+        "x",
+    )
+    xr.testing.assert_allclose(
+        result.vertical_contribution.sum("height_band"),
+        xr.ones_like(result.vertical_contribution.isel(height_band=0)),
+    )
+    assert {
+        "scattering_height_50",
+        "scattering_height_90",
+        "scattering_centroid",
+        "dominant_scattering_height",
+        "dominant_contribution",
+        "vertical_entropy",
+        "upper_contribution",
+    }.issubset(result)
+    assert result.attrs["processing_recipe"] == "tomogram_vertical_structure"
+
+
+def test_vertical_band_integration_rejects_complex_amplitude(
+    l2a_tomogram: xr.Dataset,
+) -> None:
+    with pytest.raises(ValueError, match="power, not complex"):
+        TomogramProcessor().integrate_vertical_bands(
+            l2a_tomogram, variable="tomographic_cube"
+        )
+
+
+def test_prepare_vertical_structure_supports_dask(
+    l2a_tomogram: xr.Dataset,
+) -> None:
+    pytest.importorskip("dask.array")
+    chunked = l2a_tomogram.chunk({"polarization": 1, "z": 2, "y": 1, "x": 2})
+
+    result = TomogramProcessor().prepare_vertical_structure(
+        chunked, band_size=10.0
+    )
+
+    assert result.dominant_scattering_height.chunks is not None
+    computed = result[
+        ["dominant_scattering_height", "dominant_contribution"]
+    ].compute()
+    assert np.isfinite(computed.dominant_scattering_height).all()
