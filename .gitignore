@@ -223,3 +223,21 @@ __marimo__/
 .DS_Store
 **/.DS_Store
 *.pptx
+
+# Derived Pauli GeoTIFFs and notebook figures (large; regenerate from data_view.ipynb)
+topics/11-B-FLOODED-FOREST/pauli_tif/
+topics/11-B-FLOODED-FOREST/figures/
+
+# Local PolSAR downloads and processing outputs
+topics/11-B-FLOODED-FOREST/polsar_raw/
+topics/11-B-FLOODED-FOREST/polsar_out/
+
+# MAAP / local secrets (never commit)
+credentials.txt
+**/credentials.txt
+token*.txt
+**/token_*.txt
+
+# GeoTIFF rasters (large; regenerate via run_pipeline.py / data_view.ipynb)
+*.tif
+*.tiff
