@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flooded-forest ROIs</title>
+<!-- Leaflet (map library) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --orange: #ff7f0e;
+    --ink: #1f2328;
+    --muted: #5b6370;
+    --panel: #ffffff;
+    --border: #d9d8d2;
+  }
+  html, body { height: 100%; margin: 0; background: #f4f3ef; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); }
+  #map { position: absolute; inset: 0; }
+  .info {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; font-size: 13px; line-height: 1.4; box-shadow: 0 1px 4px rgba(0,0,0,.15); max-width: 260px;
+  }
+  .info b { font-size: 14px; }
+  .info .muted { color: var(--muted); }
+  .roi-label {
+    background: rgba(255,255,255,.9); border: 1px solid var(--orange); border-radius: 4px;
+    color: var(--ink); font-size: 12px; font-weight: 600; padding: 1px 6px; box-shadow: none;
+  }
+  .roi-label::before { display: none; }
+  .popup table { border-collapse: collapse; font-size: 12px; }
+  .popup td { padding: 2px 8px 2px 0; vertical-align: top; }
+  .popup td:first-child { color: var(--muted); white-space: nowrap; }
+  .popup h3 { margin: 0 0 6px; font-size: 14px; }
+  #error {
+    display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; max-width: 460px;
+    font-size: 14px; line-height: 1.5;
+  }
+  code { background: #eeede8; padding: 1px 4px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<div id="error"></div>
+<script>
+// ---- settings -------------------------------------------------------------------------
+const ROI_URL = "../rois.json";   // rois.json of the topic folder (this page lives in notebooks/)
+const BOX_ZOOM = 6;               // from this zoom level on: orange bbox boxes, below: points with names
+const ORANGE = "#ff7f0e";
+
+// ---- base map --------------------------------------------------------------------------
+const map = L.map("map", { worldCopyJump: true, minZoom: 2 }).setView([5, 20], 2);
+const satellite = L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  { maxZoom: 18, attribution: "Imagery © Esri, Maxar, Earthstar Geographics" });
+const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  { maxZoom: 19, attribution: "© OpenStreetMap contributors" });
+satellite.addTo(map);
+L.control.layers({ "Satellite": satellite, "OpenStreetMap": streets }, null, { position: "topright" }).addTo(map);
+L.control.scale({ imperial: false }).addTo(map);
+
+const info = L.control({ position: "bottomleft" });
+info.onAdd = () => {
+  const div = L.DomUtil.create("div", "info");
+  div.innerHTML = `<b>Flooded-forest ROIs</b><br><span class="muted" id="info-text">loading rois.json…</span>`;
+  return div;
+};
+info.addTo(map);
+
+// ---- helpers ---------------------------------------------------------------------------
+const fmt = (v, d = 4) => Number(v).toFixed(d);
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function bboxOf(roi) {
+  // rois.json: {"bbox": {"west", "south", "east", "north"}}; also accepts [w, s, e, n]
+  const b = roi.bbox;
+  return Array.isArray(b) ? { west: +b[0], south: +b[1], east: +b[2], north: +b[3] }
+                          : { west: +b.west, south: +b.south, east: +b.east, north: +b.north };
+}
+
+function sizeKm(b) {
+  const R = 6371.0088, rad = Math.PI / 180;
+  const latMid = (b.south + b.north) / 2 * rad;
+  const ew = (b.east - b.west) * rad * R * Math.cos(latMid);
+  const ns = (b.north - b.south) * rad * R;
+  return { ew, ns, area: ew * ns };
+}
+
+function popupHtml(roi, b) {
+  const c = { lat: (b.south + b.north) / 2, lon: (b.west + b.east) / 2 };
+  const s = sizeKm(b);
+  const rows = [
+    ["name", escapeHtml(roi.name)],
+    ["region", escapeHtml(roi.region || "–")],
+    ["centre lat, lon", `${fmt(c.lat)}, ${fmt(c.lon)}`],
+    ["west / east", `${fmt(b.west)} / ${fmt(b.east)}`],
+    ["south / north", `${fmt(b.south)} / ${fmt(b.north)}`],
+    ["size E-W × N-S", `${s.ew.toFixed(1)} × ${s.ns.toFixed(1)} km`],
+    ["area", `${s.area.toFixed(0)} km²`],
+  ];
+  // any other property stored in rois.json
+  for (const [k, v] of Object.entries(roi)) {
+    if (["name", "region", "bbox"].includes(k)) continue;
+    rows.push([escapeHtml(k), escapeHtml(typeof v === "object" ? JSON.stringify(v) : v)]);
+  }
+  return `<div class="popup"><h3>${escapeHtml(roi.name)}</h3><table>` +
+         rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("") + `</table></div>`;
+}
+
+// ---- ROI layers: points (far) and orange boxes (close) ----------------------------------
+const points = L.layerGroup();
+const boxes = L.layerGroup();
+
+function draw(rois) {
+  const all = [];
+  for (const roi of rois) {
+    const b = bboxOf(roi);
+    if (![b.west, b.south, b.east, b.north].every(Number.isFinite)) continue;
+    const bounds = L.latLngBounds([b.south, b.west], [b.north, b.east]);
+    all.push(bounds);
+    const html = popupHtml(roi, b);
+    const label = (roi.name || "").trim();
+
+    L.circleMarker(bounds.getCenter(), { radius: 6, color: "#ffffff", weight: 2, fillColor: ORANGE, fillOpacity: 1 })
+      .bindTooltip(label, { permanent: true, direction: "right", offset: [8, 0], className: "roi-label" })
+      .bindPopup(html)
+      .on("click", () => map.fitBounds(bounds.pad(0.6)))
+      .addTo(points);
+
+    L.rectangle(bounds, { color: ORANGE, weight: 2.5, fillColor: ORANGE, fillOpacity: 0.12 })
+      .bindTooltip(label, { permanent: true, direction: "top", className: "roi-label" })
+      .bindPopup(html)
+      .addTo(boxes);
+  }
+  document.getElementById("info-text").innerHTML =
+    `${all.length} ROIs from <code>rois.json</code><br>zoom in (≥ ${BOX_ZOOM}) for the boxes, click for the details`;
+  updateLayers();
+}
+
+function updateLayers() {
+  const close = map.getZoom() >= BOX_ZOOM;
+  (close ? boxes : points).addTo(map);
+  map.removeLayer(close ? points : boxes);
+}
+map.on("zoomend", updateLayers);
+
+fetch(ROI_URL, { cache: "no-store" })
+  .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+  .then(data => draw(Array.isArray(data) ? data : (data.rois || [])))
+  .catch(err => {
+    const e = document.getElementById("error");
+    e.style.display = "block";
+    e.innerHTML = `<b>Could not read <code>${ROI_URL}</code></b> (${escapeHtml(err.message)}).<br><br>
+      Browsers do not let a page opened from disk read local files. Start the small server from the
+      topic folder and open the link it prints:<br><br>
+      <code>python notebooks/serve_roi_map.py</code>`;
+    document.getElementById("info-text").textContent = "rois.json not loaded";
+  });
+</script>
+</body>
+</html>
