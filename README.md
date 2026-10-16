@@ -1,3 +1,12 @@
+<div align="center">
+
+[![Live contribution dashboard](dashboard/readme-banner.svg)](https://biopal.github.io/biomass-hackathon-2026/)
+
+**[Open the live board →](https://biopal.github.io/biomass-hackathon-2026/)**  
+issues closed · PRs merged · group races · refreshed when issues close or PRs merge
+
+</div>
+
 # BIOMASS MAAP Hackathon 2026
 
 Shared workspace for the **ESA Biomass MAAP Hackathon** (12 to 16 October 2026, ESOC, Darmstadt): project folders, notebooks and resources.
@@ -135,11 +144,7 @@ Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## Live contribution dashboard
 
-HTML board (GitHub Pages), refreshed on **issue close** and **PR merge**:
-
-- After merge of this feature: enable **Settings → Pages → Source: GitHub Actions**, then run workflow **Hackathon dashboard** once (`workflow_dispatch`).
-- URL will be: `https://biopal.github.io/biomass-hackathon-2026/` (or the Pages URL shown in the workflow).
-- Source: [`dashboard/`](dashboard/) (`index.html` + `collect_metrics.py`).
+**[https://biopal.github.io/biomass-hackathon-2026/](https://biopal.github.io/biomass-hackathon-2026/)** — HTML board on GitHub Pages, refreshed on **issue close** and **PR merge**. Source: [`dashboard/`](dashboard/).
 
 ## Project board (Kanban)
 
