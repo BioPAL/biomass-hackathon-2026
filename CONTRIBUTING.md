@@ -7,7 +7,7 @@ Thanks for contributing to the ESA Biomass MAAP Hackathon shared repository. Thi
 This is a **hackathon** repo, not the main BPS production codebase. This week:
 
 - No signed commits required
-- No mandatory CI gate on pull requests
+- Light CI on PRs (Python syntax + a few critical Ruff checks) — fix failures when you can
 - A maintainer reviews and merges; do not merge your own PR
 
 [BioPAL/BPS](https://github.com/BioPAL/BPS) has stricter rules (approval gates, CODEOWNERS, and related checks). None of that applies here unless you are contributing to BPS itself.
@@ -16,12 +16,16 @@ This is a **hackathon** repo, not the main BPS production codebase. This week:
 
 You do not have write access to this repository, so you will work from your own fork.
 
-1. Fork the repository to your own GitHub account.
-2. Clone **your fork**, create a branch, work in your topic folder (or in `resources/` for shared code).
-3. Commit, push to your fork.
-4. Open a pull request: **base** = `BioPAL/biomass-hackathon-2026` / `main`, **head** = your fork + your branch.
+1. Create (or pick) a **Task** issue on GitHub and choose your **Group** (the group label is applied automatically).
+2. Fork the repository to your own GitHub account (**one fork per person**).
+3. Clone **your fork**, create a branch, work in your group folder (or in `resources/` for shared code).
+4. Commit, push to your fork.
+5. Open a **draft** pull request early: **base** = `BioPAL/biomass-hackathon-2026` / `main`, **head** = your fork + your branch. Put `Closes #<issue-number>` in the PR description (moves the board card to **Doing**).
+6. When ready, mark the PR **Ready for review** (moves the card to **In review**). A maintainer merges.
 
 `main` is protected: every change goes through a pull request. Do not merge your own pull request.
+
+Board Status is automated (Todo → Doing → In review → Done). See [README.md](README.md#project-board-kanban).
 
 ## Getting set up with Git
 
@@ -29,7 +33,13 @@ You do not have write access to this repository, so you will work from your own 
 
 Open [github.com/BioPAL/biomass-hackathon-2026](https://github.com/BioPAL/biomass-hackathon-2026) and click "Fork" in the top right. This creates a copy under your own GitHub account.
 
-**2. Clone your fork**
+**2. Clone your fork (HTTPS + PAT on MAAP)**
+
+On **MAAP** and often on ESA public Wi‑Fi:
+
+- SSH (`git@github.com:...`) is blocked
+- Installing / using `gh auth login` is often impossible
+- Use **HTTPS** and a **Personal Access Token (PAT)** — step-by-step in [README.md](README.md#git-from-maap-use-a-personal-access-token)
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/biomass-hackathon-2026.git
@@ -37,6 +47,32 @@ cd biomass-hackathon-2026
 ```
 
 Replace `YOUR-USERNAME` with your GitHub username.
+
+When Git asks for a **password**, paste the **PAT**, not your GitHub account password.
+
+### “Git / GitHub does not allow HTTPS” — what that usually means
+
+Git **does** support HTTPS. What fails is almost always **login**:
+
+- GitHub **rejected account passwords** for `git` years ago (`Authentication failed`, `Support for password authentication was removed`).
+- **On MAAP: create a PAT** (see README). That is the fix.
+- On a laptop where you *can* install tools, [GitHub CLI](https://cli.github.com/) also works: `gh auth login` → HTTPS → browser → `gh auth setup-git`.
+
+**Already cloned with SSH?** Switch remotes to HTTPS:
+
+```bash
+git remote -v
+git remote set-url origin https://github.com/YOUR-USERNAME/biomass-hackathon-2026.git
+git remote set-url upstream https://github.com/BioPAL/biomass-hackathon-2026.git
+git pull upstream main
+```
+
+**Check Git is not forcing SSH** (some machines rewrite HTTPS → SSH):
+
+```bash
+git config --global --get-regexp 'url\..*insteadOf'
+# git config --global --unset-all url.git@github.com:.insteadOf
+```
 
 **3. Add the original repository as a remote**
 
@@ -48,21 +84,21 @@ git remote add upstream https://github.com/BioPAL/biomass-hackathon-2026.git
 
 **4. Create a branch**
 
-Prefer `<topic-folder>/<short-description>`:
+Prefer `<GROUP-LABEL>/<short-description>` (same string as your group folder / GitHub label):
 
 ```bash
-git checkout -b 04-3d-forest-structure/short-description
+git checkout -b 04-3D-TOMO-CANOPY-VISUALIZER/short-description
 ```
 
 For shared-code work, `resources/<short-description>` is fine.
 
-**5. Work in your topic folder (or create it if needed)**
+**5. Work in your group folder**
+
+Folder names under `topics/` match the GitHub group labels (see the table in [README.md](README.md)). Example:
 
 ```bash
-mkdir -p topics/04-3D-TOMO-CANOPY-VISUALIZER
+cd topics/04-3D-TOMO-CANOPY-VISUALIZER
 ```
-
-Use the folder that matches your **group label** (same string as on GitHub Issues).
 
 **6. Commit and push to your fork**
 
@@ -74,15 +110,17 @@ git commit -m "Add first tomographic processing notebook"
 git push -u origin 04-3D-TOMO-CANOPY-VISUALIZER/short-description
 ```
 
-**7. Open a pull request**
+**7. Open a draft pull request (early)**
 
 Go to your fork on github.com. GitHub shows a banner suggesting a pull request for your new branch; click it. Check that:
 
 - Base repository: `BioPAL/biomass-hackathon-2026`
 - Base branch: `main`
 - Head: your fork and branch
+- Description includes `Closes #<issue-number>` (one PR = one issue)
+- Create as **Draft** while you are still coding (board → **Doing**)
 
-Then create the pull request. A maintainer will review and merge it.
+When the work is ready, click **Ready for review**. A maintainer will review and merge it.
 
 **Keeping your fork up to date** (optional, useful if the hackathon runs for several days)
 
@@ -104,9 +142,9 @@ git push origin main
 | `resources/plot/` | Shared figures and maps |
 | `resources/tests/` | `pytest` for shared helpers |
 
-**Promote to `resources/`** when a second team needs the same helper, or when the function is clearly generic (e.g. a common MAAP load path). Prototype in your topic folder first; then open an explicit PR that adds the cleaned version under the right `resources/` layer. See [resources/README.md](resources/README.md).
+**Promote to `resources/`** when a second team needs the same helper, or when the function is clearly generic (e.g. a common MAAP load path). Prototype in your group folder first; then open an explicit PR that adds the cleaned version under the right `resources/` layer. See [resources/README.md](resources/README.md).
 
-Edit mostly your own topic folder. Touch `resources/` only when the PR is intentionally about shared code.
+Edit mostly your own group folder. Touch `resources/` only when the PR is intentionally about shared code.
 
 ## Light coding conventions
 
@@ -121,16 +159,16 @@ Edit mostly your own topic folder. Touch `resources/` only when the PR is intent
 
 | Where | What for |
 | --- | --- |
-| Issues | Something specific and actionable: help wanted, a data access request, a bug in shared resources |
-| Discussions | Open questions, ideas, show and tell, anything not tied to one task |
+| Issues (Task forms) | Work items: **Task · my group** (code in your `topics/<GROUP-LABEL>/` folder) or **Task · resources** (shared helpers) |
+| Discussions | Questions, ideas, show and tell, Git help that is not a concrete task |
 
-Issue templates are set up for this repo: Help wanted, Data access request, and Bug report.
+Pick your **Group** in the Task form; the colored group label is applied automatically. Keep each Task small (S / M / L, ideally about 2 hours, at most 3).
 
 ## Ground rules
 
 - No large data files in the repo. Link to the MAAP dataset, or add a small download script instead.
 - No credentials or API keys, ever.
-- Keep changes inside your own topic folder unless the PR is explicitly for `resources/`.
+- Keep changes inside your own group folder unless the PR is explicitly for `resources/`.
 - Contributions should remain Apache 2.0 compatible.
 
 ## Code of conduct
@@ -139,4 +177,4 @@ Be respectful, welcome newcomers, keep feedback constructive, respect different 
 
 ## Getting help
 
-We are on site all week for Git and technical questions. Ask in person, or open a Help wanted issue. For anything not urgent, use Discussions.
+We are on site all week for Git and technical questions. Ask in person first. For anything not urgent, use Discussions.

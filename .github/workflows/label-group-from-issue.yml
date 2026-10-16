@@ -1,20 +1,25 @@
-# Apply the group label chosen in the Task issue form.
-# Runs with GITHUB_TOKEN so reporters do not need Triage rights.
-name: Label issue from group form
+# Apply the group label chosen in the Task issue form or PR template.
+# Fails the check (and comments) when Group is missing or not an allowed label.
+# Note: pull_request_target always runs the workflow from the *base* branch (main).
+#       Merge this file to main before the new fail behaviour applies to PRs.
+name: Label group from form
 
 on:
   issues:
     types: [opened, edited]
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
 
 permissions:
   issues: write
+  pull-requests: write
   contents: read
 
 jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - name: Apply group label from issue body
+      - name: Apply group label from issue or PR body
         uses: actions/github-script@v7
         with:
           script: |
@@ -22,7 +27,7 @@ jobs:
               '02-RFI',
               '03-QGIS',
               '04-3D-TOMO-CANOPY-VISUALIZER',
-              '05-BIOMASS&GEDI',
+              '05_BIOMASS_AND_GEDI',
               '06A-CARBON',
               '06B-CARBON',
               '07-GEOLOGY',
@@ -32,25 +37,170 @@ jobs:
               '11-A-SOIL-MOISTURE',
               '11-B-FLOODED-FOREST',
             ]);
+            const SKIP = new Set(['n/a', 'na', 'none', 'skip']);
+            const ALLOWED_LIST = [...ALLOWED].join(', ');
+            const MARKER = '<!-- group-label-bot -->';
 
-            const body = context.payload.issue.body || '';
-            // Issue forms render as: ### Group\n\n02-RFI  (or ### Proposing group)
-            const match = body.match(
-              /###\s*(?:Group|Proposing group)\s*\r?\n+([^\r\n]+)/i
-            );
-            if (!match) {
-              core.info('No Group / Proposing group section found; skipping.');
-              return;
-            }
-
-            const group = match[1].trim();
-            if (!ALLOWED.has(group)) {
-              core.warning('Group value is not an allowed label; skipping.');
-              return;
-            }
-
-            const issue_number = context.issue.number;
+            const isPR = !!context.payload.pull_request;
+            const item = isPR ? context.payload.pull_request : context.payload.issue;
+            const body = item.body || '';
+            const issue_number = item.number;
             const { owner, repo } = context.repo;
+
+            async function notifyFailure(message) {
+              const commentBody = `${MARKER}\n:x: **Group label**\n\n${message}\n\nAllowed values: \`${ALLOWED_LIST}\`\n\nMaintainer-only escape: put \`n/a\` under \`## Group\`.`;
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                { owner, repo, issue_number, per_page: 100 }
+              );
+              const existing = comments.find((c) =>
+                (c.body || '').includes(MARKER)
+              );
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                  body: commentBody,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number,
+                  body: commentBody,
+                });
+              }
+              core.setFailed(message);
+            }
+
+            async function clearFailureComment() {
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                { owner, repo, issue_number, per_page: 100 }
+              );
+              const existing = comments.find((c) =>
+                (c.body || '').includes(MARKER)
+              );
+              if (existing) {
+                await github.rest.issues.deleteComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                });
+              }
+            }
+
+            // Issue forms: ### Group\n\n02-RFI
+            // PR template: ## Group + checklist (- [x] 06A-CARBON) or plain line
+            function groupSection() {
+              const m = body.match(/#{2,3}\s*(?:Group|Proposing group)\s*\r?\n/i);
+              if (!m) return null;
+              const start = m.index + m[0].length;
+              const rest = body.slice(start);
+              const next = rest.search(/\r?\n#{1,3}\s+\S/);
+              return next === -1 ? rest : rest.slice(0, next);
+            }
+
+            function parseGroup() {
+              const section = groupSection();
+              if (section === null) return { error: 'missing-section' };
+
+              const checked = [
+                ...section.matchAll(/^\s*[-*]\s*\[x\]\s*([^\r\n]+)/gim),
+              ].map((x) =>
+                x[1]
+                  .trim()
+                  .replace(/^`+|`+$/g, '')
+                  .replace(/\s*\(.*\)\s*$/, '')
+                  .trim()
+              );
+
+              if (checked.length > 1) {
+                return {
+                  error: 'multi',
+                  detail: checked.join(', '),
+                };
+              }
+              if (checked.length === 1) {
+                return { group: checked[0] };
+              }
+
+              // Legacy / issue form: first non-empty line that is not a list item
+              const lines = section
+                .split(/\r?\n/)
+                .map((l) => l.trim())
+                .filter(Boolean)
+                .filter((l) => !l.startsWith('<!--'))
+                .filter((l) => !/^[-*]\s*\[[ xX]\]/.test(l))
+                .filter((l) => !/^tick\b/i.test(l));
+
+              if (lines.length === 0) {
+                // Only unchecked boxes → treat as empty
+                if (/^\s*[-*]\s*\[[ ]\]/m.test(section)) {
+                  return { error: 'unchecked' };
+                }
+                return { error: 'empty' };
+              }
+
+              return {
+                group: lines[0].replace(/^`+|`+$/g, '').trim(),
+              };
+            }
+
+            const parsed = parseGroup();
+
+            if (parsed.error === 'missing-section') {
+              await notifyFailure(
+                isPR
+                  ? 'Add `## Group` and tick **one** group box in the PR description, or tick `n/a` for maintainer/docs PRs.'
+                  : 'Group field is missing from the issue body.'
+              );
+              return;
+            }
+
+            if (parsed.error === 'multi') {
+              await notifyFailure(
+                `Tick **exactly one** group box (found: \`${parsed.detail}\`).`
+              );
+              return;
+            }
+
+            if (parsed.error === 'unchecked' || parsed.error === 'empty') {
+              await notifyFailure(
+                isPR
+                  ? 'Tick **exactly one** box under `## Group` (or `n/a` for maintainer/docs PRs).'
+                  : 'Group value is empty.'
+              );
+              return;
+            }
+
+            const group = parsed.group;
+
+            if (SKIP.has(group.toLowerCase())) {
+              await clearFailureComment();
+              core.info(`Group is "${group}"; skipping label (explicit escape).`);
+              return;
+            }
+
+            if (
+              !group ||
+              group.startsWith('<!--') ||
+              /^e\.g\./i.test(group) ||
+              /your group label/i.test(group)
+            ) {
+              await notifyFailure(
+                `Group value is empty or still a placeholder (\`${group}\`). Tick an exact label box, e.g. \`03-QGIS\`.`
+              );
+              return;
+            }
+
+            if (!ALLOWED.has(group)) {
+              await notifyFailure(
+                `Group value \`${group}\` is not a valid group label.`
+              );
+              return;
+            }
 
             const { data: current } = await github.rest.issues.listLabelsOnIssue({
               owner,
@@ -77,4 +227,7 @@ jobs:
               labels: [group],
             });
 
-            core.info('Applied group label from form.');
+            await clearFailureComment();
+            core.info(
+              `Applied group label ${group} on ${isPR ? 'PR' : 'issue'} #${issue_number}.`
+            );

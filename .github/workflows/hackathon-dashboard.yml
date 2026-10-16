@@ -1,0 +1,60 @@
+# Build live HTML dashboard metrics on issue close / PR merge, deploy to GitHub Pages.
+name: Hackathon dashboard
+
+on:
+  issues:
+    types: [closed, reopened]
+  pull_request_target:
+    types: [closed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: hackathon-dashboard-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'issues' ||
+      (github.event_name == 'pull_request_target' && github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Collect metrics
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python dashboard/collect_metrics.py
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

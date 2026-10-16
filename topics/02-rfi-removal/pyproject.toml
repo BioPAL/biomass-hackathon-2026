@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rfi"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = []   # numpy, scipy, etc. if you want them tracked
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BIOMASS Hackathon Live Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* Aligned with kickoff deck tokens (docs/presentations/.../tokens.css) */
+    :root {
+      --bg: #0f1923;
+      --bg-2: #152433;
+      --panel: rgba(21, 36, 51, 0.82);
+      --ink: #ffffff;
+      --muted: #9bb0c0;
+      --line: rgba(0, 182, 240, 0.22);
+      --tl: #007a94;
+      --tl2: #347891;
+      --cy: #00b6f0;
+      --gr: #97c00b;
+      --pk: #ff7e79;
+      --vm: #5234c9;
+      --mn: #a3d8b0;
+      --signal: var(--cy);
+      --warn: var(--gr);
+      --hot: var(--pk);
+      --fs: "Inter", "Helvetica Neue", sans-serif;
+      --fm: "JetBrains Mono", "IBM Plex Mono", monospace;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      color: var(--ink);
+      font-family: var(--fs);
+      background:
+        radial-gradient(1000px 520px at 8% -8%, rgba(0, 182, 240, 0.16), transparent 55%),
+        radial-gradient(800px 480px at 92% 0%, rgba(151, 192, 11, 0.1), transparent 50%),
+        linear-gradient(165deg, var(--bg) 0%, var(--bg-2) 55%, #0c141c 100%);
+      overflow-x: hidden;
+    }
+    /* Soft drifting glow blobs */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(0, 182, 240, 0.22), transparent 42%),
+        radial-gradient(circle at 78% 18%, rgba(151, 192, 11, 0.14), transparent 38%),
+        radial-gradient(circle at 60% 75%, rgba(0, 122, 148, 0.18), transparent 45%);
+      animation: drift 22s ease-in-out infinite alternate;
+      filter: blur(8px);
+    }
+    /* Rotating radar grid (subtle) */
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -30%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cpath d='M0 100H200M100 0V200' stroke='%2300b6f0' stroke-width='0.7' fill='none'/%3E%3Ccircle cx='100' cy='100' r='45' stroke='%2300b6f0' stroke-width='0.5' fill='none'/%3E%3Ccircle cx='100' cy='100' r='80' stroke='%2397c00b' stroke-width='0.4' fill='none'/%3E%3Cpath d='M100 100L180 60' stroke='%2300b6f0' stroke-width='0.8'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      animation: sweep 28s linear infinite;
+    }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(3%, -2%) scale(1.06); }
+    }
+    @keyframes sweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) {
+      body::before, body::after { animation: none; }
+    }
+    .wrap { position: relative; z-index: 1; max-width: 1280px; margin: 0 auto; padding: 1.5rem 1.25rem 2.5rem; }
+
+    .brand-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem 1.5rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+      animation: rise 0.55s ease both;
+    }
+    .brand-left, .brand-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .brand-left img.esa { height: 42px; width: auto; display: block; }
+    .brand-left img.biomass { height: 40px; width: auto; display: block; }
+    .brand-right img.biopal { height: 36px; width: auto; display: block; }
+    .brand-right img.acri { height: 28px; width: auto; display: block; opacity: 0.92; }
+    .brand-sep {
+      width: 1px; height: 28px; background: var(--line);
+    }
+
+    header { display: grid; gap: 0.65rem; margin-bottom: 1.5rem; animation: rise 0.65s ease both; }
+    .eyebrow {
+      font-family: var(--fm); font-size: 0.72rem; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--cy);
+    }
+    h1 {
+      margin: 0; font-weight: 700; font-size: clamp(1.9rem, 4.5vw, 2.75rem);
+      line-height: 1.1; letter-spacing: -0.02em;
+    }
+    h1 span { color: var(--cy); }
+    .sub { max-width: 40rem; color: var(--muted); font-size: 0.98rem; line-height: 1.45; margin: 0; }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 0.65rem 1.1rem;
+      font-family: var(--fm); font-size: 0.74rem; color: var(--muted);
+    }
+    .meta strong { color: var(--ink); font-weight: 500; }
+    .pulse { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .pulse i {
+      width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--gr);
+      box-shadow: 0 0 0 0 rgba(151, 192, 11, 0.55); animation: ping 1.8s ease infinite;
+    }
+    @keyframes ping {
+      0% { box-shadow: 0 0 0 0 rgba(151, 192, 11, 0.5); }
+      70% { box-shadow: 0 0 0 9px rgba(151, 192, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(151, 192, 11, 0); }
+    }
+
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+    @media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .kpi {
+      background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--cy);
+      padding: 1rem 0.95rem 0.9rem; animation: rise 0.7s ease both;
+    }
+    .kpi:nth-child(2) { border-top-color: var(--gr); }
+    .kpi:nth-child(3) { border-top-color: var(--tl); }
+    .kpi:nth-child(4) { border-top-color: var(--pk); }
+    .kpi:nth-child(1) { animation-delay: 0.04s; } .kpi:nth-child(2) { animation-delay: 0.08s; }
+    .kpi:nth-child(3) { animation-delay: 0.12s; } .kpi:nth-child(4) { animation-delay: 0.16s; }
+    .kpi .label {
+      font-family: var(--fm); font-size: 0.68rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .kpi .value {
+      margin-top: 0.3rem; font-weight: 700; font-size: 2.4rem; line-height: 1; color: var(--ink);
+    }
+    .kpi:nth-child(1) .value { color: var(--cy); }
+    .kpi:nth-child(2) .value { color: var(--gr); }
+    .kpi:nth-child(3) .value { color: var(--tl2); }
+    .kpi:nth-child(4) .value { color: var(--pk); }
+    .kpi .hint { margin-top: 0.3rem; color: var(--muted); font-size: 0.85rem; }
+
+    .grid { display: grid; grid-template-columns: 1.65fr 1fr; gap: 0.9rem; }
+    @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+    section.panel {
+      background: var(--panel); border: 1px solid var(--line); padding: 1rem 1.05rem 1.05rem;
+      animation: rise 0.75s ease both; animation-delay: 0.2s;
+    }
+    section.panel h2 {
+      margin: 0 0 0.85rem; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.01em;
+      color: var(--ink); display: flex; align-items: center; gap: 0.5rem;
+    }
+    section.panel h2::before {
+      content: ""; width: 0.55rem; height: 0.55rem; background: var(--cy); border-radius: 1px;
+    }
+    section.panel.contributors h2::before { background: var(--gr); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 0.5rem 0.35rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    th {
+      font-family: var(--fm); font-size: 0.65rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted); font-weight: 500;
+    }
+    td.mono, .mono { font-family: var(--fm); font-size: 0.78rem; }
+    tr:hover td { background: rgba(0, 182, 240, 0.05); }
+    .bar { height: 0.32rem; background: rgba(0, 122, 148, 0.25); overflow: hidden; margin-top: 0.3rem; border-radius: 1px; }
+    .bar > span {
+      display: block; height: 100%;
+      background: linear-gradient(90deg, var(--tl), var(--cy));
+      width: 0; transition: width 0.85s ease;
+    }
+
+    .person { display: flex; justify-content: space-between; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+    .person:last-child { border-bottom: 0; }
+    .person .name-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.45rem 0.55rem; }
+    .person .name { font-family: var(--fm); font-size: 0.84rem; }
+    .person .group-tag {
+      font-family: var(--fm); font-size: 0.72rem; letter-spacing: 0.02em;
+      color: var(--ink); background: rgba(0, 182, 240, 0.18);
+      border: 1px solid rgba(0, 182, 240, 0.55);
+      padding: 0.14rem 0.45rem; border-radius: 2px; white-space: nowrap;
+    }
+    .person .group-tag.is-repo {
+      color: var(--ink); background: rgba(151, 192, 11, 0.22);
+      border-color: rgba(151, 192, 11, 0.55);
+    }
+    .person .group-tag.is-empty { color: var(--muted); background: transparent; border-color: var(--line); }
+    .lines-star {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 1.15rem; height: 1.15rem; flex-shrink: 0;
+      transform-origin: 50% 50%;
+      filter: drop-shadow(0 0 0.35rem rgba(255, 214, 0, 0.75));
+      animation: star-spin 1.15s linear infinite, star-flash 0.7s ease-in-out infinite, star-bob 0.7s ease-in-out infinite;
+    }
+    .lines-star svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .race-labels .lines-star { width: 0.95rem; height: 0.95rem; }
+    .svg-lines-star {
+      transform-box: fill-box;
+      transform-origin: center;
+      filter: drop-shadow(0 0 2px rgba(255, 214, 0, 0.85));
+      animation: star-spin 1.15s linear infinite, star-flash 0.7s ease-in-out infinite;
+    }
+    @keyframes star-spin {
+      from { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.15); }
+      to { transform: rotate(360deg) scale(1); }
+    }
+    @keyframes star-flash {
+      0%, 100% { filter: drop-shadow(0 0 0.35rem rgba(255, 214, 0, 0.95)); }
+      33% { filter: drop-shadow(0 0 0.5rem rgba(255, 126, 121, 0.9)); }
+      66% { filter: drop-shadow(0 0 0.5rem rgba(0, 182, 240, 0.9)); }
+    }
+    @keyframes star-bob {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -0.12rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .lines-star, .svg-lines-star { animation: none; filter: drop-shadow(0 0 0.25rem rgba(255, 214, 0, 0.6)); }
+    }
+    .person .stats { color: var(--muted); font-size: 0.84rem; display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+    .person .stats em { font-style: normal; color: var(--gr); font-family: var(--fm); }
+    .person .stats .lines-hot {
+      font-style: normal; font-family: var(--fm); font-weight: 600;
+      color: #ffd200;
+      text-shadow: 0 0 0.55rem rgba(255, 210, 0, 0.55);
+      display: inline-flex; align-items: center; gap: 0.3rem;
+    }
+
+    footer {
+      margin-top: 1.35rem; font-family: var(--fm); font-size: 0.7rem; color: var(--muted);
+      animation: rise 0.8s ease both; animation-delay: 0.28s;
+    }
+    footer a { color: var(--cy); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .err { border: 1px solid var(--pk); color: var(--pk); padding: 0.9rem; font-family: var(--fm); font-size: 0.82rem; }
+
+    .charts-pick {
+      margin: 1.35rem 0 0.75rem;
+      font-family: var(--fm); font-size: 0.72rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--cy);
+    }
+    .chart-panel { margin-bottom: 1rem; }
+    .chart-panel .option-tag {
+      display: inline-block; font-family: var(--fm); font-size: 0.68rem;
+      color: var(--pk); border: 1px solid rgba(255, 126, 121, 0.45);
+      padding: 0.1rem 0.4rem; margin-right: 0.45rem; vertical-align: middle;
+    }
+    .chart-panel h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem; }
+    .chart-legend {
+      display: flex; flex-wrap: wrap; gap: 0.75rem 1.1rem;
+      margin: 0.35rem 0 0.75rem; font-family: var(--fm); font-size: 0.72rem; color: var(--muted);
+    }
+    .chart-legend i {
+      display: inline-block; width: 0.75rem; height: 0.22rem; margin-right: 0.35rem;
+      vertical-align: middle; border-radius: 1px;
+    }
+    .chart-svg-wrap { width: 100%; overflow-x: auto; }
+    .chart-svg-wrap svg { width: 100%; height: auto; display: block; min-width: 560px; }
+    .race-labels {
+      display: flex; flex-wrap: wrap; gap: 0.5rem 0.9rem;
+      margin-top: 0.55rem; font-family: var(--fm); font-size: 0.72rem;
+    }
+    .race-labels span { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted); }
+    .race-labels i { width: 0.7rem; height: 0.7rem; border-radius: 50%; display: inline-block; }
+    .countdown {
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.55rem 1rem;
+      margin: 0 0 1rem; padding: 0.75rem 0.9rem;
+      border: 1px solid rgba(255, 126, 121, 0.35);
+      background: rgba(255, 126, 121, 0.08);
+      font-family: var(--fm);
+    }
+    .countdown .cd-label {
+      font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pk);
+    }
+    .countdown .cd-clock {
+      font-size: clamp(1.15rem, 2.5vw, 1.55rem); font-weight: 600; color: var(--ink);
+      letter-spacing: 0.04em;
+    }
+    .countdown .cd-hint { font-size: 0.72rem; color: var(--muted); }
+    .countdown.is-done .cd-clock { color: var(--gr); }
+    .podium {
+      font-family: var(--fm); font-size: 0.62rem; font-weight: 700;
+      width: 1.05rem; height: 1.05rem; border-radius: 2px;
+      display: inline-flex; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .podium.is-1 { background: #ffd200; color: #0f1923; box-shadow: 0 0 0.45rem rgba(255, 210, 0, 0.45); }
+    .podium.is-2 { background: #c5d0d8; color: #0f1923; }
+    .podium.is-3 { background: #c47a45; color: #0f1923; }
+    .race-draw {
+      stroke-dasharray: var(--path-len);
+      stroke-dashoffset: var(--path-len);
+      animation: race-launch 0.8s ease-out forwards;
+    }
+    @keyframes race-launch {
+      to { stroke-dashoffset: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .race-draw { animation: none; stroke-dashoffset: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand-bar">
+      <div class="brand-left">
+        <img class="esa" src="assets/logos/esa-dark.png" alt="ESA" />
+        <span class="brand-sep" aria-hidden="true"></span>
+        <img class="biomass" src="assets/logos/biomass-disc.png" alt="BIOMASS" />
+      </div>
+      <div class="brand-right">
+        <img class="biopal" src="assets/logos/biopal-text-right.png" alt="BioPAL" />
+        <span class="brand-sep" aria-hidden="true"></span>
+        <img class="acri" src="assets/logos/acri-st.png" alt="ACRI-ST" />
+      </div>
+    </div>
+
+    <header>
+      <div class="eyebrow">ESA · BioPAL · ESOC 2026</div>
+      <h1>BIOMASS Hackathon<br /><span>Live contribution board</span></h1>
+      <p class="sub">Issues closed, PRs merged, and code churn by group, refreshed when an issue is closed or a PR is merged.</p>
+      <div class="meta">
+        <span class="pulse"><i></i> Auto-refresh on close / merge</span>
+        <span>Repo <strong id="repo">…</strong></span>
+        <span>Updated <strong id="updated">…</strong></span>
+      </div>
+    </header>
+
+    <div id="err" class="err" hidden></div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="label">Issues closed</div><div class="value" id="kpi-issues-closed">—</div><div class="hint">all closed issues</div></div>
+      <div class="kpi"><div class="label">PRs merged</div><div class="value" id="kpi-prs">—</div><div class="hint">into main</div></div>
+      <div class="kpi"><div class="label">Issues open</div><div class="value" id="kpi-open">—</div><div class="hint">all open issues</div></div>
+      <div class="kpi"><div class="label">PRs open</div><div class="value" id="kpi-pr-open">—</div><div class="hint">including drafts</div></div>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>By group</h2>
+        <p class="sub" style="margin: -0.35rem 0 0.85rem; font-size: 0.78rem;">Ranked by PRs merged, then issues closed, then issues open. Gold star = #1.</p>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Group</th><th>PRs merged</th><th>Issues closed</th><th>Issues open</th><th>+ / − (merged PRs)</th><th>Activity</th>
+              </tr>
+            </thead>
+            <tbody id="groups-body"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="panel contributors">
+        <h2>Top contributors</h2>
+        <p class="sub" style="margin: -0.35rem 0 0.85rem; font-size: 0.78rem;">Ranked by merged PRs. Gold star + lines = most lines added.</p>
+        <div id="people"></div>
+      </section>
+    </div>
+
+    <div class="charts-pick">Hackathon window · 13–16 Oct · hourly (Europe/Berlin)</div>
+    <div class="countdown" id="finish-countdown" aria-live="polite">
+      <span class="cd-label">Countdown</span>
+      <span class="cd-clock" id="countdown-clock">--:--:--</span>
+      <span class="cd-hint">End of hackathon · 16 Oct 12:00 · Europe/Berlin</span>
+    </div>
+
+    <section class="panel chart-panel">
+      <h2>Groups cumulative work</h2>
+      <p class="sub" style="margin: -0.25rem 0 0.35rem; font-size: 0.78rem;">Hourly cumulative lines added under each topic (13–16 Oct).</p>
+      <div class="chart-svg-wrap" id="chart-groups"></div>
+      <div class="race-labels" id="chart-groups-legend"></div>
+    </section>
+
+    <section class="panel chart-panel">
+      <h2>Contributor lines race</h2>
+      <p class="sub" style="margin: -0.25rem 0 0.35rem; font-size: 0.78rem;">Hourly cumulative lines for the top writers (13–16 Oct).</p>
+      <div class="chart-svg-wrap" id="chart-race"></div>
+      <div class="race-labels" id="chart-race-legend"></div>
+    </section>
+
+    <footer>
+      Source: GitHub API · Actions · visuals aligned with the hackathon kickoff deck ·
+      <a href="https://github.com/BioPAL/biomass-hackathon-2026">repo</a>
+      · <a href="https://github.com/orgs/BioPAL/projects/6">project board</a>
+      · live: <a href="https://biopal.github.io/biomass-hackathon-2026/">Pages</a>
+    </footer>
+  </div>
+  <script>
+    function fmt(n) { return new Intl.NumberFormat("en-GB").format(n ?? 0); }
+    function fmtTime(iso) {
+      if (!iso) return "—";
+      return new Date(iso).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+    }
+    function el(tag, props, kids) {
+      const node = document.createElement(tag);
+      if (props) {
+        Object.entries(props).forEach(([k, v]) => {
+          if (k === "className") node.className = v;
+          else if (k === "text") node.textContent = v;
+          else if (k === "style" && v && typeof v === "object") Object.assign(node.style, v);
+          else if (v != null) node.setAttribute(k, v);
+        });
+      }
+      (kids || []).forEach((c) => node.appendChild(typeof c === "string" ? document.createTextNode(c) : c));
+      return node;
+    }
+    const RACE_COLORS = ["#00b6f0", "#97c00b", "#ff7e79", "#a3d8b0", "#5234c9", "#ffd200"];
+    const GROUP_COLORS = ["#00b6f0", "#97c00b", "#ff7e79", "#a3d8b0", "#5234c9", "#ffd200", "#347891", "#ff9f43", "#c8f542", "#7ec8e3", "#e8a0bf", "#9bb0c0"];
+    const STAR_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#ffd200" stroke="#fff3a0" stroke-width="0.6" d="M12 2.2l2.7 6.2 6.7.6-5.1 4.4 1.5 6.5L12 16.8 6.2 20l1.5-6.5L2.6 9l6.7-.6L12 2.2z"/></svg>';
+
+    function makeLinesStar(title) {
+      const star = el("span", {
+        className: "lines-star",
+        role: "img",
+        "aria-label": "Most lines added",
+        title: title || "Most lines added",
+      });
+      star.innerHTML = STAR_SVG;
+      return star;
+    }
+
+    function svgEl(name, attrs) {
+      const n = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.entries(attrs || {}).forEach(([k, v]) => n.setAttribute(k, v));
+      return n;
+    }
+
+    function appendSvgStar(parent, cx, cy, size) {
+      const outer = svgEl("g", { transform: `translate(${cx},${cy})` });
+      const inner = svgEl("g", { class: "svg-lines-star" });
+      const s = size / 24;
+      const path = svgEl("path", {
+        d: "M12 2.2l2.7 6.2 6.7.6-5.1 4.4 1.5 6.5L12 16.8 6.2 20l1.5-6.5L2.6 9l6.7-.6L12 2.2z",
+        fill: "#ffd200",
+        stroke: "#fff8c8",
+        "stroke-width": "0.8",
+        transform: `translate(${-12 * s},${-12 * s}) scale(${s})`,
+      });
+      const tip = svgEl("title");
+      tip.textContent = "Most lines added";
+      inner.appendChild(tip);
+      inner.appendChild(path);
+      outer.appendChild(inner);
+      parent.appendChild(outer);
+      return outer;
+    }
+
+    function appendRocket(parent, x, y, color, withFlame) {
+      const g = svgEl("g", { transform: `translate(${x},${y})` });
+      if (withFlame) {
+        g.appendChild(svgEl("path", {
+          d: "M-10,-2.2 L-16,0 L-10,2.2 Z",
+          fill: "#ff7e79",
+          opacity: "0.95",
+        }));
+        g.appendChild(svgEl("path", {
+          d: "M-9,-1.2 L-13.5,0 L-9,1.2 Z",
+          fill: "#ffd200",
+          opacity: "0.95",
+        }));
+      }
+      g.appendChild(svgEl("path", {
+        d: "M-7,-3.2 L3,-3.2 L7,0 L3,3.2 L-7,3.2 Z",
+        fill: color,
+        stroke: "rgba(255,255,255,0.35)",
+        "stroke-width": "0.5",
+      }));
+      g.appendChild(svgEl("path", {
+        d: "M3,-3.2 L8,0 L3,3.2 Z",
+        fill: "#ffffff",
+        opacity: "0.9",
+      }));
+      parent.appendChild(g);
+      return g;
+    }
+
+    // Finish line: 16 Oct 2026 12:00 Europe/Berlin (CEST = UTC+2)
+    const FINISH_AT = new Date("2026-10-16T12:00:00+02:00");
+    const FINISH_HOUR = "2026-10-16T12";
+
+    function chartHours(charts) {
+      return charts.hours || charts.days || [];
+    }
+
+    function hourIndex(hours, key) {
+      const exact = hours.indexOf(key);
+      if (exact >= 0) return exact;
+      if (!hours.length) return 0;
+      if (key < hours[0]) return 0;
+      if (key > hours[hours.length - 1]) return hours.length - 1;
+      for (let i = 0; i < hours.length - 1; i++) {
+        if (hours[i] <= key && key < hours[i + 1]) return i;
+      }
+      return hours.length - 1;
+    }
+
+    function berlinHourKey(d) {
+      const parts = new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Berlin",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        hourCycle: "h23",
+      }).formatToParts(d || new Date());
+      const get = (t) => parts.find((p) => p.type === t).value;
+      return get("year") + "-" + get("month") + "-" + get("day") + "T" + get("hour");
+    }
+
+    function nowHourIndex(hours) {
+      return hourIndex(hours, berlinHourKey());
+    }
+
+    function hourLabel(h) {
+      const [datePart, hr] = h.split("T");
+      const day = Number(datePart.split("-")[2]);
+      const hour = Number(hr);
+      if (hour === 0) return day + " Oct";
+      if (hour % 6 === 0) return String(hour).padStart(2, "0") + "h";
+      return "";
+    }
+
+    function formatCountdown(ms) {
+      if (ms <= 0) return "00:00:00";
+      const total = Math.floor(ms / 1000);
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      const pad2 = (n) => String(n).padStart(2, "0");
+      return pad2(h) + ":" + pad2(m) + ":" + pad2(s);
+    }
+
+    function tickCountdown() {
+      const box = document.getElementById("finish-countdown");
+      const clock = document.getElementById("countdown-clock");
+      if (!box || !clock) return;
+      const left = FINISH_AT.getTime() - Date.now();
+      if (left <= 0) {
+        clock.textContent = "FINISHED";
+        box.classList.add("is-done");
+        return;
+      }
+      box.classList.remove("is-done");
+      clock.textContent = formatCountdown(left);
+    }
+
+    function smoothPath(points) {
+      if (!points.length) return "";
+      if (points.length === 1) return `M${points[0][0]},${points[0][1]}`;
+      let d = `M${points[0][0]},${points[0][1]}`;
+      for (let i = 0; i < points.length - 1; i++) {
+        const [x0, y0] = points[i];
+        const [x1, y1] = points[i + 1];
+        const cx = (x0 + x1) / 2;
+        d += ` C${cx},${y0} ${cx},${y1} ${x1},${y1}`;
+      }
+      return d;
+    }
+
+    const launchedHosts = new WeakSet();
+    function launchPath(path) {
+      try {
+        const len = path.getTotalLength();
+        path.style.setProperty("--path-len", String(len));
+        path.classList.add("race-draw");
+      } catch (_) { /* empty */ }
+    }
+
+    function podiumBadge(place) {
+      return el("span", { className: "podium is-" + place, text: String(place), title: "Podium #" + place });
+    }
+
+    function fillRaceLegend(legend, items, colors) {
+      legend.replaceChildren();
+      items.forEach((item, idx) => {
+        const kids = [
+          el("i", { style: { background: colors[idx % colors.length] } }),
+        ];
+        if (idx < 3) kids.push(podiumBadge(idx + 1));
+        if (item.star) kids.push(makeLinesStar(item.starTitle || "Most lines added"));
+        kids.push(document.createTextNode(item.label + " (+" + fmt(item.last) + ")"));
+        legend.appendChild(el("span", null, kids));
+      });
+    }
+
+    function renderLineChart(host, hours, seriesList, opts) {
+      host.replaceChildren();
+      if (!hours.length) {
+        host.appendChild(el("p", { className: "sub", text: "No chart data yet." }));
+        return;
+      }
+      const maxY = Math.max(1, ...seriesList.flatMap((s) => s.vals));
+      const W = opts.width || 860;
+      const H = opts.height || 240;
+      const pad = opts.pad || { t: 18, r: opts.right || 16, b: 40, l: 44 };
+      const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+      const svg = svgEl("svg", {
+        viewBox: `0 0 ${W} ${H}`,
+        role: "img",
+        "aria-label": opts.label || "chart",
+        overflow: "visible",
+        style: "overflow: visible;",
+      });
+
+      const defs = svgEl("defs");
+      const flame = svgEl("linearGradient", { id: "flame-trail-" + (opts.id || "x"), x1: "0%", y1: "0%", x2: "100%", y2: "0%" });
+      [
+        ["0%", "#ff7e79", "0"],
+        ["35%", "#ff9f43", "0.85"],
+        ["70%", "#ffd200", "0.95"],
+        ["100%", "#ffffff", "0.35"],
+      ].forEach(([offset, color, opacity]) => {
+        flame.appendChild(svgEl("stop", { offset, "stop-color": color, "stop-opacity": opacity }));
+      });
+      defs.appendChild(flame);
+      const glowId = "leader-glow-" + (opts.id || "x");
+      const glow = svgEl("filter", { id: glowId, x: "-20%", y: "-40%", width: "140%", height: "180%" });
+      glow.appendChild(svgEl("feGaussianBlur", { stdDeviation: "2.2", result: "blur" }));
+      const merge = svgEl("feMerge");
+      merge.appendChild(svgEl("feMergeNode", { in: "blur" }));
+      merge.appendChild(svgEl("feMergeNode", { in: "SourceGraphic" }));
+      glow.appendChild(merge);
+      defs.appendChild(glow);
+      svg.appendChild(defs);
+
+      svg.appendChild(svgEl("line", { x1: pad.l, y1: pad.t, x2: pad.l, y2: pad.t + ih, stroke: "rgba(0,182,240,0.25)", "stroke-width": "1" }));
+      svg.appendChild(svgEl("line", { x1: pad.l, y1: pad.t + ih, x2: pad.l + iw, y2: pad.t + ih, stroke: "rgba(0,182,240,0.25)", "stroke-width": "1" }));
+      [0, 0.5, 1].forEach((t) => {
+        const y = pad.t + ih * (1 - t);
+        const label = svgEl("text", { x: pad.l - 6, y: y + 3, fill: "#9bb0c0", "font-size": "9", "text-anchor": "end", "font-family": "JetBrains Mono, monospace" });
+        label.textContent = String(Math.round(maxY * t));
+        svg.appendChild(label);
+      });
+
+      const n = Math.max(1, hours.length - 1);
+      const xAt = (i) => pad.l + (iw * i) / n;
+      const yAt = (v) => pad.t + ih * (1 - v / maxY);
+      const nowIdx = nowHourIndex(hours);
+      const finishIdx = hourIndex(hours, FINISH_HOUR);
+
+      hours.forEach((h, i) => {
+        if (!h.endsWith("T00")) return;
+        svg.appendChild(svgEl("line", {
+          x1: xAt(i), y1: pad.t, x2: xAt(i), y2: pad.t + ih,
+          stroke: "rgba(0,182,240,0.12)", "stroke-width": "1", "stroke-dasharray": "3 4",
+        }));
+      });
+
+      // End of hackathon marker: 16 Oct 12:00 Berlin (curves stop at "now", not here)
+      const finishX = xAt(finishIdx);
+      svg.appendChild(svgEl("line", {
+        x1: finishX, y1: pad.t - 6, x2: finishX, y2: pad.t + ih,
+        stroke: "#ff7e79", "stroke-width": "1.8", "stroke-dasharray": "5 4", opacity: "0.95",
+      }));
+      const finishLbl = svgEl("text", {
+        x: finishX + 5, y: pad.t + 9, fill: "#ff7e79", "font-size": "9",
+        "font-family": "JetBrains Mono, monospace",
+      });
+      finishLbl.textContent = "End of hackathon";
+      svg.appendChild(finishLbl);
+
+      // Subtle "now" tick so it's clear rockets stop at current hour
+      if (nowIdx < finishIdx) {
+        const nowX = xAt(nowIdx);
+        svg.appendChild(svgEl("line", {
+          x1: nowX, y1: pad.t, x2: nowX, y2: pad.t + ih,
+          stroke: "rgba(255,255,255,0.22)", "stroke-width": "1", "stroke-dasharray": "2 3",
+        }));
+      }
+
+      const drawables = [];
+      const ordered = seriesList.slice().sort((a, b) => Number(!!a.star) - Number(!!b.star));
+      ordered.forEach((s) => {
+        // Always stop curves at the current hour — never draw into the future
+        const endIdx = Math.max(0, Math.min(nowIdx, (s.vals.length || 1) - 1));
+        const pts = [];
+        for (let i = 0; i <= endIdx; i++) {
+          pts.push([xAt(i), yAt(s.vals[i] ?? 0)]);
+        }
+        if (pts.length < 1) pts.push([xAt(0), yAt(0)]);
+        if (pts.length < 2) pts.push(pts[0]);
+        const d = smoothPath(pts);
+        const flameUrl = "url(#flame-trail-" + (opts.id || "x") + ")";
+        const glowUrl = "url(#" + glowId + ")";
+
+        if (s.star) {
+          const trailWide = svgEl("path", {
+            d, fill: "none", stroke: flameUrl, "stroke-width": "9",
+            "stroke-linejoin": "round", "stroke-linecap": "round", opacity: "0.45",
+            filter: glowUrl,
+          });
+          const trailCore = svgEl("path", {
+            d, fill: "none", stroke: "#ffd200", "stroke-width": "4",
+            "stroke-linejoin": "round", "stroke-linecap": "round", opacity: "0.55",
+          });
+          svg.appendChild(trailWide);
+          svg.appendChild(trailCore);
+          drawables.push(trailWide, trailCore);
+        }
+
+        const main = svgEl("path", {
+          d, fill: "none", stroke: s.color,
+          "stroke-width": s.star ? "2.8" : "2.1",
+          "stroke-linejoin": "round", "stroke-linecap": "round",
+        });
+        svg.appendChild(main);
+        drawables.push(main);
+
+        const tip = pts[pts.length - 1];
+        appendRocket(svg, tip[0], tip[1], s.color, !!(s.flame || s.star));
+        if (s.star) appendSvgStar(svg, tip[0] + 14, tip[1] - 10, 13);
+
+        if (s.endLabel) {
+          const t = svgEl("text", {
+            x: tip[0] + (s.star ? 24 : 12), y: tip[1] + 3, fill: s.color, "font-size": "10",
+            "font-family": "JetBrains Mono, monospace",
+          });
+          t.textContent = s.endLabel;
+          svg.appendChild(t);
+        }
+      });
+
+      hours.forEach((h, i) => {
+        const lab = hourLabel(h);
+        if (!lab) return;
+        const t = svgEl("text", {
+          x: xAt(i), y: H - 12, fill: "#9bb0c0", "font-size": "9",
+          "text-anchor": "middle", "font-family": "JetBrains Mono, monospace",
+        });
+        t.textContent = lab;
+        svg.appendChild(t);
+      });
+
+      host.appendChild(svg);
+      if (!launchedHosts.has(host)) {
+        requestAnimationFrame(() => {
+          drawables.forEach(launchPath);
+          launchedHosts.add(host);
+        });
+      }
+      return { maxY, seriesList };
+    }
+
+    function renderGroups(charts, groupsMeta) {
+      const host = document.getElementById("chart-groups");
+      const legend = document.getElementById("chart-groups-legend");
+      if (!charts.groups || !charts.groups.ids || !charts.groups.ids.length) {
+        host.replaceChildren(el("p", { className: "sub", text: "No group chart data yet." }));
+        legend.replaceChildren();
+        return;
+      }
+      const hours = chartHours(charts);
+      const ids = charts.groups.ids;
+      const names = charts.groups.names || {};
+      const series = charts.groups.series;
+      const topId = ids[0];
+      const closedById = Object.fromEntries(
+        (groupsMeta || []).map((g) => [g.id, (g.issues_closed || 0) > 0])
+      );
+      const seriesList = ids.map((id, idx) => ({
+        vals: series[id] || [],
+        color: GROUP_COLORS[idx % GROUP_COLORS.length],
+        endLabel: names[id] || id,
+        star: id === topId,
+        // Flames on rockets for groups that already closed at least one issue
+        flame: !!closedById[id],
+      }));
+      renderLineChart(host, hours, seriesList, {
+        id: "groups", label: "Groups cumulative work", height: 300, width: 980, right: 170,
+      });
+      fillRaceLegend(legend, ids.map((id) => ({
+        label: names[id] || id,
+        last: (series[id] || []).slice(-1)[0] || 0,
+        star: id === topId,
+        starTitle: "Most lines under topics/",
+      })), GROUP_COLORS);
+    }
+
+    function renderRace(charts) {
+      const host = document.getElementById("chart-race");
+      const legend = document.getElementById("chart-race-legend");
+      if (!charts.race || !charts.race.logins.length) {
+        host.replaceChildren(el("p", { className: "sub", text: "No race data yet." }));
+        legend.replaceChildren();
+        return;
+      }
+      const hours = chartHours(charts);
+      const logins = charts.race.logins;
+      const series = charts.race.series;
+      const topLinesLogin = logins[0];
+      const seriesList = logins.map((u, idx) => ({
+        vals: series[u] || [],
+        color: RACE_COLORS[idx % RACE_COLORS.length],
+        endLabel: u,
+        star: u === topLinesLogin,
+      }));
+      renderLineChart(host, hours, seriesList, {
+        id: "race", label: "Contributor lines race", height: 280, width: 960, right: 150,
+      });
+      fillRaceLegend(legend, logins.map((u) => ({
+        label: u,
+        last: (series[u] || []).slice(-1)[0] || 0,
+        star: u === topLinesLogin,
+        starTitle: "Most lines added",
+      })), RACE_COLORS);
+    }
+
+    function renderCharts(data) {
+      const charts = data.charts;
+      if (!charts) {
+        ["chart-groups", "chart-race"].forEach((id) => {
+          const h = document.getElementById(id);
+          if (h) h.replaceChildren(el("p", { className: "sub", text: "Regenerate metrics.json to load charts." }));
+        });
+        return;
+      }
+      renderGroups(charts, data.groups);
+      renderRace(charts);
+    }
+
+    async function load() {
+      const err = document.getElementById("err");
+      try {
+        const res = await fetch("./metrics.json?ts=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("metrics.json missing: run workflow Hackathon dashboard once.");
+        const data = await res.json();
+        document.getElementById("repo").textContent = data.repo;
+        document.getElementById("updated").textContent = fmtTime(data.generated_at);
+        document.getElementById("kpi-issues-closed").textContent = fmt(data.totals.issues_closed);
+        document.getElementById("kpi-prs").textContent = fmt(data.totals.prs_merged);
+        document.getElementById("kpi-open").textContent = fmt(data.totals.issues_open);
+        document.getElementById("kpi-pr-open").textContent = fmt(data.totals.prs_open);
+
+        // Activity bar follows the same priority as the row sort.
+        const groupScore = (g) =>
+          g.prs_merged * 1000 + g.issues_closed * 10 + g.issues_open;
+        const maxScore = Math.max(1, ...data.groups.map(groupScore));
+        const tbody = document.getElementById("groups-body");
+        tbody.replaceChildren();
+        // Rank: PRs merged → issues closed → issues open
+        data.groups.slice().sort((a, b) =>
+          (b.prs_merged - a.prs_merged) ||
+          (b.issues_closed - a.issues_closed) ||
+          (b.issues_open - a.issues_open) ||
+          a.id.localeCompare(b.id)
+        ).forEach((g, rank) => {
+          const score = groupScore(g);
+          const pct = Math.round((score / maxScore) * 100);
+          const barInner = el("span", { style: { width: "0%" } });
+          const nameRow = el("div", {
+            style: { display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" },
+          }, [
+            el("div", { text: g.name || g.id }),
+          ]);
+          if (rank === 0) {
+            nameRow.appendChild(makeLinesStar("Top group: most merged PRs"));
+          }
+          const groupCell = el("td", null, [
+            nameRow,
+            el("div", { className: "mono", text: g.id, style: { color: "var(--muted)", fontSize: "0.68rem", marginTop: "0.15rem" } }),
+          ]);
+          tbody.appendChild(el("tr", null, [
+            groupCell,
+            el("td", { text: fmt(g.prs_merged) }),
+            el("td", { text: fmt(g.issues_closed) }),
+            el("td", { text: fmt(g.issues_open) }),
+            el("td", { className: "mono", text: "+" + fmt(g.pr_additions) + " / −" + fmt(g.pr_deletions) }),
+            el("td", { style: { minWidth: "7rem" } }, [el("div", { className: "bar" }, [barInner])]),
+          ]));
+          requestAnimationFrame(() => { barInner.style.width = pct + "%"; });
+        });
+
+        const people = document.getElementById("people");
+        people.replaceChildren();
+        if (!data.top_contributors.length) {
+          people.appendChild(el("p", { className: "sub", text: "No merged PRs yet." }));
+        } else {
+          const topLinesLogin = data.top_contributors
+            .slice()
+            .sort((a, b) => (b.additions - a.additions) || (b.net - a.net) || a.login.localeCompare(b.login))
+            .find((p) => (p.additions || 0) > 0)?.login;
+          const groupNames = Object.fromEntries((data.groups || []).map((g) => [g.id, g.name || g.id]));
+
+          data.top_contributors.forEach((p, i) => {
+            const isTopLines = p.login === topLinesLogin;
+            const stats = el("div", { className: "stats" });
+            stats.appendChild(document.createTextNode(fmt(p.merged_prs) + " merged · "));
+            const linesText = "+" + fmt(p.additions) + " / −" + fmt(p.deletions);
+            if (isTopLines) {
+              const hot = el("span", {
+                className: "lines-hot",
+                title: "Most lines added in merged PRs (+" + fmt(p.additions) + ")",
+              });
+              hot.appendChild(makeLinesStar("Most lines added in merged PRs (+" + fmt(p.additions) + ")"));
+              hot.appendChild(document.createTextNode(linesText));
+              stats.appendChild(hot);
+            } else {
+              stats.appendChild(el("em", { text: linesText }));
+            }
+            const nameRow = el("div", { className: "name-row" }, [
+              el("div", { className: "name", text: "#" + (i + 1) + " " + p.login }),
+            ]);
+            const tag = p.top_group || "repo";
+            const tagClass = tag === "repo"
+              ? "group-tag is-repo"
+              : (p.top_group ? "group-tag" : "group-tag is-empty");
+            const tagText = tag === "repo" ? "repo" : (groupNames[tag] || tag);
+            nameRow.appendChild(el("span", {
+              className: tagClass,
+              text: tagText,
+              title: tag === "repo"
+                ? "Most added lines outside topics/ (docs, CI, dashboard, …)"
+                : ("Most contributed topic: " + tag),
+            }));
+            people.appendChild(el("div", { className: "person" }, [
+              el("div", null, [nameRow, stats]),
+            ]));
+          });
+        }
+
+        renderCharts(data);
+        err.hidden = true;
+      } catch (e) {
+        err.hidden = false;
+        err.textContent = String(e.message || e);
+      }
+    }
+    load();
+    setInterval(load, 60000);
+    tickCountdown();
+    setInterval(tickCountdown, 1000);
+  </script>
+</body>
+</html>

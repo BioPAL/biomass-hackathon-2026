@@ -1,0 +1,48 @@
+# Copy to configs/local.yaml (git-ignored) and edit the paths. Run from the repository root:
+#   tomgedi run all --config configs/local.yaml
+paths:
+  # BIOMASS TOM L2A product directory (contains measurement/*_geo_tomcubes.nc and annotation/*_annot.xml)
+  tom_product: /path/to/BIOMASS/TOM/BIO_TP_TOM_L2A_..._QRDMUH
+  # BIOMASS DTM L2A product directory (contains measurement/*_height.tiff)
+  dtm_product: /path/to/BIOMASS/DTM/BIO_TP_DTM_L2A_..._QRDMUH
+  # GEDI shot table (.parquet or .csv): the output of step 01, or your own (needs latitude, longitude, rh_*, agbd, ...)
+  gedi_table: data/interim/gedi_download.parquet
+  data_dir: data          # intermediate files go to <data_dir>/interim
+  results_dir: results
+
+gedi:                     # step 01 only
+  bbox: null              # [min_lon, min_lat, max_lon, max_lat]; null = footprint of the TOM scene
+  start_time: "2019-01-01"
+  end_time: "2026-12-31"
+  max_days: null          # step 02: keep shots within +-N days of the BIOMASS acquisition (null = all)
+
+tom:
+  window_half: 1          # average (2*half+1)^2 pixels around each footprint (3x3 ~ 140 m)
+
+terrain:
+  max_slope_deg: 5.0      # keep shots whose DTM slope is below this
+  smooth_px: 3            # Gaussian sigma (pixels) applied to the DTM before the gradient (~140 m)
+
+cells:
+  pixels_per_cell: 11     # 11 x 46 m pixels ~ 500 m
+  min_shots: 5
+
+cv:
+  block_deg: 0.1          # spatial CV blocks (~11 km), GroupKFold(5)
+
+features:
+  mode: profile_db        # 'profile_db' = whole dB profile in window_m (168 features) | 'ground_relative' (69 features)
+  window_m: [-20, 90]
+
+ridge_cv:
+  levels: [cell, shot]
+
+filter_experiment:
+  quantiles: [0.01, 0.025, 0.05, 0.10]
+  modes: [hv, any]
+  n_random: 2
+  levels: [shot, cell]
+
+plots:
+  target: agbd
+  level: cell
