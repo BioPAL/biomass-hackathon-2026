@@ -68,6 +68,16 @@ Outputs go to `~/data/runs/<stack>/` (option `--out`). The home folder is not sh
 at the end of the day `mkdir -p ~/my-private-bucket/data/runs && cp -ru ~/data/runs/. ~/my-private-bucket/data/runs/`
 (MAAP has no rsync).
 
+### MAAP token (each user needs their own)
+Only the SAR part (stage 4: amplitude/phase COGs and LUTs of the BIOMASS products) needs a token. The dashboard, the stack
+search (public MAAP STAC) and the reference part (`run_stack.py --no-sar`: ISMN, ERA5-Land, SoilGrids, Sentinel-2) run without it.
+- Get your own offline token (valid 90 days): portal.maap.eo.esa.int -> services -> auth -> token.
+- Save it as ONE line in `~/token.txt` or `~/my-private-bucket/token.txt` in YOUR MAAP home (if both exist, `~/token.txt`
+  is used). The pipeline exchanges it for a short-lived access token at the ESA MAAP IAM (`sm_pipeline/catalog.py`).
+- Never commit it: `token.txt` is in `.gitignore`, and the repository contains no token. Nobody uses someone else's token.
+- Check: `grep "access token from MAAP IAM" ~/data/runs/<stack>/run.log` -> `HTTP 206 -> ok (range)`; HTTP 401 = token expired
+  or mis-copied (renew it in the portal); no token file = the run stops at stage 4 with a message saying where to put it.
+
 ## Run
     # one stack, all stations inside the footprint (the stack centre if there is no station)
     python run_stack.py --stack S2_T009_F118_G01_M04 --ismn <ISMN>/ismn_locations.geojson --ismn-dir <ISMN>
@@ -84,6 +94,9 @@ data 0.2 / 0.4), `--no-quicklooks`, `--lut-check`, `--no-s2` (no Sentinel-2), `-
 `window_images.png`; the analysis uses `--look-m`).
 
 ## Interactive use (the dashboard)
+Layout: drag the grey bars between map and side panels to resize them; the arrow buttons hide / show a panel. On narrow
+screens (< 1700 CSS px, e.g. laptops with display scaling) the info panel starts hidden and opens when a tile is clicked;
+in the notebook the dashboard is at most 88 % of the window high (`App(height=...)` for the upper limit in px).
 Open `select_tile.ipynb`, run the cell. The first start builds `dashboard.html` (about 30 s). Left: colour (grassland + cropland,
 tree cover, mean slope, number of stacks), filters (land cover, slope, ISMN, computed points, months of the stack window, warm
 season by hemisphere as a proxy against frozen soil and snow), preset *open land, gentle terrain*, export of the filtered stacks

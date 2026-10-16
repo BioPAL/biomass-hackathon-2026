@@ -51,7 +51,7 @@ class App:
                                                  str(ROOT / "tile_landcover.csv"), str(self.out), str(f))
             self.log.append_stdout(buf.getvalue())
         doc = f.read_text().replace("<head>", f'<head><script>window.SM_TARGET="{self.tag}";</script>', 1)
-        self.dash.value = f'<iframe srcdoc="{html.escape(doc, quote=True)}" style="width:100%;height:{self.height}px;border:1px solid #ccc"></iframe>'
+        self.dash.value = f'<iframe srcdoc="{html.escape(doc, quote=True)}" style="width:100%;height:min({self.height}px,88vh);border:1px solid #ccc"></iframe>'   # never taller than the window
         self.status.value = "Click a tile, then a stack, then <b>compute full report</b> (or <b>open full report</b> for computed stacks)."
 
     def show(self):

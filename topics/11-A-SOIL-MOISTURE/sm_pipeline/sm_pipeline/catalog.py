@@ -20,6 +20,9 @@ def access_token(path=TOKEN_FILE, force=False):
     """Exchange the offline token for an access token (cached until ~1 min before expiry)."""
     import time, requests
     if not force and _ACCESS["token"] and time.time() < _ACCESS["exp"] - 60: return _ACCESS["token"]
+    if not os.path.exists(os.path.expanduser(path)):
+        raise RuntimeError("no MAAP offline token found: put your own token (one line, portal.maap.eo.esa.int -> services -> auth -> token)"
+                           " into ~/my-private-bucket/token.txt or ~/token.txt. The dashboard and --no-sar runs work without it.")
     offline = open(os.path.expanduser(path)).read().strip().replace("\n", "")
     r = requests.post(IAM_URL, data={"client_id": IAM_CLIENT_ID, "client_secret": IAM_CLIENT_SECRET, "grant_type": "refresh_token",
                                      "refresh_token": offline, "scope": "offline_access openid"}, timeout=60)

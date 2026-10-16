@@ -115,7 +115,14 @@ TEMPLATE = r"""<!doctype html><html><head><meta charset="utf-8"><title>BIOMASS L
 <script>__LEAFLET_JS__</script>
 <style>
 html,body{margin:0;height:100%;font:13px/1.4 Helvetica,Arial,sans-serif;color:#222}
-#app{display:grid;grid-template-columns:290px 1fr 470px;height:100%}
+#app{display:grid;grid-template-columns:var(--left-w,290px) 8px minmax(0,1fr) 8px var(--right-w,470px);height:100%}
+/* grey bars between the panels: drag to resize, arrow button to hide / show a panel */
+.split{background:#e2e2e2;cursor:col-resize;position:relative;z-index:900;touch-action:none}
+.split:hover,.split.drag{background:#9bbcd8}
+.split button{position:absolute;top:50%;left:-8px;width:24px;height:48px;margin-top:-24px;padding:0;border:1px solid #888;
+ border-radius:4px;background:#fff;cursor:pointer;font-size:12px;line-height:1;box-shadow:0 1px 3px #0004}
+#app.hide-left #ctl,#app.hide-right #side{padding:0;border:0;overflow:hidden}
+#app.hide-left #split-left button{left:0}#app.hide-right #split-right button{left:auto;right:0}   /* keep the arrow inside the window */
 #ctl{overflow:auto;padding:12px 14px;background:#f6f6f6;border-right:1px solid #ddd}
 #map{height:100%;background:#dfe9f2}
 #side{overflow:auto;padding:12px 16px;border-left:1px solid #ddd;background:#fff}
@@ -154,13 +161,16 @@ tr.st:hover td{background:#eef5fb;cursor:pointer}.thumbs{display:flex;gap:4px;ov
  <h2>Filtered stacks</h2><button id="exp">copy as CSV for run_batch.py</button><textarea id="exptxt" style="display:none"></textarea>
  <p class="small" id="caveat"></p>
 </div>
+<div class="split" id="split-left" title="drag to resize the filter panel"><button id="toggle-left" title="hide / show the filter panel">&#9664;</button></div>
 <div id="map"></div>
+<div class="split" id="split-right" title="drag to resize the info panel"><button id="toggle-right" title="hide / show the info panel">&#9654;</button></div>
 <div id="side"><h1>Click a tile</h1><p class="small">Shows the land cover and terrain of the tile, all its BIOMASS stacks and, for a selected stack, the seven public BPS quicklooks and, where the stack was computed, the BIOMASS numbers and the main figure (BIOMASS backscatter and coherence against the soil-moisture reference).</p></div>
 </div>
 <script id="payload" type="application/octet-stream">__PAYLOAD__</script>
 <script>
 "use strict";
 const OI={blue:"#0072B2",orange:"#E69F00",verm:"#D55E00"};
+let LAYOUT=null;   // panel layout controller (setupLayout)
 const PCOL={insitu:"#FFD700",model:"#F57C00",skip:"#BDBDBD"};   // computed points: in-situ station data / model reference only / SAR skipped
 const pcol=r=>r.skipped?PCOL.skip:(r.has_ismn?PCOL.insitu:PCOL.model);
 const dot=c=>`<svg width="11" height="11" style="vertical-align:-1px"><circle cx="5.5" cy="5.5" r="4.5" fill="${c}" stroke="#000" stroke-width="1"/></svg>`;
@@ -231,7 +241,7 @@ function showPt(){const e=$("ptmsg");if(!e)return;const k=D.stacks.key[SELSTACK]
   ALL.sort((x,y)=>S.f[x]-S.f[y]);ba.style.display=ALL.length>1?"inline-block":"none";ba.textContent=`compute all ${ALL.length} stacks at this point`;
   bl.innerHTML=`${nall} stacks cover this point (all tracks, swaths and major cycles), ${ALL.length} pass the filters: `+ALL.map(j=>S.key[j]+" ("+day2iso(S.f[j]).slice(0,7)+")").join(", ")+
     (ALL.length>1?`. One run per stack, one after the other (several minutes each).`:"")}
-function showTile(t){SELTILE=t;clearPt();if(FOOT)FOOT.remove();FOOT=L.layerGroup(TS[t].map(i=>{const b=D.stacks.bb[i];
+function showTile(t){if(LAYOUT)LAYOUT.show("right");SELTILE=t;clearPt();if(FOOT)FOOT.remove();FOOT=L.layerGroup(TS[t].map(i=>{const b=D.stacks.bb[i];
     return L.rectangle([[b[1],b[0]],[b[3],b[2]]],{renderer:REN,color:"#333",weight:0.8,dashArray:"2 4",fill:false,interactive:false})})).addTo(MAP);const T=D.tiles[t],S=D.stacks,idx=TS[t].slice().sort((a,b)=>S.f[a]-S.f[b]),c=[(T.b[1]+T.b[3])/2,(((T.b[0]+T.b[2])/2+540)%360)-180];
   let h=`<h1>Tile ${T.id}</h1><div class="small">centre ${c[0].toFixed(2)} N, ${c[1].toFixed(2)} E &middot; ${idx.length} stacks${T.sta?"<br>ISMN stations: "+T.sta:""}</div>`;
   h+=`<h2>Land cover (WorldCover 2021, % of land; land = ${fmt(lcv("land_pct",t),0)} % of the box) and terrain</h2>`+lcBar(t)+`<div class="small">mean slope ${fmt(lcv("slope_mean_deg",t),1)} deg, 90th percentile ${fmt(lcv("slope_p90_deg",t),1)} deg, mean elevation ${fmt(lcv("elev_mean_m",t),0)} m (Copernicus DEM at 200 m; information)</div>`;
@@ -274,11 +284,42 @@ function preset(p){if($("f_gc")){$("f_gc").value=p.gc||0;$("f_tr").value=p.tr??1
 function exportCsv(){const S=D.stacks;let s="stack,lat,lon,name\n",n=0;for(let i=0;i<S.key.length;i++)if(PASS[i]){const b=D.tiles[S.t[i]].b;n++;
   s+=`${S.key[i]},${((b[1]+b[3])/2).toFixed(4)},${((((b[0]+b[2])/2)+540)%360-180).toFixed(4)},centre_${S.key[i]}\n`}
   const ta=$("exptxt");ta.style.display="block";ta.value=s;ta.select();if(navigator.clipboard)navigator.clipboard.writeText(s).catch(()=>{});$("exp").textContent=`copied ${n} stacks`}
+// Panel layout: the two side panels can be hidden (arrow buttons) and resized (drag the grey bars). The info panel starts
+// hidden on narrow screens (< 1700 CSS px, e.g. laptops with display scaling) and opens when a tile is clicked.
+function setupLayout(){
+  const app=$("app");
+  let leftWidth=290,rightWidth=470,hideLeft=false,hideRight=window.innerWidth<1700;
+  function apply(){
+    app.style.setProperty("--left-w",(hideLeft?0:leftWidth)+"px");
+    app.style.setProperty("--right-w",(hideRight?0:rightWidth)+"px");
+    app.classList.toggle("hide-left",hideLeft);app.classList.toggle("hide-right",hideRight);
+    $("toggle-left").innerHTML=hideLeft?"&#9654;":"&#9664;";$("toggle-right").innerHTML=hideRight?"&#9664;":"&#9654;";
+    if(MAP)setTimeout(()=>MAP.invalidateSize(),60);                   // Leaflet must re-measure the map container
+  }
+  $("toggle-left").onclick=ev=>{ev.stopPropagation();hideLeft=!hideLeft;apply()};
+  $("toggle-right").onclick=ev=>{ev.stopPropagation();hideRight=!hideRight;apply()};
+  function startDrag(side){
+    return ev=>{
+      if(ev.target.tagName==="BUTTON")return;
+      ev.preventDefault();const bar=ev.currentTarget;bar.classList.add("drag");
+      const move=e=>{
+        const total=app.clientWidth,x=e.clientX-app.getBoundingClientRect().left;
+        if(side==="left"){hideLeft=false;leftWidth=Math.round(Math.max(180,Math.min(x,0.45*total)))}
+        else{hideRight=false;rightWidth=Math.round(Math.max(260,Math.min(total-x,0.6*total)))}
+        apply()};
+      const stop=()=>{bar.classList.remove("drag");removeEventListener("pointermove",move);removeEventListener("pointerup",stop)};
+      addEventListener("pointermove",move);addEventListener("pointerup",stop)};
+  }
+  $("split-left").addEventListener("pointerdown",startDrag("left"));
+  $("split-right").addEventListener("pointerdown",startDrag("right"));
+  apply();
+  return {show(side){if(side==="right"&&hideRight){hideRight=false;apply()}if(side==="left"&&hideLeft){hideLeft=false;apply()}}};
+}
 (async function(){D=await load();const M=D.meta;TS=D.tiles.map(()=>[]);D.stacks.t.forEach((t,i)=>TS[t].push(i));PASS=new Uint8Array(D.stacks.key.length).fill(1);VARS=vars();lcFilters();
   $("meta").innerHTML=`${M.n_tiles.toLocaleString()} tiles (track x frame), ${M.n_stacks.toLocaleString()} stacks with &ge; 6 acquisitions (3-day repeat), ${day2iso(M.d_min)} to ${day2iso(M.d_max)}; ${M.n_sta} tiles with an ISMN station; ${Object.keys(D.runs).length} stacks already computed. Built ${M.built}.`;
   $("caveat").innerHTML=`Land cover (ESA WorldCover 2021) and slope (Copernicus DEM, 200 m) are tile averages over the bounding box of the tile's stacks (about 5&deg; x 1.5&deg;) - information to find suitable test sites, not a BIOMASS result. The soil-moisture comparison is in the computed stacks.`;
   VARS.forEach(v=>{const o=document.createElement("option");o.textContent=v.lab;$("colour").appendChild(o)});
-  MAP=L.map("map",{preferCanvas:true,worldCopyJump:true,minZoom:2}).setView([20,10],2);
+  MAP=L.map("map",{preferCanvas:true,worldCopyJump:true,minZoom:2}).setView([20,10],2);LAYOUT=setupLayout();
   const osm=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"OpenStreetMap",maxZoom:12});
   const esri=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",{attribution:"Esri",maxZoom:12});
   MAP.createPane("land").style.zIndex=350;const none=L.layerGroup();none.addTo(MAP);[-360,0,360].forEach(k=>L.geoJSON(D.land,{pane:"land",interactive:false,coordsToLatLng:c=>L.latLng(c[1],c[0]+k),style:{color:"#777",weight:0.6,fillColor:"#f2f2ee",fillOpacity:1}}).addTo(none));
@@ -298,7 +339,7 @@ function exportCsv(){const S=D.stacks;let s="stack,lat,lon,name\n",n=0;for(let i
   MAP.on("zoomend",sched);                                   // zoomed in: almost transparent tiles, so the base map shows through
   document.querySelectorAll("#ctl input,#ctl select").forEach(e=>{e.addEventListener("input",sched);e.addEventListener("change",sched)});
   if($("p_open")){$("p_open").onclick=()=>preset({gc:50,tr:20,sl:5});$("p_reset").onclick=()=>preset({})}$("exp").onclick=exportCsv;
-  update();$("loading").remove();window.__dash={showTile,showStack,update,setPoint,get PT(){return PT},get D(){return D},get MAP(){return MAP},get PASS(){return PASS}}})().catch(e=>{$("loading").textContent="could not load the data: "+e});
+  update();$("loading").remove();window.__dash={showTile,showStack,update,setPoint,get LAYOUT(){return LAYOUT},get PT(){return PT},get D(){return D},get MAP(){return MAP},get PASS(){return PASS}}})().catch(e=>{$("loading").textContent="could not load the data: "+e});
 </script></body></html>"""
 
 
