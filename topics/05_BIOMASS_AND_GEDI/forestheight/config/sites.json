@@ -1,0 +1,51 @@
+{
+  "catalog_url": "https://catalog.maap.eo.esa.int/catalogue/",
+  "biomass_datetime": "2026-01-01/2026-10-14",
+  "lvis_base_url": "https://data.ornldaac.earthdata.nasa.gov/protected/afrisar/Afrisar_LVIS_Biomass_VProfiles/data/",
+  "swath_incidence_deg": [
+    26.5,
+    31.4
+  ],
+  "lvis_min_coverage_fraction": 0.5,
+  "low_height_m": 10.0,
+  "sites": {
+    "rabi": {
+      "name": "Rabi",
+      "role": "flat closed forest (control)",
+      "bbox": [
+        9.59494,
+        -2.29494,
+        10.2766,
+        -1.68464
+      ],
+      "lvis": "lvis2_rabi_2016022020160308_l3a1_RH98_e32732_v0301_r025m.tif"
+    },
+    "mabounie": {
+      "name": "Mabounie",
+      "role": "hilly forest, two viewing directions",
+      "bbox": [
+        9.93509,
+        -0.950969,
+        10.7425,
+        -0.679589
+      ],
+      "lvis": "lvis2_mabo_2016022020160308_l3a1_RH98_e32732_v0301_r025m.tif"
+    },
+    "lope": {
+      "name": "Lopé",
+      "role": "forest + savanna + hills",
+      "bbox": [
+        11.39674,
+        -0.64224,
+        12.02394,
+        -0.01559
+      ],
+      "lvis": "lvis2_lope_2016022020160308_l3a1_RH98_e32732_v0301_r025m.tif"
+    }
+  },
+  "min_pass_lidar_coverage": 0.2,
+  "workshop_fh_dir": "~/Examples_and_Data/Workshops/BIOMASS-Coding2026/Gabon/fh_gabon_geocoded",
+  "gedi_start": "2019-04-01",
+  "gedi_end": "2026-10-14",
+  "gedi_sensitivity_min": 0.95
+}
