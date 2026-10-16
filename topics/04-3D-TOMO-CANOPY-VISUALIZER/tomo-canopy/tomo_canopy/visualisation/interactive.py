@@ -251,22 +251,36 @@ class InteractiveTomogramViewer:
             )
             plotter.render()
 
+        sliders_margin_x = 0.02
+        sliders_margin_y = 0.12
+        sliders_top = 1 - sliders_margin_y
+        sliders_row_height = 0.12
+        sliders_width = 0.18
+        sliders_x = 1 - sliders_margin_x - sliders_width
+
+        slider_bar_width = 0.015  # slider handle thickness (modern default is ~0.025)
+        slider_tube_width = 0.0035  # track thickness (default ~0.005)
+        slider_title_height = 0.024  # title text size (default ~0.03 for modern style)
+
         def slider(key: str, title: str, limits, row: int, fmt="%.2f") -> None:
             def callback(value) -> None:
                 self.state[key] = float(value)
                 update_scene()
 
-            y = 0.82 - row * 0.09
+            y = sliders_top - row * sliders_row_height
             plotter.add_slider_widget(
                 callback,
                 rng=limits,
                 value=self.state[key],
                 title=title,
-                pointa=(0.02, y),
-                pointb=(0.30, y),
+                pointa=(sliders_x, y),
+                pointb=(sliders_x + sliders_width, y),
                 fmt=fmt,
                 style="modern",
                 interaction_event="end",
+                slider_width=slider_bar_width,
+                tube_width=slider_tube_width,
+                title_height=slider_title_height,
             )
 
         slider(
