@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Live contribution dashboard](dashboard/readme-banner.png)](https://biopal.github.io/biomass-hackathon-2026/)
+[![Live contribution dashboard](dashboard/readme-banner-v2.png)](https://biopal.github.io/biomass-hackathon-2026/)
 
 </div>
 
