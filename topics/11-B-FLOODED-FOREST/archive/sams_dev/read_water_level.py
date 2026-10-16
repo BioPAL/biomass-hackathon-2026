@@ -15,7 +15,7 @@ download_path = 'downloads/'
 if not os.path.isdir(download_path):
     os.mkdir(download_path)
 
-API_KEY = "589AD7A19BAE1CBA8FCE33756EBD90BD124ECB2A2F4E638BFADD12C6C4DE84C4"
+API_KEY = ""
 OUTPUT_FORMAT = 'ascii'
 BASE_URL = "https://dahiti.dgfi.tum.de/api/v2/"
 
