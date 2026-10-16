@@ -1,0 +1,20 @@
+# data and outputs (large / not redistributable)
+data/
+results/
+*.npz
+*.parquet
+*.h5
+*.nc
+*.tif
+*.tiff
+# local configuration (machine-specific paths)
+configs/local*.yaml
+configs/*.local.yaml
+# python
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+build/
+dist/

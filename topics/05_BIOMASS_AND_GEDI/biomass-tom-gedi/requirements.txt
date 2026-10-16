@@ -1,0 +1,13 @@
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+scikit-learn>=1.3
+h5py>=3.8
+rasterio>=1.3
+matplotlib>=3.7
+pyarrow>=12
+pyyaml>=6
+# step 01 only (GEDI download):
+# gedidb
+# geopandas
+# shapely
