@@ -194,11 +194,20 @@ class TomogramProvider:
         x, y, convention = _resolve_l2a_axes(
             first_axis, second_axis, product.bbox
         )
+        if x.size == product.shape[1] and y.size == product.shape[0]:
+            horizontal_dimensions = {
+                "relativeAzimuthTime": "y",
+                "slantRangeTime": "x",
+            }
+        else:
+            horizontal_dimensions = {
+                "relativeAzimuthTime": "x",
+                "slantRangeTime": "y",
+            }
         result = dataset.rename(
             {
                 "tomographicCubes": "tomographic_cube",
-                "relativeAzimuthTime": "x",
-                "slantRangeTime": "y",
+                **horizontal_dimensions,
                 "tomographicHeight": "z",
                 "polarizations": "polarization",
             }
@@ -436,22 +445,39 @@ def _resolve_l2a_axes(
     second_axis: np.ndarray,
     bbox: tuple[float, float, float, float],
 ) -> tuple[np.ndarray, np.ndarray, str]:
-    def error(x: np.ndarray, y: np.ndarray) -> float:
+    def error(
+        x: np.ndarray,
+        y: np.ndarray,
+        target_bbox: tuple[float, float, float, float] = bbox,
+    ) -> float:
         extent = (float(x.min()), float(y.min()), float(x.max()), float(y.max()))
-        return float(np.max(np.abs(np.asarray(extent) - np.asarray(bbox))))
+        return float(np.max(np.abs(np.asarray(extent) - np.asarray(target_bbox))))
 
+    # The annotation names have geographic meaning: rows are latitude and
+    # columns are longitude.  Some prototype products encode the STAC bbox as
+    # (south, west, north, east), rather than the GeoJSON/STAC longitude-first
+    # order.  Accept that known metadata defect without swapping the actual
+    # coordinates exposed to users.
     metadata_error = error(second_axis, first_axis)
+    latitude_first_bbox = (bbox[1], bbox[0], bbox[3], bbox[2])
+    latitude_first_error = error(second_axis, first_axis, latitude_first_bbox)
     swapped_error = error(first_axis, second_axis)
     tolerance = max(
         abs(float(np.diff(first_axis[:2])[0])) if first_axis.size > 1 else 0.0,
         abs(float(np.diff(second_axis[:2])[0])) if second_axis.size > 1 else 0.0,
         1e-8,
     ) * 1.5
-    if swapped_error <= tolerance and swapped_error < metadata_error:
-        convention = "XML latitude/longitude fields swapped to match STAC"
-        return first_axis, second_axis, convention
     if metadata_error <= tolerance:
         return second_axis, first_axis, "XML latitude/longitude field semantics"
+    if latitude_first_error <= tolerance:
+        return (
+            second_axis,
+            first_axis,
+            "XML latitude/longitude field semantics; STAC bbox was latitude-first",
+        )
+    if swapped_error <= tolerance:
+        convention = "XML latitude/longitude fields swapped to match STAC"
+        return first_axis, second_axis, convention
     raise ValueError(
         "Reconstructed L2A coordinates do not match the STAC bbox "
         f"{bbox!r}"

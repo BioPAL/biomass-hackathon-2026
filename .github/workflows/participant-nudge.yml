@@ -1,0 +1,172 @@
+# Auto-nudge Task PRs: require Closes #N (fail check); soft tip if opened non-draft.
+# Escape: tick n/a under ## Group (same as group-label bot).
+# pull_request_target runs from main — merge this file before it applies.
+name: Participant nudge
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, ready_for_review, converted_to_draft]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  nudge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Nudge PR description / draft habit
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const MARKER = '<!-- participant-nudge-bot -->';
+            const SKIP = new Set(['n/a', 'na', 'none', 'skip']);
+
+            const pr = context.payload.pull_request;
+            const { owner, repo } = context.repo;
+            const issue_number = pr.number;
+
+            const fresh = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: issue_number,
+            });
+            const body = fresh.data.body || '';
+            const isDraft = fresh.data.draft;
+            const action = context.payload.action;
+
+            function sectionAfter(headingRe) {
+              const m = body.match(headingRe);
+              if (!m) return '';
+              const start = m.index + m[0].length;
+              const rest = body.slice(start);
+              const next = rest.search(/\r?\n#{1,3}\s+\S/);
+              return next === -1 ? rest : rest.slice(0, next);
+            }
+
+            function isMaintainerEscape() {
+              const groupSection = sectionAfter(/#{2,3}\s*Group\s*\r?\n/i);
+              const checked = [
+                ...groupSection.matchAll(/^\s*[-*]\s*\[x\]\s*([^\r\n]+)/gim),
+              ].map((x) =>
+                x[1]
+                  .trim()
+                  .replace(/^`+|`+$/g, '')
+                  .replace(/\s*\(.*\)\s*$/, '')
+                  .trim()
+              );
+              for (const g of checked) {
+                if (SKIP.has(g.toLowerCase())) return true;
+              }
+              const line = groupSection.match(/^\s*([^\r\n<-][^\r\n]*)$/m);
+              if (line && SKIP.has(line[1].trim().toLowerCase())) return true;
+              return false;
+            }
+
+            function closesIssues(text) {
+              const cleaned = (text || '').replace(/<!--[\s\S]*?-->/g, '');
+              const re =
+                /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s*:?\s*#(\d+)/gi;
+              const nums = new Set();
+              let m;
+              while ((m = re.exec(cleaned)) !== null) {
+                nums.add(parseInt(m[1], 10));
+              }
+              return [...nums];
+            }
+
+            async function upsertComment(markdown) {
+              const commentBody = `${MARKER}\n${markdown}`;
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                { owner, repo, issue_number, per_page: 100 }
+              );
+              const existing = comments.find((c) =>
+                (c.body || '').includes(MARKER)
+              );
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                  body: commentBody,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number,
+                  body: commentBody,
+                });
+              }
+            }
+
+            async function clearComment() {
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                { owner, repo, issue_number, per_page: 100 }
+              );
+              const existing = comments.find((c) =>
+                (c.body || '').includes(MARKER)
+              );
+              if (existing) {
+                await github.rest.issues.deleteComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                });
+              }
+            }
+
+            if (isMaintainerEscape()) {
+              await clearComment();
+              core.info('Group is n/a; skipping participant nudges.');
+              return;
+            }
+
+            if (action === 'edited') {
+              const changes = context.payload.changes || {};
+              if (!changes.body) {
+                core.info('PR edit did not change body; skipping.');
+                return;
+              }
+            }
+
+            const closed = closesIssues(body);
+            const tips = [];
+
+            if (closed.length === 0) {
+              tips.push(
+                ':x: **Missing `Closes #N`**\n\n' +
+                  'Add a real Task issue number in the description, e.g. `Closes #68`.\n' +
+                  'That links the [project board](https://github.com/orgs/BioPAL/projects/6) card (the **issue**, not the PR number).\n\n' +
+                  'Maintainer/docs PR? Tick **`n/a`** under `## Group`.'
+              );
+            }
+
+            if (
+              !isDraft &&
+              (action === 'opened' || action === 'reopened') &&
+              closed.length > 0
+            ) {
+              tips.push(
+                ':memo: **Tip — open as Draft while coding**\n\n' +
+                  'Draft + `Closes #N` moves the board card to **Doing**. ' +
+                  'Mark **Ready for review** when you want maintainers.'
+              );
+            }
+
+            if (tips.length === 0) {
+              await clearComment();
+              core.info('No participant nudges needed.');
+              return;
+            }
+
+            await upsertComment(tips.join('\n\n---\n\n'));
+
+            if (closed.length === 0) {
+              core.setFailed(
+                'PR description must include Closes #<issue-number> (or tick n/a under ## Group).'
+              );
+            }
