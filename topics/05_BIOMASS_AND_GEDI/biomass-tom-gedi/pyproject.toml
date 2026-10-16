@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "biomass-tom-gedi"
+version = "0.1.0"
+description = "BIOMASS P-band TomoSAR (TOM L2A) vs GEDI: profile extraction, slope masking, 500 m cells, spatial-block ridge CV and profile-filter experiments"
+readme = "README.md"
+authors = [{ name = "Abhilash Dutta Roy", email = "duttaroy@umd.edu" }]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "scipy>=1.10",
+    "scikit-learn>=1.3",
+    "h5py>=3.8",
+    "rasterio>=1.3",
+    "matplotlib>=3.7",
+    "pyarrow>=12",
+    "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+gedidb = ["gedidb", "geopandas", "shapely"]
+dev = ["pytest>=7"]
+
+[project.scripts]
+tomgedi = "biomass_tom_gedi.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
