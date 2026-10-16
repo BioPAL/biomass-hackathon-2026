@@ -40,7 +40,7 @@ import requests
 # DAHITI_API_KEY environment variable (or a git-ignored credentials file)
 # instead of hardcoding it here.
 # ---------------------------------------------------------------------------
-API_KEY = "589AD7A19BAE1CBA8FCE33756EBD90BD124ECB2A2F4E638BFADD12C6C4DE84C4"
+API_KEY = ""
 
 # Temporal extent of the water-level series that is kept and plotted.
 PERIOD_START = datetime(2024, 1, 1)  # inclusive
