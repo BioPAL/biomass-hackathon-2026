@@ -354,11 +354,12 @@
     <div class="grid">
       <section class="panel">
         <h2>By group</h2>
+        <p class="sub" style="margin: -0.35rem 0 0.85rem; font-size: 0.78rem;">Ranked by PRs merged, then issues closed, then issues open. Gold star = #1.</p>
         <div style="overflow-x:auto">
           <table>
             <thead>
               <tr>
-                <th>Group</th><th>Issues closed</th><th>Issues open</th><th>PRs merged</th><th>+ / − (merged PRs)</th><th>Activity</th>
+                <th>Group</th><th>PRs merged</th><th>Issues closed</th><th>Issues open</th><th>+ / − (merged PRs)</th><th>Activity</th>
               </tr>
             </thead>
             <tbody id="groups-body"></tbody>
@@ -846,15 +847,16 @@
         document.getElementById("kpi-open").textContent = fmt(data.totals.issues_open);
         document.getElementById("kpi-pr-open").textContent = fmt(data.totals.prs_open);
 
+        // Activity bar follows the same priority as the row sort.
         const groupScore = (g) =>
-          g.issues_closed * 3 + g.issues_open * 1 + g.prs_merged * 2 + Math.min(g.pr_additions, 5000) / 500;
+          g.prs_merged * 1000 + g.issues_closed * 10 + g.issues_open;
         const maxScore = Math.max(1, ...data.groups.map(groupScore));
         const tbody = document.getElementById("groups-body");
         tbody.replaceChildren();
-        // Rank: closed issues, then merged PRs, then open issues (break ties like the shared scaffold PR)
+        // Rank: PRs merged → issues closed → issues open
         data.groups.slice().sort((a, b) =>
-          (b.issues_closed - a.issues_closed) ||
           (b.prs_merged - a.prs_merged) ||
+          (b.issues_closed - a.issues_closed) ||
           (b.issues_open - a.issues_open) ||
           a.id.localeCompare(b.id)
         ).forEach((g, rank) => {
@@ -867,7 +869,7 @@
             el("div", { text: g.name || g.id }),
           ]);
           if (rank === 0) {
-            nameRow.appendChild(makeLinesStar("Top group in the board ranking"));
+            nameRow.appendChild(makeLinesStar("Top group: most merged PRs"));
           }
           const groupCell = el("td", null, [
             nameRow,
@@ -875,9 +877,9 @@
           ]);
           tbody.appendChild(el("tr", null, [
             groupCell,
+            el("td", { text: fmt(g.prs_merged) }),
             el("td", { text: fmt(g.issues_closed) }),
             el("td", { text: fmt(g.issues_open) }),
-            el("td", { text: fmt(g.prs_merged) }),
             el("td", { className: "mono", text: "+" + fmt(g.pr_additions) + " / −" + fmt(g.pr_deletions) }),
             el("td", { style: { minWidth: "7rem" } }, [el("div", { className: "bar" }, [barInner])]),
           ]));

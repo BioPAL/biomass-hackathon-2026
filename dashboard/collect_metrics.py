@@ -82,6 +82,31 @@ FOLDER_ALIASES = {
     "06B-CARBON": ["06B-CARBON", "06-biomass-validation"],
 }
 
+# Bulk data dumps inflate "lines added" without reflecting real work.
+# PRs / issues still count; only LOC scoring and race charts skip these paths.
+SKIP_LOC_SUFFIXES = (
+    ".csv",
+    ".tsv",
+    ".parquet",
+    ".feather",
+    ".npy",
+    ".npz",
+    ".h5",
+    ".hdf5",
+    ".nc",
+    ".grib",
+    ".zip",
+    ".gz",
+    ".xz",
+    ".7z",
+)
+
+
+def counts_toward_loc(filename: str) -> bool:
+    """False for data dumps we do not want in line-score / race charts."""
+    lower = (filename or "").lower()
+    return not any(lower.endswith(suf) for suf in SKIP_LOC_SUFFIXES)
+
 
 def topic_group_for_path(filename: str) -> str | None:
     """Return group id if path is under topics/<group>/, else None."""
@@ -194,16 +219,6 @@ def collect_prs():
         if pr.get("merged_at"):
             merged_total += 1
             contributors[user]["merged_prs"] += 1
-            # detailed stats
-            try:
-                detail, _ = api(f"/repos/{OWNER}/{REPO}/pulls/{pr['number']}")
-                add = detail.get("additions") or 0
-                dele = detail.get("deletions") or 0
-            except urllib.error.HTTPError:
-                add = dele = 0
-            contributors[user]["additions"] += add
-            contributors[user]["deletions"] += dele
-
             try:
                 files = api_paginated(
                     f"/repos/{OWNER}/{REPO}/pulls/{pr['number']}/files"
@@ -214,24 +229,51 @@ def collect_prs():
             hit = set(groups)
             path_groups: set[str] = set()
             by_group_adds: dict[str, int] = defaultdict(int)
+            by_group_dels: dict[str, int] = defaultdict(int)
+            add = dele = 0
             for f in files:
                 fn = f.get("filename", "")
                 file_add = int(f.get("additions") or 0)
+                file_del = int(f.get("deletions") or 0)
                 g = topic_group_for_path(fn)
                 if g:
                     path_groups.add(g)
+                # Topic touch still counts for merged-PR attribution;
+                # only LOC / race scoring skips CSV and other data dumps.
+                if not counts_toward_loc(fn):
+                    continue
+                add += file_add
+                dele += file_del
+                if g:
                     by_group_adds[g] += file_add
+                    by_group_dels[g] += file_del
                     contributors[user]["group_additions"][g] += file_add
                 else:
                     contributors[user]["repo_additions"] += file_add
 
+            contributors[user]["additions"] += add
+            contributors[user]["deletions"] += dele
+
             if not hit:
                 hit = path_groups
 
+            # Unlabeled PRs that touch many topics/ (scaffold/docs) should not
+            # inflate every group's merged-PR count with the full diff.
+            scaffold_multi = (not groups) and len(path_groups) >= 4
+
             for g in hit:
+                ga = by_group_adds.get(g, 0)
+                gd = by_group_dels.get(g, 0)
+                by_group[g]["additions"] += ga
+                by_group[g]["deletions"] += gd
+                if scaffold_multi and g not in groups:
+                    continue
+                # Path-only touches with no scored LOC (renames, empty README
+                # moves, CSV-only after filter) must not inflate merged-PR rank.
+                # Labeled group PRs still count even at +0 (intentional empty PR).
+                if g not in groups and ga == 0 and gd == 0:
+                    continue
                 by_group[g]["merged"] += 1
-                by_group[g]["additions"] += add
-                by_group[g]["deletions"] += dele
                 contributors[user]["groups"][g] += 1
 
             merged_events.append(
@@ -374,7 +416,9 @@ def loc_by_group_from_git():
             parts = line.split("\t")
             if len(parts) != 3:
                 continue
-            a, d, _ = parts
+            a, d, path = parts
+            if not counts_toward_loc(path):
+                continue
             if a.isdigit():
                 add += int(a)
             if d.isdigit():
