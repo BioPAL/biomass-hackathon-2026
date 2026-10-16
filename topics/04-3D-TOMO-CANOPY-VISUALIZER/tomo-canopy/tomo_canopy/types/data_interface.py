@@ -207,6 +207,33 @@ class DataCube:
         except KeyError as error:
             raise KeyError(f"Layer {name!r} is not present") from error
 
+    def get_layer(
+        self,
+        name: str,
+        *,
+        modality: Modality | str | None = None,
+        geometry: GeometryType | str | None = None,
+    ) -> DataLayer:
+        """Return one layer and optionally enforce its semantic contract."""
+        try:
+            layer = self.layers[name]
+        except KeyError as error:
+            available = ", ".join(sorted(self.layers)) or "none"
+            raise KeyError(
+                f"Layer {name!r} is not present; available layers: {available}"
+            ) from error
+        if modality is not None and layer.modality != _label(modality):
+            raise ValueError(
+                f"Layer {name!r} has modality {layer.modality!r}, "
+                f"expected {_label(modality)!r}"
+            )
+        if geometry is not None and layer.geometry != _label(geometry):
+            raise ValueError(
+                f"Layer {name!r} has geometry {layer.geometry!r}, "
+                f"expected {_label(geometry)!r}"
+            )
+        return layer
+
     def has_modality(self, modality: Modality | str) -> bool:
         """Return whether at least one layer exists for *modality*."""
         expected = _label(modality)

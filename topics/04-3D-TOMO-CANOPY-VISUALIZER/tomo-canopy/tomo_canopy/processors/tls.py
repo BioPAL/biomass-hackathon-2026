@@ -9,6 +9,7 @@ import numpy as np
 import xarray as xr
 
 from tomo_canopy.providers import TLSProvider
+from tomo_canopy.transforms import points_to_voxels
 
 _GEOMETRY_DIMENSIONS = {
     "point_cloud": "point",
@@ -29,11 +30,11 @@ class TLSProcessor:
     provider: TLSProvider = field(default_factory=TLSProvider)
 
     def open(
-        self,
-        source: str | Path,
-        *,
-        crs: str | None = None,
-        load: bool = False,
+            self,
+            source: str | Path,
+            *,
+            crs: str | None = None,
+            load: bool = False,
     ) -> xr.Dataset:
         """Open and structurally validate a supported TLS source."""
         dataset = self.provider.open(source, crs=crs, load=load)
@@ -41,11 +42,11 @@ class TLSProcessor:
         return dataset
 
     def validate(
-        self,
-        dataset: xr.Dataset,
-        *,
-        require_crs: bool = False,
-        check_finite: bool = False,
+            self,
+            dataset: xr.Dataset,
+            *,
+            require_crs: bool = False,
+            check_finite: bool = False,
     ) -> None:
         """Validate the common TLS schema.
 
@@ -113,10 +114,10 @@ class TLSProcessor:
         return result
 
     def to_local_coordinates(
-        self,
-        dataset: xr.Dataset,
-        *,
-        origin: tuple[float, float, float] | None = None,
+            self,
+            dataset: xr.Dataset,
+            *,
+            origin: tuple[float, float, float] | None = None,
     ) -> xr.Dataset:
         """Translate spatial coordinates to a local origin.
 
@@ -153,12 +154,29 @@ class TLSProcessor:
         )
         return result
 
+    def voxelize(
+            self,
+            points: xr.DataArray | xr.Dataset,
+            voxel_size: float,
+            *,
+            crs: str | None = None,
+            bounds: xr.DataArray | None = None,
+            source: str | None = None,
+    ) -> xr.Dataset:
+        return points_to_voxels(
+            points,
+            voxel_size,
+            crs=crs,
+            bounds=bounds if bounds is not None else self.bounds(points),
+            source=source,
+        )
+
     def sample_vertices(
-        self,
-        dataset: xr.Dataset,
-        *,
-        count: int,
-        seed: int | None = 0,
+            self,
+            dataset: xr.Dataset,
+            *,
+            count: int,
+            seed: int | None = 0,
     ) -> xr.Dataset:
         """Select a reproducible subset of mesh vertices or point-cloud points.
 

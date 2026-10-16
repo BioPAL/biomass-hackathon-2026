@@ -274,7 +274,7 @@ tomo_canopy/
 ├── cubegen/         # Cube-generation workflows (planned)
 ├── methods/         # Shared algorithms (planned)
 ├── transforms/      # Resolution matching and regular-grid resampling
-└── visualisation/   # Rendering interfaces (planned)
+└── visualisation/   # Rendering interfaces
 ```
 
 ---
