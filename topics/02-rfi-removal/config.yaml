@@ -1,4 +1,14 @@
 paths:
+<<<<<<< HEAD
+  data: /home/amelis/projects/BIOMASS/biomass-hackathon-2026/topics/02-rfi-removal/rfi_data
+  output: /home/amelis/projects/BIOMASS/biomass-hackathon-2026/topics/02-rfi-removal/out
+  token_file: /home/amelis/projects/BIOMASS/token.txt 
+
+files:
+  rfi_products: products_rfi_asia.json   # inside paths.output
+  gdf: gdf_asia.parquet                  # inside paths.output
+=======
   data: /home/jovyan/biomass-hackathon-2026/topics/02-rfi-removal/rfi_data
   output: /home/jovyan/biomass-hackathon-2026/topics/02-rfi-removal/out
   token_file: /home/jovyan/Biomass_hackathon/token.txt 
+>>>>>>> origin/main

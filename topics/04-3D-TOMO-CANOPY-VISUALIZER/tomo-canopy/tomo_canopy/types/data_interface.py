@@ -17,7 +17,7 @@ class Modality(str, Enum):
     """Known observation modalities."""
 
     TLS = "tls"
-    ALS = "als"
+    LVIS = "lvis"
     GEDI = "gedi"
     TOMOGRAM = "tomogram"
     OTHER = "other"
@@ -29,6 +29,7 @@ class GeometryType(str, Enum):
     POINT_CLOUD = "point_cloud"
     TRIANGULAR_MESH = "triangular_mesh"
     TREE_SEGMENTS = "tree_segments"
+    FOOTPRINTS = "footprints"
     RASTER = "raster"
     VOLUME = "volume"
     WAVEFORM = "waveform"
@@ -45,8 +46,9 @@ def _label(value: str | Enum) -> str:
 class DataLayer:
     """A named, self-describing dataset from one observation modality.
 
-    A layer may still use its sensor-native geometry. Only layers registered in
-    a :class:`DataCube` must be aligned with that cube's common grid.
+    A layer may use sensor-native geometry or a rectilinear grid. Layers in a
+    :class:`DataCube` share a CRS, while only raster and volume layers must be
+    aligned with the cube's common grid.
     """
 
     name: str
@@ -133,10 +135,13 @@ class GridSpec:
 
 @dataclass
 class DataCube:
-    """Collection of zero or more layers aligned to one spatial grid.
+    """Collection of native and gridded layers in one spatial reference.
 
     Modalities are deliberately optional. A cube can contain TLS alone, any
-    other subset of sources, or initially no layers at all.
+    other subset of sources, or initially no layers at all. Raster and volume
+    layers must align with ``grid``; point clouds, meshes, tree segments, and
+    footprints and waveforms retain their native geometry and only need to
+    share its CRS.
     """
 
     grid: GridSpec
@@ -156,7 +161,7 @@ class DataCube:
             self.add_layer(layer)
 
     def add_layer(self, layer: DataLayer, *, replace: bool = False) -> None:
-        """Register a present modality layer after grid and CRS validation."""
+        """Register a layer after geometry-aware spatial validation."""
         if not isinstance(layer, DataLayer):
             raise TypeError("layer must be a DataLayer")
         if layer.name in self.layers and not replace:
@@ -167,8 +172,33 @@ class DataCube:
             raise ValueError(
                 f"Layer CRS {layer.crs!r} does not match grid CRS {self.grid.crs!r}"
             )
-        self.grid.validate_dataset(layer.data)
+        self._validate_geometry(layer)
         self.layers[layer.name] = layer
+
+    def _validate_geometry(self, layer: DataLayer) -> None:
+        geometry = layer.geometry
+        if geometry == GeometryType.RASTER.value:
+            _require_grid_axes(layer.data, ("x", "y"))
+            self.grid.validate_dataset(layer.data)
+        elif geometry == GeometryType.VOLUME.value:
+            _require_grid_axes(layer.data, ("x", "y", "z"))
+            self.grid.validate_dataset(layer.data)
+        elif geometry in {
+            GeometryType.POINT_CLOUD.value,
+            GeometryType.FOOTPRINTS.value,
+        }:
+            _validate_point_geometry(layer.data)
+        elif geometry == GeometryType.TRIANGULAR_MESH.value:
+            _validate_mesh_geometry(layer.data)
+        elif geometry == GeometryType.TREE_SEGMENTS.value:
+            _validate_shared_coordinates(layer.data, ("x", "y", "z"), "segment")
+        elif geometry == GeometryType.WAVEFORM.value:
+            _validate_point_geometry(layer.data)
+        else:
+            supported = ", ".join(member.value for member in GeometryType)
+            raise ValueError(
+                f"Unsupported layer geometry {geometry!r}; expected {supported}"
+            )
 
     def remove_layer(self, name: str) -> DataLayer:
         """Remove and return a layer."""
@@ -211,27 +241,107 @@ class DataCube:
     def to_xarray(self) -> xr.Dataset:
         """Combine available layers into one visualization-ready dataset.
 
-        Variables are prefixed with their layer name, avoiding collisions when
-        different modalities expose variables with the same name.
+        Variables are prefixed with their layer name. Native dimensions and
+        coordinates are prefixed as well, preventing their irregular ``x``,
+        ``y``, and ``z`` coordinates from colliding with the common grid axes.
         """
-        data_variables: dict[str, xr.DataArray] = {}
+        datasets: list[xr.Dataset] = [xr.Dataset(coords=self.grid.coordinates)]
         for layer_name, layer in self.layers.items():
-            for variable_name, variable in layer.data.data_vars.items():
-                output_name = f"{layer_name}__{variable_name}"
-                output = variable.copy(deep=False)
-                output.attrs = {
+            native_geometry = layer.geometry not in {
+                GeometryType.RASTER.value,
+                GeometryType.VOLUME.value,
+            }
+            rename: dict[str, str] = {
+                name: f"{layer_name}__{name}" for name in layer.data.data_vars
+            }
+            if native_geometry:
+                rename.update(
+                    {
+                        name: f"{layer_name}__{name}"
+                        for name in (*layer.data.dims, *layer.data.coords)
+                        if name not in rename
+                    }
+                )
+            else:
+                rename.update(
+                    {
+                        name: f"{layer_name}__{name}"
+                        for name in layer.data.dims
+                        if name not in {"x", "y", "z"} and name not in rename
+                    }
+                )
+
+            output = layer.data.rename(rename).copy(deep=False)
+            for variable in output.data_vars.values():
+                variable.attrs = {
                     **variable.attrs,
                     "layer": layer_name,
                     "modality": layer.modality,
                     "geometry": layer.geometry,
                 }
-                data_variables[output_name] = output
+            datasets.append(output)
 
-        return xr.Dataset(
-            data_vars=data_variables,
-            coords=self.grid.coordinates,
-            attrs={
-                "crs": self.grid.crs,
-                "modalities": sorted(self.modalities),
-            },
+        result = xr.merge(datasets, compat="no_conflicts", join="exact")
+        result.attrs = {
+            "crs": self.grid.crs,
+            "modalities": sorted(self.modalities),
+        }
+        return result
+
+
+def _require_grid_axes(dataset: xr.Dataset, axes: tuple[str, ...]) -> None:
+    missing = [axis for axis in axes if axis not in dataset.coords]
+    if missing:
+        names = ", ".join(missing)
+        raise ValueError(f"Gridded layer is missing coordinate(s): {names}")
+
+
+def _validate_shared_coordinates(
+    dataset: xr.Dataset,
+    coordinates: tuple[str, ...],
+    expected_dimension: str | None = None,
+) -> str:
+    missing = [name for name in coordinates if name not in dataset.coords]
+    if missing:
+        names = ", ".join(missing)
+        raise ValueError(f"Native layer is missing coordinate(s): {names}")
+
+    first = dataset.coords[coordinates[0]]
+    if first.ndim != 1 or first.size == 0:
+        raise ValueError("Native spatial coordinates must be non-empty and 1D")
+    dimension = first.dims[0]
+    if expected_dimension is not None and dimension != expected_dimension:
+        raise ValueError(
+            f"Native coordinates must use the {expected_dimension!r} dimension"
         )
+    for name in coordinates:
+        coordinate = dataset.coords[name]
+        if coordinate.dims != (dimension,):
+            raise ValueError(
+                f"Native coordinate {name!r} must use the ({dimension!r},) dimension"
+            )
+        if not np.issubdtype(coordinate.dtype, np.number):
+            raise ValueError(f"Native coordinate {name!r} must be numeric")
+    return dimension
+
+
+def _validate_point_geometry(dataset: xr.Dataset) -> None:
+    coordinates = ("x", "y", "z") if "z" in dataset.coords else ("x", "y")
+    _validate_shared_coordinates(dataset, coordinates)
+
+
+def _validate_mesh_geometry(dataset: xr.Dataset) -> None:
+    vertex_dimension = _validate_shared_coordinates(
+        dataset, ("x", "y", "z"), "vertex"
+    )
+    if "face_vertices" not in dataset:
+        raise ValueError("Triangular mesh is missing 'face_vertices'")
+    faces = dataset["face_vertices"]
+    if faces.dims != ("face", "corner"):
+        raise ValueError("'face_vertices' must use ('face', 'corner') dimensions")
+    if faces.sizes["corner"] != 3:
+        raise ValueError("Triangular meshes must contain three indices per face")
+    if not np.issubdtype(faces.dtype, np.integer):
+        raise ValueError("'face_vertices' must contain integer indices")
+    if dataset.sizes[vertex_dimension] == 0:
+        raise ValueError("Triangular mesh contains no vertices")
