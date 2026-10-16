@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+from matplotlib.colors import LinearSegmentedColormap
 
 
 @dataclass(frozen=True)
@@ -28,6 +30,15 @@ class Tomogram3DConfig:
     opacity_percentiles: tuple[float, float] = (10.0, 99.0)
 
 
+
+def _height_cmap() -> LinearSegmentedColormap:
+    return LinearSegmentedColormap.from_list("trees-like", ["#8b4513", "green"])
+
+
+def _energy_cmap() -> LinearSegmentedColormap:
+    return LinearSegmentedColormap.from_list("energy-like", ["white", "purple"])
+
+
 @dataclass(frozen=True)
 class InteractiveTomogramConfig:
     """Display and widget settings for the interactive TOM point viewer."""
@@ -46,8 +57,8 @@ class InteractiveTomogramConfig:
     point_size_range: tuple[float, float] = (1.0, 40.0)
     window_size: tuple[int, int] = (1100, 750)
     background: str = "#eeeeee"
-    height_cmap: str = "terrain"
-    energy_cmap: str = "magma"
+    height_cmap: LinearSegmentedColormap = field(default_factory=_height_cmap)
+    energy_cmap: LinearSegmentedColormap = field(default_factory=_energy_cmap)
     normalized_energy_clim: tuple[float, float] = (0.0, 1.0)
     ground_color: str = "tan"
     ground_opacity: float = 0.35

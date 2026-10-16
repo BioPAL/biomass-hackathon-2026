@@ -25,7 +25,7 @@ class TomographicPlotter(BasicPlotterApp):
 
     def __init__(self, data_getter_dict: dict[str, DataGetter], mode="voxel_as_bubbles"):
         self.mode = mode
-        self.modality = "TOMO"
+        self.modality = "TLS"
         self.voxel_res = 10.0
         self.data_getter_dict = data_getter_dict
         super().__init__()
