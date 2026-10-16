@@ -35,8 +35,13 @@ def all_model_sources(lat, lon, start, end):
             print("model", m, "failed:", str(e)[:60] + hint)
     return out
 
-ISMN_DIR_DEFAULT = "~/shared-buckets/3482590a-d411-4ac1-aebb-95a343d33b3a/ISMN"
-ISMN_GEOJSON_DEFAULT = ISMN_DIR_DEFAULT + "/ismn_locations.geojson"
+# ISMN station data are optional and not part of the repository (ISMN terms: no onward distribution of the original data).
+# Default = the team-11a copy in the MAAP shared bucket; another source (e.g. your own ISMN download) is set without code
+# changes via the environment variables SM_PIPELINE_ISMN_DIR / SM_PIPELINE_ISMN_GEOJSON or the --ismn-dir / --ismn options.
+# If the folder or a station file is missing, the runs continue with the model references (ERA5-Land, ERA5, ECMWF IFS).
+import os as _os
+ISMN_DIR_DEFAULT = _os.environ.get("SM_PIPELINE_ISMN_DIR", "~/shared-buckets/3482590a-d411-4ac1-aebb-95a343d33b3a/ISMN")
+ISMN_GEOJSON_DEFAULT = _os.environ.get("SM_PIPELINE_ISMN_GEOJSON", ISMN_DIR_DEFAULT.rstrip("/") + "/ismn_locations.geojson")
 # ISMN quality flags (ISMN documentation): G good; C01 SM<0, C02 SM>0.60, C03 SM>saturation; D01 soil T<0, D02 air T<0,
 # D03 GLDAS T<0, D04 snow, D05 spike, D06/D07 jumps, D08-D10 plateaus; M missing. For analysis use G only.
 SENSOR_RE = r"^(?P<instrument>.+?)_(?P<variable>soil_moisture|soil_temperature|air_temperature|precipitation|snow_depth|snow_water_equivalent|soil_suction|surface_temperature)_(?P<depth_from>-?\d+\.\d+)_(?P<depth_to>-?\d+\.\d+)$"

@@ -3,7 +3,7 @@
 Takes ~15 min on the first run (87 pages of 2000 items from the public MAAP catalogue); re-uses the parquet if present.
 Outputs: l1c_items_index.parquet, l1c_stack_index.csv, biomass_l1c_tiles_map.html, biomass_l1c_tiles_overview.png
 """
-import argparse, json, time, pathlib, sys
+import argparse, json, os, time, pathlib, sys
 import pandas as pd
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from sm_pipeline import catalog, plots, auxiliary
@@ -30,6 +30,8 @@ def stack_index(items, ismn_geojson=None):
     st = g.agg(n_acq=("pid", "count"), first_date=("dt", "first"), last_date=("dt", "last"), w=("w", "min"), s=("s", "min"), e=("e", "max"), n=("n", "max"), first_pid=("pid", "first"), orbit_state=("orbit_state", "first")).reset_index()
     prim = items[items["primary"] == True].groupby("stack")["dt"].first().str[:10]; st["primary_date"] = st["stack"].map(prim)
     st["stations_inside"] = ""
+    if ismn_geojson and not os.path.exists(os.path.expanduser(ismn_geojson)):
+        print(f"ISMN station list not found ({ismn_geojson}) -> stack index without stations"); ismn_geojson = None
     if ismn_geojson:   # bbox test first (cheap), exact footprint test only for the hits
         gj = json.load(open(ismn_geojson)); pts = [(f["properties"]["station"], f["properties"]["network"], *f["geometry"]["coordinates"][:2], f["properties"]["end"]) for f in gj["features"]]
         for i, r in st.iterrows():

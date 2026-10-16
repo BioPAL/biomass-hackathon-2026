@@ -2,7 +2,7 @@
 fixed colours per polarisation and per reference source (Okabe-Ito palette, safe for red-green colour-vision deficiency),
 acquisition dates as dark dotted lines, grid and zero lines darker and thicker than the matplotlib defaults (visible on
 projectors and in print), every figure carries the stack, the point and the processing notes in its title."""
-import json, pathlib, re, textwrap
+import json, os, pathlib, re, textwrap
 import numpy as np, pandas as pd
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -470,8 +470,8 @@ def global_tile_map(stack_index_csv, ismn_geojson, out_html, out_png=None, min_a
     m = folium.Map(location=[10, 20], zoom_start=2, tiles="OpenStreetMap")
     for _, r in st.iterrows():
         folium.Rectangle([[r.s, r.w], [r.n, r.e]], color="#0072B2", weight=0.5, fill=True, fill_opacity=0.06, tooltip=f"{r.stack} {str(r.first_date)[:10]}..{str(r.last_date)[:10]} n={r.n_acq}").add_to(m)
-    if ismn_geojson:
-        for f in json.load(open(ismn_geojson))["features"]:
+    if ismn_geojson and os.path.exists(os.path.expanduser(ismn_geojson)):
+        for f in json.load(open(os.path.expanduser(ismn_geojson)))["features"]:
             lo, la = f["geometry"]["coordinates"][:2]; folium.CircleMarker([la, lo], radius=2.5, color="#D55E00", fill=True, tooltip=f["properties"].get("station", "")).add_to(m)
     m.save(out_html)
     if out_png:

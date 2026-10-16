@@ -145,8 +145,14 @@ def reference_for_point(p, times, a, out):
     if not getattr(a, "no_s2", False): add_sentinel2(rec, times, out, 2 * a.half_m)
     rec["has_ismn"] = False
     f = reference.ismn_station_file(a.ismn_dir, rec["network"], rec["station"]) if (a.ismn_dir and rec["network"] != "user") else None
+    ser = None
     if f is not None:
-        ser = reference.ismn_series(f); rec["ismn_file"] = str(f)
+        try:
+            ser = reference.ismn_series(f)
+        except Exception as ex:
+            log(f"[3] {rec['station']}: ISMN file {pathlib.Path(f).name} not readable ({str(ex)[:60]}) -> models only")
+    if ser is not None:
+        rec["ismn_file"] = str(f)
         for lab, sr in ser.items():
             if lab.endswith("_allflags") or not lab.startswith(("soil_moisture", "soil_temperature", "air_temperature", "precipitation")): continue
             rec[f"ismn_{lab}"] = reference.at_overpass(sr, times).tolist()
@@ -155,8 +161,11 @@ def reference_for_point(p, times, a, out):
         pk = [k for k in ser if k.startswith("precipitation") and not k.endswith("_allflags")]
         if pk: rec["ismn_rain_between_mm"] = reference.rain_between(ser[pk[0]], times).tolist()
         log(f"[3] {rec['station']}: ISMN file {pathlib.Path(f).name}, depths {[k.replace('ismn_soil_moisture_', '') for k in sm_keys]}, usable {rec['has_ismn']}")
-    elif rec["network"] != "user":
-        log(f"[3] {rec['station']}: no ISMN file {rec['network']}+{rec['station']}.csv below {a.ismn_dir} -> models only")
+    elif f is None and rec["network"] not in ("user", "centre"):
+        if not (a.ismn_dir and os.path.isdir(os.path.expanduser(a.ismn_dir))):
+            log(f"[3] {rec['station']}: ISMN folder not found ({a.ismn_dir}; set SM_PIPELINE_ISMN_DIR or --ismn-dir) -> models only")
+        else:
+            log(f"[3] {rec['station']}: no ISMN file {rec['network']}+{rec['station']}.csv below {a.ismn_dir} -> models only")
     for m in rec["sm_sources"]:
         log(f"[3] {rec['station']} {m:10s} SM 0-7 cm at overpasses {np.round(rec.get(f'{m}_soil_moisture_0_to_7cm', []), 3).tolist()}")
     log(f"[3] {rec['station']}: slope {rec.get('aux_slope_mean_deg', np.nan):.1f} deg, land cover {rec.get('aux_landcover_pct')}")
