@@ -37,6 +37,44 @@ The package is under active development as part of the
 
 ---
 
+## Preview
+
+### TLS (Terrestrial Laser Scanning)
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="img/screen-tls-1%20Large.jpeg" alt="TLS raw point cloud">
+      <br><sub><b>Raw data</b><br>Point cloud</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="img/screen-tls-2%20Large.jpeg" alt="TLS voxels as cubes">
+      <br><sub><b>Voxels as cubes</b></sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="img/screen-tls-3%20Large.jpeg" alt="TLS voxels as spheres">
+      <br><sub><b>Voxels as spheres</b><br>Bubbles</sub>
+    </td>
+  </tr>
+</table>
+
+### TOMO (Tomography)
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="img/screen-tomo-1%20Large.jpeg" alt="TOMO screenshot">
+      <br><sub><b>Screenshot</b></sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="img/tomo.gif" alt="TOMO animation">
+      <br><sub><b>Animation</b></sub>
+    </td>
+  </tr>
+</table>
+
+---
+
 ## Installation
 
 The distribution name is `tomo-canopy`; the Python import name is
