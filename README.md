@@ -1,3 +1,9 @@
+<div align="center">
+
+[![Live contribution dashboard](dashboard/readme-banner-v2.png)](https://biopal.github.io/biomass-hackathon-2026/)
+
+</div>
+
 # BIOMASS MAAP Hackathon 2026
 
 Shared workspace for the **ESA Biomass MAAP Hackathon** (12 to 16 October 2026, ESOC, Darmstadt): project folders, notebooks and resources.
@@ -132,6 +138,10 @@ Work from a **fork** (one fork per person; you do not push directly to `main`):
 - Code useful to several teams → `resources/` (load / process / evaluate / plot)
 
 Details, naming conventions, and ground rules: [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Live contribution dashboard
+
+**[https://biopal.github.io/biomass-hackathon-2026/](https://biopal.github.io/biomass-hackathon-2026/)** — HTML board on GitHub Pages, refreshed on **issue close** and **PR merge**. Source: [`dashboard/`](dashboard/).
 
 ## Project board (Kanban)
 

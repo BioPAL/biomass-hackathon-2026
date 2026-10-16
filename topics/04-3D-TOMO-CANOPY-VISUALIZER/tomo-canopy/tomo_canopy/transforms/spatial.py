@@ -19,6 +19,40 @@ class CoordinateTransformer(Protocol):
     ) -> tuple[np.ndarray, np.ndarray]: ...
 
 
+def geographic_to_local_xy(
+    longitude: np.ndarray,
+    latitude: np.ndarray,
+    *,
+    origin: tuple[float, float] | None = None,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Convert a small lon/lat scene to approximate local metre offsets.
+
+    This equirectangular transform is intended for display-scale subsets, not
+    survey-grade georeferencing. ``origin`` is ``(longitude, latitude)`` and
+    defaults to the coordinate means.
+    """
+    longitude = np.asarray(longitude, dtype=float)
+    latitude = np.asarray(latitude, dtype=float)
+    if longitude.ndim != 1 or latitude.ndim != 1:
+        raise ValueError("longitude and latitude must be one-dimensional")
+    if not np.isfinite(longitude).all() or not np.isfinite(latitude).all():
+        raise ValueError("longitude and latitude must contain finite values")
+    if origin is None:
+        longitude_origin = float(longitude.mean())
+        latitude_origin = float(latitude.mean())
+    else:
+        if len(origin) != 2 or not np.isfinite(origin).all():
+            raise ValueError("origin must contain finite longitude and latitude")
+        longitude_origin, latitude_origin = map(float, origin)
+    x = (
+        (longitude - longitude_origin)
+        * 111_320.0
+        * np.cos(np.deg2rad(latitude_origin))
+    )
+    y = (latitude - latitude_origin) * 110_574.0
+    return x, y
+
+
 def reproject_points(
     dataset: xr.Dataset,
     *,

@@ -1,0 +1,12 @@
+# downloaded data and generated outputs: never committed (link, do not commit)
+/data
+/results
+*.parquet
+*.tif
+*.npz
+*.npy
+*.pptx
+.ipynb_checkpoints/
+__pycache__/
+.pytest_cache/
+.ruff_cache/

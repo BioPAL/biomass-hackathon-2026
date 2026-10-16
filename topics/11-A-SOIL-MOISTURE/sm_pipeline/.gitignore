@@ -1,0 +1,12 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+data/
+runs/
+*.npz
+*.nc
+*.log
+token.txt
+tile_screening_partial.csv
+dashboard.html
+qa/
