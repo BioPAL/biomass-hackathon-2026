@@ -23,6 +23,8 @@ import numpy as np, pandas as pd
 
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+from sm_pipeline import deps  # noqa: E402
+deps.ensure()                 # install missing packages (pip --user) before the modules that need them are imported
 from sm_pipeline import catalog, auxiliary, reference, io_l1c, observables, estimators, evaluate, plots  # noqa: E402
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)

@@ -11,6 +11,7 @@ the recovered HH/VV sensitivities match the simulated ones; the closure-phase fo
 a run with an empty ISMN folder falls back to tier 3 (model reference only).
     python tests/test_end_to_end_mock.py        (2-4 min)
 """
+import os; os.environ.setdefault("SM_PIPELINE_NO_INSTALL", "1")   # the test must not pip-install anything
 import sys, pathlib, json, re, tempfile
 import numpy as np, pandas as pd
 ROOT = pathlib.Path(__file__).resolve().parents[1]; sys.path.insert(0, str(ROOT))

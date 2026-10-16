@@ -307,4 +307,6 @@ if __name__ == "__main__":
     ap.add_argument("--index", default=str(HERE / "l1c_stack_index.csv")); ap.add_argument("--items", default=str(HERE / "l1c_items_index.parquet"))
     ap.add_argument("--landcover", default=str(HERE / "tile_landcover.csv")); ap.add_argument("--runs", default="~/data/runs", help="run root with all_tiles_summary.csv ('' = none)")
     ap.add_argument("--out", default="dashboard.html")
-    a = ap.parse_args(); build(a.index, a.items, a.landcover, a.runs or None, a.out)
+    a = ap.parse_args()
+    import sys; sys.path.insert(0, str(HERE)); from sm_pipeline import deps; deps.ensure(polsarpro=False)   # pyarrow, Pillow, ...
+    build(a.index, a.items, a.landcover, a.runs or None, a.out)

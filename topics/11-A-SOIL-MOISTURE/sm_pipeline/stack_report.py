@@ -159,4 +159,5 @@ def build(run):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2: sys.exit(__doc__)
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent)); from sm_pipeline import deps; deps.ensure(polsarpro=False)
     build(sys.argv[1])

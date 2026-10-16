@@ -39,6 +39,7 @@ done separately by the team.
     sm_pipeline/observables.py   multilook, coherence matrix, closure phases, PyPolSARpro wrapper, own H/alpha (fallback)
     sm_pipeline/estimators.py    Mironov / Hallikainen dielectric models, De Zan closure model, experimental inversion
     sm_pipeline/reference.py     Open-Meteo (IFS, ERA5, ERA5-Land) at the overpass hour, ISMN export reader
+    sm_pipeline/deps.py          checks the required packages and pip-installs missing ones (called by every entry point)
     sm_pipeline/auxiliary.py     stations in footprint, SMOS listing, SoilGrids, WorldCover + Copernicus DEM, Sentinel-2 NDVI / NDMI
                                  (Earth Search on AWS; Sentinel-1 RTC reader kept, not used)
     sm_pipeline/evaluate.py      slopes with t-CI, Pearson/Spearman, correlation of first differences, pair regression, closure check
@@ -56,13 +57,16 @@ done separately by the team.
     unzip -q ~/sm_pipeline_draft.zip -d ~                 # or from the repository: cp -r topics/11-A-SOIL-MOISTURE/sm_pipeline ~/sm_pipeline_draft
     cd ~/sm_pipeline_draft
     pip install --user -r requirements.txt                # --user survives a server restart, /opt/conda does not
+    # (optional: run_stack.py, run_batch.py, build_dashboard.py, stack_report.py and select_tile.ipynb check the packages
+    #  themselves and pip-install missing ones, incl. PyPolSARpro on Python >= 3.12; SM_PIPELINE_NO_INSTALL=1 switches this off)
     # PyPolSARpro (Apache-2.0, satim-co/PolSARpro): all polarimetric decompositions (without it: own H/alpha only); needs Python >= 3.12,
     # dask and xarray; check: python -c "import dask, xarray, polsarpro.decompositions"
     pip install --user --no-deps "git+https://github.com/satim-co/PolSARpro@bea8352fec10496f1a78d9b9992154006d8e0514"
     # offline token (90 days) from portal.maap.eo.esa.int -> services -> auth -> token -> one line in ~/token.txt
     # ISMN exports: ~/shared-buckets/<id>/ISMN/<network>+<station>.csv (+ ismn_locations.geojson); set the paths in the first notebook cell
 Outputs go to `~/data/runs/<stack>/` (option `--out`). The home folder is not shared and may not survive a server rebuild:
-at the end of the day `rsync -a ~/data/runs/ ~/my-private-bucket/data/runs/`.
+at the end of the day `mkdir -p ~/my-private-bucket/data/runs && cp -ru ~/data/runs/. ~/my-private-bucket/data/runs/`
+(MAAP has no rsync).
 
 ## Run
     # one stack, all stations inside the footprint (the stack centre if there is no station)

@@ -101,6 +101,8 @@ def aggregate(out_root):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); ap.add_argument("batch_csv", nargs="?"); ap.add_argument("--out", default="~/data/runs")
     ap.add_argument("--force", action="store_true"); ap.add_argument("--aggregate-only", action="store_true"); a = ap.parse_args()
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent)); from sm_pipeline import deps
+    if not a.aggregate_only: deps.ensure()        # once here, so that the run_stack.py calls find everything installed
     out_root = pathlib.Path(os.path.expanduser(a.out)); out_root.mkdir(parents=True, exist_ok=True)
     if not a.aggregate_only:
         b = pd.read_csv(a.batch_csv); logs = []

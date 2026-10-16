@@ -4,6 +4,7 @@ scipy
 matplotlib
 rasterio
 netCDF4
+xarray
 requests
 folium
 ipywidgets
