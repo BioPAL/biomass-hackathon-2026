@@ -2,9 +2,6 @@
 
 [![Live contribution dashboard](dashboard/readme-banner.png)](https://biopal.github.io/biomass-hackathon-2026/)
 
-**[Open the live board →](https://biopal.github.io/biomass-hackathon-2026/)**  
-issues closed · PRs merged · group races · refreshed when issues close or PRs merge
-
 </div>
 
 # BIOMASS MAAP Hackathon 2026
