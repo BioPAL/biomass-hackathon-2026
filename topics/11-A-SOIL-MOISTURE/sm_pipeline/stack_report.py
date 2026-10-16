@@ -130,7 +130,7 @@ def build(run):
     if len(rows):
         b.append("<section><h2>Key numbers per point</h2>" + table(rows[[c for c in KEY if c in rows]], cls) +
                  "<p class='note'>r_diff = correlation of first differences of sigma0 HH and the soil-moisture reference (green if p &lt; 0.05; 7 acquisitions = 6 differences need |r_diff| &ge; 0.81, 6 acquisitions need &ge; 0.88); "
-                 "green / red: reference range &ge; 0.05 m3/m3 with strong / weak response. Slope and land cover are information. Reading guide: INTERPRETATION_GUIDE.md.</p></section>")
+                 "green / red: reference range &ge; 0.05 m3/m3 with strong / weak response. Slope and land cover are information. Reading guide: docs/INTERPRETATION_GUIDE.md.</p></section>")
     if (run / "reference_sources.png").exists() and not any((run / r["station"] / "biomass_vs_reference.png").exists() for r in refs):  # reference-only run
         b.append(f"<section><h2>Reference data at the overpasses</h2><div class='fig'><img src='{img(run / 'reference_sources.png')}'></div></section>")
     for r in refs:

@@ -14,7 +14,7 @@ Optional: hourly ISMN file (long format: sensor, date_time, soil_moisture /
 precipitation columns with *_flag).
 
 Usage:
-  python overview_figure.py --runs ~/data/runs --station Kukuihaele \
+  python tools/overview_figure.py --runs ~/data/runs --station Kukuihaele \
       --stacks S2_T018_F137_G01_M03 S3_T018_F137_G01_M03 \
       --ismn ISMN/SCAN+Kukuihaele.csv --out overview_Kukuihaele.png
 """

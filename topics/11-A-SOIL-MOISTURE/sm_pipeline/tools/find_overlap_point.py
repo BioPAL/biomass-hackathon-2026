@@ -6,7 +6,7 @@ in A and, via the nearest node, in B. The margin of a node is the smaller of the
 no-data pixels although the LUT grid covers them, so choose a margin of a few km.
 
 Usage (on MAAP, from the package folder):
-  python find_overlap_point.py --runs ~/data/runs --stacks S1_T009_F118_G01_M04 S2_T009_F118_G01_M04 \
+  python tools/find_overlap_point.py --runs ~/data/runs --stacks S1_T009_F118_G01_M04 S2_T009_F118_G01_M04 \
       --lat 41.99651 --lon 70.63916 --name Maydantal
 """
 import argparse
