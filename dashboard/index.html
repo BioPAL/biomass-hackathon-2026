@@ -490,9 +490,11 @@
       return g;
     }
 
-    // Finish line: 16 Oct 2026 12:00 Europe/Berlin (CEST = UTC+2)
+    // Official end: 16 Oct 2026 12:00 Europe/Berlin (CEST = UTC+2)
+    // Race curves may run a bit past that line until 18:00, then freeze.
     const FINISH_AT = new Date("2026-10-16T12:00:00+02:00");
     const FINISH_HOUR = "2026-10-16T12";
+    const RACE_FREEZE_HOUR = "2026-10-16T18";
     const isFinished = () => Date.now() >= FINISH_AT.getTime();
 
     function chartHours(charts) {
@@ -528,11 +530,11 @@
       return hourIndex(hours, berlinHourKey());
     }
 
-    /** Curves / rockets never draw past the finish line after the hackathon ends. */
+    /** Curves / rockets stop at "now", but never past 18:00 on finish day. */
     function raceEndIndex(hours) {
-      const finishIdx = hourIndex(hours, FINISH_HOUR);
-      if (isFinished()) return finishIdx;
-      return Math.min(nowHourIndex(hours), finishIdx);
+      const freezeIdx = hourIndex(hours, RACE_FREEZE_HOUR);
+      if (Date.now() >= new Date("2026-10-16T18:00:00+02:00").getTime()) return freezeIdx;
+      return Math.min(nowHourIndex(hours), freezeIdx);
     }
 
     function applyFinishedChrome() {
@@ -546,11 +548,11 @@
       if (title) title.textContent = "Final contribution board";
       if (sub) {
         sub.textContent =
-          "Hackathon finished · final standings by group and contributor (frozen at 16 Oct 12:00 Europe/Berlin).";
+          "Hackathon finished · final standings by group and contributor (curves frozen at 16 Oct 18:00 Europe/Berlin).";
       }
       if (pulse) pulse.classList.remove("pulse");
-      if (pulseText) pulseText.textContent = "Final results · race frozen";
-      if (pick) pick.textContent = "Final standings · 13–16 Oct · frozen at End of hackathon";
+      if (pulseText) pulseText.textContent = "Final results · race frozen at 18:00";
+      if (pick) pick.textContent = "Final standings · 13–16 Oct · curves frozen at 18:00 (finish line 12:00)";
       if (raceH) raceH.textContent = "Contributor lines (final)";
       document.title = "BIOMASS Hackathon Final Board";
     }
@@ -585,7 +587,7 @@
         clock.textContent = "FINISHED";
         box.classList.add("is-done");
         if (label) label.textContent = "Status";
-        if (hint) hint.textContent = "Hackathon ended · 16 Oct 12:00 · Europe/Berlin · race frozen";
+        if (hint) hint.textContent = "Hackathon ended · 16 Oct 12:00 · curves frozen at 18:00 · Europe/Berlin";
         applyFinishedChrome();
         return;
       }
@@ -695,7 +697,7 @@
         }));
       });
 
-      // End of hackathon marker: 16 Oct 12:00 Berlin — rockets freeze here after finish
+      // Official end marker at 12:00; rockets may continue a bit until 18:00 then freeze
       const finishX = xAt(finishIdx);
       svg.appendChild(svgEl("line", {
         x1: finishX, y1: pad.t - 6, x2: finishX, y2: pad.t + ih,
@@ -705,11 +707,27 @@
         x: finishX + 5, y: pad.t + 9, fill: "#ff7e79", "font-size": "9",
         "font-family": "JetBrains Mono, monospace",
       });
-      finishLbl.textContent = isFinished() ? "Finish (frozen)" : "End of hackathon";
+      finishLbl.textContent = "End of hackathon";
       svg.appendChild(finishLbl);
 
-      // Subtle "now" tick only while the race is still running
-      if (!isFinished() && endCap < finishIdx) {
+      const freezeIdx = hourIndex(hours, RACE_FREEZE_HOUR);
+      if (freezeIdx > finishIdx) {
+        const freezeX = xAt(freezeIdx);
+        svg.appendChild(svgEl("line", {
+          x1: freezeX, y1: pad.t, x2: freezeX, y2: pad.t + ih,
+          stroke: "rgba(151,192,11,0.55)", "stroke-width": "1.2", "stroke-dasharray": "3 3",
+        }));
+        const freezeLbl = svgEl("text", {
+          x: freezeX + 4, y: pad.t + 22, fill: "#97c00b", "font-size": "8",
+          "font-family": "JetBrains Mono, monospace",
+        });
+        freezeLbl.textContent = isFinished() ? "Frozen 18:00" : "18:00 cap";
+        svg.appendChild(freezeLbl);
+      }
+
+      // Subtle "now" tick only while curves are still advancing
+      const raceFrozenAt = new Date("2026-10-16T18:00:00+02:00").getTime();
+      if (Date.now() < raceFrozenAt && endCap < freezeIdx) {
         const nowX = xAt(endCap);
         svg.appendChild(svgEl("line", {
           x1: nowX, y1: pad.t, x2: nowX, y2: pad.t + ih,
