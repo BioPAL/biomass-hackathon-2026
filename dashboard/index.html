@@ -333,10 +333,10 @@
 
     <header>
       <div class="eyebrow">ESA · BioPAL · ESOC 2026</div>
-      <h1>BIOMASS Hackathon<br /><span>Live contribution board</span></h1>
-      <p class="sub">Issues closed, PRs merged, and code churn by group, refreshed when an issue is closed or a PR is merged.</p>
+      <h1>BIOMASS Hackathon<br /><span id="board-title">Live contribution board</span></h1>
+      <p class="sub" id="board-sub">Issues closed, PRs merged, and code churn by group, refreshed when an issue is closed or a PR is merged.</p>
       <div class="meta">
-        <span class="pulse"><i></i> Auto-refresh on close / merge</span>
+        <span class="pulse" id="board-pulse"><i></i> <span id="board-pulse-text">Auto-refresh on close / merge</span></span>
         <span>Repo <strong id="repo">…</strong></span>
         <span>Updated <strong id="updated">…</strong></span>
       </div>
@@ -373,11 +373,11 @@
       </section>
     </div>
 
-    <div class="charts-pick">Hackathon window · 13–16 Oct · hourly (Europe/Berlin)</div>
+    <div class="charts-pick" id="charts-pick">Hackathon window · 13–16 Oct · hourly (Europe/Berlin)</div>
     <div class="countdown" id="finish-countdown" aria-live="polite">
-      <span class="cd-label">Countdown</span>
+      <span class="cd-label" id="cd-label">Countdown</span>
       <span class="cd-clock" id="countdown-clock">--:--:--</span>
-      <span class="cd-hint">End of hackathon · 16 Oct 12:00 · Europe/Berlin</span>
+      <span class="cd-hint" id="cd-hint">End of hackathon · 16 Oct 12:00 · Europe/Berlin</span>
     </div>
 
     <section class="panel chart-panel">
@@ -388,7 +388,7 @@
     </section>
 
     <section class="panel chart-panel">
-      <h2>Contributor lines race</h2>
+      <h2 id="race-heading">Contributor lines race</h2>
       <p class="sub" style="margin: -0.25rem 0 0.35rem; font-size: 0.78rem;">Hourly cumulative lines for the top writers (13–16 Oct).</p>
       <div class="chart-svg-wrap" id="chart-race"></div>
       <div class="race-labels" id="chart-race-legend"></div>
@@ -493,6 +493,7 @@
     // Finish line: 16 Oct 2026 12:00 Europe/Berlin (CEST = UTC+2)
     const FINISH_AT = new Date("2026-10-16T12:00:00+02:00");
     const FINISH_HOUR = "2026-10-16T12";
+    const isFinished = () => Date.now() >= FINISH_AT.getTime();
 
     function chartHours(charts) {
       return charts.hours || charts.days || [];
@@ -527,6 +528,33 @@
       return hourIndex(hours, berlinHourKey());
     }
 
+    /** Curves / rockets never draw past the finish line after the hackathon ends. */
+    function raceEndIndex(hours) {
+      const finishIdx = hourIndex(hours, FINISH_HOUR);
+      if (isFinished()) return finishIdx;
+      return Math.min(nowHourIndex(hours), finishIdx);
+    }
+
+    function applyFinishedChrome() {
+      if (!isFinished()) return;
+      const title = document.getElementById("board-title");
+      const sub = document.getElementById("board-sub");
+      const pulse = document.getElementById("board-pulse");
+      const pulseText = document.getElementById("board-pulse-text");
+      const pick = document.getElementById("charts-pick");
+      const raceH = document.getElementById("race-heading");
+      if (title) title.textContent = "Final contribution board";
+      if (sub) {
+        sub.textContent =
+          "Hackathon finished · final standings by group and contributor (frozen at 16 Oct 12:00 Europe/Berlin).";
+      }
+      if (pulse) pulse.classList.remove("pulse");
+      if (pulseText) pulseText.textContent = "Final results · race frozen";
+      if (pick) pick.textContent = "Final standings · 13–16 Oct · frozen at End of hackathon";
+      if (raceH) raceH.textContent = "Contributor lines (final)";
+      document.title = "BIOMASS Hackathon Final Board";
+    }
+
     function hourLabel(h) {
       const [datePart, hr] = h.split("T");
       const day = Number(datePart.split("-")[2]);
@@ -549,11 +577,16 @@
     function tickCountdown() {
       const box = document.getElementById("finish-countdown");
       const clock = document.getElementById("countdown-clock");
+      const label = document.getElementById("cd-label");
+      const hint = document.getElementById("cd-hint");
       if (!box || !clock) return;
       const left = FINISH_AT.getTime() - Date.now();
       if (left <= 0) {
         clock.textContent = "FINISHED";
         box.classList.add("is-done");
+        if (label) label.textContent = "Status";
+        if (hint) hint.textContent = "Hackathon ended · 16 Oct 12:00 · Europe/Berlin · race frozen";
+        applyFinishedChrome();
         return;
       }
       box.classList.remove("is-done");
@@ -651,8 +684,8 @@
       const n = Math.max(1, hours.length - 1);
       const xAt = (i) => pad.l + (iw * i) / n;
       const yAt = (v) => pad.t + ih * (1 - v / maxY);
-      const nowIdx = nowHourIndex(hours);
       const finishIdx = hourIndex(hours, FINISH_HOUR);
+      const endCap = raceEndIndex(hours);
 
       hours.forEach((h, i) => {
         if (!h.endsWith("T00")) return;
@@ -662,7 +695,7 @@
         }));
       });
 
-      // End of hackathon marker: 16 Oct 12:00 Berlin (curves stop at "now", not here)
+      // End of hackathon marker: 16 Oct 12:00 Berlin — rockets freeze here after finish
       const finishX = xAt(finishIdx);
       svg.appendChild(svgEl("line", {
         x1: finishX, y1: pad.t - 6, x2: finishX, y2: pad.t + ih,
@@ -672,12 +705,12 @@
         x: finishX + 5, y: pad.t + 9, fill: "#ff7e79", "font-size": "9",
         "font-family": "JetBrains Mono, monospace",
       });
-      finishLbl.textContent = "End of hackathon";
+      finishLbl.textContent = isFinished() ? "Finish (frozen)" : "End of hackathon";
       svg.appendChild(finishLbl);
 
-      // Subtle "now" tick so it's clear rockets stop at current hour
-      if (nowIdx < finishIdx) {
-        const nowX = xAt(nowIdx);
+      // Subtle "now" tick only while the race is still running
+      if (!isFinished() && endCap < finishIdx) {
+        const nowX = xAt(endCap);
         svg.appendChild(svgEl("line", {
           x1: nowX, y1: pad.t, x2: nowX, y2: pad.t + ih,
           stroke: "rgba(255,255,255,0.22)", "stroke-width": "1", "stroke-dasharray": "2 3",
@@ -687,8 +720,8 @@
       const drawables = [];
       const ordered = seriesList.slice().sort((a, b) => Number(!!a.star) - Number(!!b.star));
       ordered.forEach((s) => {
-        // Always stop curves at the current hour — never draw into the future
-        const endIdx = Math.max(0, Math.min(nowIdx, (s.vals.length || 1) - 1));
+        // Stop at current hour during the event; freeze at finish line afterward
+        const endIdx = Math.max(0, Math.min(endCap, (s.vals.length || 1) - 1));
         const pts = [];
         for (let i = 0; i <= endIdx; i++) {
           pts.push([xAt(i), yAt(s.vals[i] ?? 0)]);
@@ -748,7 +781,8 @@
       });
 
       host.appendChild(svg);
-      if (!launchedHosts.has(host)) {
+      // After the finish, show the final chart static (no ongoing race draw)
+      if (!isFinished() && !launchedHosts.has(host)) {
         requestAnimationFrame(() => {
           drawables.forEach(launchPath);
           launchedHosts.add(host);
@@ -941,10 +975,14 @@
         err.textContent = String(e.message || e);
       }
     }
+    applyFinishedChrome();
     load();
+    // Keep metrics refresh for late merges; race curves stay frozen at the finish line.
     setInterval(load, 60000);
     tickCountdown();
-    setInterval(tickCountdown, 1000);
+    if (!isFinished()) {
+      setInterval(tickCountdown, 1000);
+    }
   </script>
 </body>
 </html>
