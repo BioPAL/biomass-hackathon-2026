@@ -1,0 +1,31 @@
+name: tomosar
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - scipy
+  - pandas
+  - xarray
+  - netcdf4
+  - h5netcdf
+  - dask
+  - bottleneck
+  - rasterio
+  - pyproj
+  - gdal
+  - geopandas
+  - shapely
+  - fiona
+  - pystac-client
+  - requests
+  - aiohttp
+  - fsspec
+  - tqdm
+  - matplotlib
+  - ipympl
+  - folium
+  - pillow
+  - ipykernel
+  - jupyter
+  - polsarpro
